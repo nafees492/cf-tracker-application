@@ -1,5 +1,6 @@
 package com.example.cfprogresstracker.ui
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -26,6 +27,7 @@ import com.example.cfprogresstracker.ui.navigation.Screens
 import com.example.cfprogresstracker.ui.theme.CodeforcesProgressTrackerTheme
 import com.example.cfprogresstracker.viewmodel.MainViewModel
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Application(
