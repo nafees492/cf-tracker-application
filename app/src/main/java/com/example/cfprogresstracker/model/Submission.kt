@@ -10,4 +10,6 @@ data class Submission(
     val passedTestCount: Int,
     val timeConsumedMillis: Int,
     val memoryConsumedBytes: Int
-)
+) {
+    fun creationTimeInMillis() = creationTimeSeconds * 1000L
+}

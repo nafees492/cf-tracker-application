@@ -39,7 +39,7 @@ fun Toolbar(
     ) {
         when (toolbarController.toolbarStyle) {
             is ToolbarStyles.Small ->
-                SmallTopAppBar(
+                TopAppBar(
                     navigationIcon = navigationIcon,
                     title = {
                         Text(

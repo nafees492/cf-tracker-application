@@ -22,4 +22,7 @@ interface ApiService {
 
     @GET("problemset.problems")
     suspend fun getProblemSet(): ApiResultProblemSet
+
+    @GET("user.rating")
+    suspend fun getUserRatingChanges(@Query("handle") userHandle: String): ApiResult<UserRatingChanges>
 }

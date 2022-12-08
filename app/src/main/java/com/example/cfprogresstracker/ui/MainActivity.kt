@@ -8,6 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import com.example.cfprogresstracker.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.*
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -23,11 +24,18 @@ class MainActivity : ComponentActivity() {
             startActivity(intent).also { this.finish() }
         }
 
+
+
         setContent {
             Application(
+                mainViewModel = mainViewModel,
                 navigateToLoginActivity = navigateToLoginActivity,
-                mainViewModel = mainViewModel
             )
         }
     }
+
+    companion object {
+        const val TAG = "Main Activity"
+    }
+
 }

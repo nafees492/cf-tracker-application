@@ -1,5 +1,6 @@
 package com.example.cfprogresstracker.ui.components
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,7 +13,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun CircularIndeterminateProgressBar(isDisplayed: Boolean) {
-    if (isDisplayed) {
+    AnimatedVisibility(visible = isDisplayed) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()

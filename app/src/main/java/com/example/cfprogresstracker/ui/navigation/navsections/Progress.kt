@@ -1,9 +1,13 @@
 package com.example.cfprogresstracker.ui.navigation.navsections
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
@@ -15,17 +19,21 @@ import com.example.cfprogresstracker.model.Submission
 import com.example.cfprogresstracker.model.User
 import com.example.cfprogresstracker.retrofit.util.ApiState
 import com.example.cfprogresstracker.ui.components.CircularIndeterminateProgressBar
+import com.example.cfprogresstracker.ui.components.ProgressScreenActions
+import com.example.cfprogresstracker.ui.components.UserSubmissionsScreenActions
 import com.example.cfprogresstracker.ui.controllers.ToolbarController
 import com.example.cfprogresstracker.ui.navigation.Screens
 import com.example.cfprogresstracker.ui.screens.NetworkFailScreen
 import com.example.cfprogresstracker.ui.screens.ProgressScreen
 import com.example.cfprogresstracker.ui.screens.UserSubmissionScreen
+import com.example.cfprogresstracker.utils.UserSubmissionFilter
+import com.example.cfprogresstracker.utils.Verdict
 import com.example.cfprogresstracker.viewmodel.MainViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalAnimationApi::class)
 @SuppressLint("CoroutineCreationDuringComposition")
 fun NavGraphBuilder.progress(
     toolbarController: ToolbarController,
@@ -37,7 +45,7 @@ fun NavGraphBuilder.progress(
     toggleRequestedForUserInfoTo: (Boolean) -> Unit,
     requestedForUserSubmission: Boolean,
     toggleRequestedForUserSubmissionTo: (Boolean) -> Unit,
-    navigateToLoginActivity: () -> Unit
+    navigateToLoginActivity: () -> Unit,
 ) {
 
     composable(route = Screens.ProgressScreen.name) {
@@ -50,11 +58,28 @@ fun NavGraphBuilder.progress(
             }
         }
 
-        if (!requestedForUserInfo) {
-            toggleRequestedForUserInfoTo(true)
-            coroutineScope.launch(Dispatchers.IO) {
-                userPreferences.handleNameFlow.collect { userHandle ->
-                    mainViewModel.getUserInfo(userHandle!!)
+        toolbarController.actions = {
+            ProgressScreenActions(onClickLogOut = onClickLogoutBtn)
+        }
+
+        val requestForUserInfo: () -> Unit = {
+            if (!requestedForUserInfo) {
+                toggleRequestedForUserInfoTo(true)
+                coroutineScope.launch(Dispatchers.IO) {
+                    userPreferences.handleNameFlow.collect { userHandle ->
+                        mainViewModel.getUserInfo(userHandle!!)
+                    }
+                }
+            }
+        }
+
+        val requestForUserSubmission: () -> Unit = {
+            if (!requestedForUserSubmission) {
+                toggleRequestedForUserSubmissionTo(true)
+                coroutineScope.launch(Dispatchers.IO) {
+                    userPreferences.handleNameFlow.collect { userHandle ->
+                        mainViewModel.getUserSubmission(userHandle!!)
+                    }
                 }
             }
         }
@@ -71,11 +96,14 @@ fun NavGraphBuilder.progress(
             is ApiState.Success<*> -> {
                 if (apiResult.response.status == "OK") {
                     mainViewModel.user = apiResult.response.result?.get(0) as User
+
                     mainViewModel.user?.let {
                         ProgressScreen(
                             user = it,
                             goToSubmission = { navController.navigate(Screens.UserSubmissionsScreen.name) },
-                            onClickLogoutBtn = onClickLogoutBtn
+                            mainViewModel = mainViewModel,
+                            requestForUserSubmission = requestForUserSubmission,
+                            toggleRequestedForUserSubmissionTo = toggleRequestedForUserSubmissionTo
                         )
                     }
                 } else {
@@ -83,24 +111,47 @@ fun NavGraphBuilder.progress(
                 }
             }
             is ApiState.Failure -> {
-                NetworkFailScreen(onClickRetry = { toggleRequestedForUserInfoTo(false) })
+                NetworkFailScreen(
+                    onClickRetry = {
+                        toggleRequestedForUserInfoTo(false)
+                        requestForUserInfo()
+                    }
+                )
             }
-            is ApiState.Empty -> {}
+            is ApiState.Empty -> {
+                requestForUserInfo()
+            }
+            else -> {
+                // Nothing
+            }
         }
     }
-
-
 
     composable(Screens.UserSubmissionsScreen.name) {
         toolbarController.title = Screens.UserSubmissionsScreen.title
 
-        if (!requestedForUserSubmission) {
-            toggleRequestedForUserSubmissionTo(true)
-            coroutineScope.launch(Dispatchers.IO) {
-                userPreferences.handleNameFlow.collect { userHandle ->
-                    mainViewModel.getUserSubmission(userHandle!!)
+        var currentSelection by rememberSaveable {
+            mutableStateOf(UserSubmissionFilter.ALL)
+        }
+
+        val requestForUserSubmission: () -> Unit = {
+            if (!requestedForUserSubmission) {
+                toggleRequestedForUserSubmissionTo(true)
+                coroutineScope.launch(Dispatchers.IO) {
+                    userPreferences.handleNameFlow.collect { userHandle ->
+                        mainViewModel.getUserSubmission(userHandle!!)
+                    }
                 }
             }
+        }
+
+        toolbarController.actions = {
+            UserSubmissionsScreenActions(
+                currentSelectionForUserSubmissions = currentSelection,
+                onClickAll = { currentSelection = UserSubmissionFilter.ALL },
+                onClickCorrect = { currentSelection = UserSubmissionFilter.CORRECT },
+                onClickIncorrect = { currentSelection = UserSubmissionFilter.INCORRECT }
+            )
         }
 
         when (val apiResult = mainViewModel.responseForUserSubmissions) {
@@ -113,27 +164,72 @@ fun NavGraphBuilder.progress(
                 }
             }
             is ApiState.Success<*> -> {
-                mainViewModel.problemMapWithSubmissions.clear()
+                if(apiResult.response.status == "OK") {
+                    processSubmittedProblem(mainViewModel = mainViewModel, apiResult = apiResult)
 
-                val submissions = apiResult.response.result as List<Submission>
-                for (submission in submissions) {
-                    if (mainViewModel.problemMapWithSubmissions[submission.problem].isNullOrEmpty()) {
-                        mainViewModel.problemMapWithSubmissions[submission.problem] =
-                            mutableListOf(submission)
-                    } else {
-                        mainViewModel.problemMapWithSubmissions[submission.problem]?.add(submission)
-                    }
+                    UserSubmissionScreen(
+                        submittedProblemsWithSubmissions = when (currentSelection) {
+                            UserSubmissionFilter.ALL -> mainViewModel.submittedProblems
+                            UserSubmissionFilter.CORRECT -> mainViewModel.correctProblems
+                            else -> mainViewModel.incorrectProblems
+                        },
+                        contestListById = mainViewModel.contestListById
+                    )
+                } else {
+                    mainViewModel.responseForUserSubmissions = ApiState.Failure(Throwable())
                 }
-                val submittedProblem = remember { mutableListOf<Pair<Problem, List<Submission>>>() }
-                for (problem in mainViewModel.problemMapWithSubmissions) {
-                    submittedProblem.add(Pair(problem.key, problem.value))
-                }
-                UserSubmissionScreen(submittedProblems = submittedProblem)
             }
             is ApiState.Failure -> {
-                NetworkFailScreen(onClickRetry = { toggleRequestedForUserSubmissionTo(false) })
+                NetworkFailScreen(
+                    onClickRetry = {
+                        toggleRequestedForUserSubmissionTo(false)
+                        requestForUserSubmission()
+                    }
+                )
             }
-            is ApiState.Empty -> {}
+            is ApiState.Empty -> {
+                requestForUserSubmission()
+            }
+            else -> {
+                // Nothing
+            }
         }
     }
 }
+
+fun processSubmittedProblem(mainViewModel: MainViewModel, apiResult: ApiState.Success<*>){
+    mainViewModel.submittedProblems.clear()
+    mainViewModel.incorrectProblems.clear()
+    mainViewModel.correctProblems.clear()
+
+    val problemNameMapWithSubmissions =
+        mutableMapOf<String, ArrayList<Submission>>()
+    val problemNameMapWithProblem = mutableMapOf<String, Problem>()
+    val problemNameWithVerdictOK: MutableSet<String> = mutableSetOf()
+
+    val submissions: ArrayList<Submission> =
+        apiResult.response.result as ArrayList<Submission>
+
+    submissions.forEach {
+        if (it.verdict == Verdict.OK) problemNameWithVerdictOK.add(it.problem.name)
+        problemNameMapWithProblem[it.problem.name] = it.problem
+        if (problemNameMapWithSubmissions[it.problem.name].isNullOrEmpty()) {
+            problemNameMapWithSubmissions[it.problem.name] = arrayListOf(it)
+        } else {
+            problemNameMapWithSubmissions[it.problem.name]?.add(it)
+        }
+    }
+
+    problemNameWithVerdictOK.forEach {
+        problemNameMapWithProblem[it]?.hasVerdictOK = true
+    }
+
+    for (problem in problemNameMapWithProblem) {
+        Pair(problem.value, problemNameMapWithSubmissions[problem.key]!!).let {
+            mainViewModel.submittedProblems.add(it)
+            if (problem.value.hasVerdictOK) mainViewModel.correctProblems.add(it)
+            else mainViewModel.incorrectProblems.add(it)
+        }
+    }
+}
+

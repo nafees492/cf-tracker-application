@@ -14,9 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.OutlinedTextField
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -97,6 +95,9 @@ class LoginActivity : ComponentActivity() {
                     Toast.makeText(this, apiResult.msg.toString(), Toast.LENGTH_SHORT).show()
                     mainViewModel.responseForUserInfo = ApiState.Empty
                 }
+                else -> {
+                    // Nothing
+                }
             }
         } else {
             val intent = Intent(this, MainActivity::class.java)
@@ -104,7 +105,7 @@ class LoginActivity : ComponentActivity() {
         }
     }
 
-    @OptIn(ExperimentalComposeUiApi::class)
+    @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
     @Composable
     fun InputHandle(
         inputHandle: String,
@@ -112,16 +113,14 @@ class LoginActivity : ComponentActivity() {
     ) {
         val keyboardController = LocalSoftwareKeyboardController.current
         Column {
-            OutlinedTextField(
+            TextField(
                 value = inputHandle,
                 onValueChange = onValueChange,
-                label = { Text("Enter Codeforces Handle") },
+                label = { Text("Enter Your Codeforces Handle") },
                 maxLines = 1,
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Go,
-                ),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(
-                    onGo = {
+                    onDone = {
                         keyboardController?.hide()
                         mainViewModel.getUserInfo(inputHandle)
                     }

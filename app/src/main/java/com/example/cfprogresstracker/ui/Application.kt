@@ -4,16 +4,11 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.TopAppBarScrollBehavior
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
@@ -31,17 +26,19 @@ import com.example.cfprogresstracker.viewmodel.MainViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Application(
-    navigateToLoginActivity: () -> Unit,
-    mainViewModel: MainViewModel
+    mainViewModel: MainViewModel,
+    navigateToLoginActivity: () -> Unit
 ) {
     val navController = rememberNavController()
+
+    val topAppBarDefault = TopAppBarDefaults.pinnedScrollBehavior()
 
     val toolbarController = remember {
         object : ToolbarController {
             override var title: String by mutableStateOf(Screens.ContestsScreen.title)
 
-            override var scrollBehavior: TopAppBarScrollBehavior by mutableStateOf(
-                TopAppBarDefaults.pinnedScrollBehavior()
+            override var scrollBehavior: TopAppBarScrollBehavior  by mutableStateOf(
+                topAppBarDefault
             )
 
             override var toolbarStyle: ToolbarStyles by mutableStateOf(ToolbarStyles.Small)
@@ -95,13 +92,13 @@ fun Application(
             Scaffold(
                 topBar = topBar,
                 bottomBar = bottomNavBar,
-                modifier = Modifier.nestedScroll(nestedScrollConnection)
             ) {
                 NavigationHost(
                     toolbarController = toolbarController,
                     navController = navController,
-                    navigateToLoginActivity = navigateToLoginActivity,
-                    mainViewModel = mainViewModel
+                    mainViewModel = mainViewModel,
+                    paddingValues = it,
+                    navigateToLoginActivity = navigateToLoginActivity
                 )
             }
         }

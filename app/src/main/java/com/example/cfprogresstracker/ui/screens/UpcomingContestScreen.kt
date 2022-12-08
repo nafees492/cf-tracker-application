@@ -5,31 +5,27 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.cfprogresstracker.model.Contest
 import com.example.cfprogresstracker.ui.components.ContestInfoCard
-import com.example.cfprogresstracker.ui.components.NormalButton
-import com.example.cfprogresstracker.viewmodel.Phase
+import com.example.cfprogresstracker.utils.Phase
+import com.example.cfprogresstracker.utils.addEventToCalendar
 
 @Composable
-fun ContestsScreen(
+fun UpcomingContestScreen(
     contestLists: Map<String, List<Contest>>,
-    contestListBefore: Map<String, List<Contest>>,
-    toolBarScrollBehavior: TopAppBarScrollBehavior,
-    onClickFinishedContests: () -> Unit
+    contestListBefore: Map<String, List<Contest>>
 ) {
 
-    LazyColumn(
-        modifier = Modifier.nestedScroll(toolBarScrollBehavior.nestedScrollConnection)
-    ) {
+    val context = LocalContext.current
+
+    LazyColumn{
         contestLists[Phase.CODING]?.let { list ->
             item {
                 Text(
@@ -65,7 +61,18 @@ fun ContestsScreen(
                     )
                 }
                 items(count = list.size) {
-                    ContestInfoCard(contest = list[list.size - it - 1], true)
+                    val contest = list[list.size - it - 1]
+                    val onClickAddToCalender : () -> Unit = {
+                        addEventToCalendar(
+                            context = context,
+                            title = contest.name,
+                            startTime = contest.startTimeInMillis(),
+                            endTime = contest.endTimeInMillis(),
+                            location = contest.getContestLink(),
+                            description = ""
+                        )
+                    }
+                    ContestInfoCard(contest = contest, within3days = true, onClickAddToCalender = onClickAddToCalender)
                 }
                 item {
                     NoContestTag(list = list)
@@ -81,22 +88,23 @@ fun ContestsScreen(
                     )
                 }
                 items(count = list.size) {
-                    ContestInfoCard(contest = list[list.size - it - 1], false)
+                    val contest = list[list.size - it - 1]
+                    val onClickAddToCalender : () -> Unit = {
+                        addEventToCalendar(
+                            context = context,
+                            title = contest.name,
+                            startTime = contest.startTimeInMillis(),
+                            endTime = contest.endTimeInMillis(),
+                            location = contest.getContestLink(),
+                            description = ""
+                        )
+                    }
+                    ContestInfoCard(contest = contest, within3days = false, onClickAddToCalender = onClickAddToCalender)
                 }
                 item {
                     NoContestTag(list = list)
                 }
             }
-        }
-        item {
-            Divider(modifier = Modifier.padding(8.dp))
-            NormalButton(
-                text = "Finished Contests",
-                onClick = onClickFinishedContests,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-            )
         }
         item {
             Spacer(modifier = Modifier.height(120.dp))

@@ -25,4 +25,8 @@ class MainRepository @Inject constructor(private val apiService: ApiService) {
     fun getProblemSet(): Flow<ApiResultProblemSet> = flow {
         emit(apiService.getProblemSet())
     }.flowOn(Dispatchers.IO)
+
+    fun getUserRatingChanges(userHandle: String): Flow<ApiResult<UserRatingChanges>> = flow {
+        emit(apiService.getUserRatingChanges(userHandle))
+    }.flowOn(Dispatchers.IO)
 }

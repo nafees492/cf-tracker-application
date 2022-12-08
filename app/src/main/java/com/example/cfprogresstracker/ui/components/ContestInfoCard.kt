@@ -1,36 +1,36 @@
 package com.example.cfprogresstracker.ui.components
 
-import android.annotation.SuppressLint
 import android.os.CountDownTimer
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.contentColorFor
-import androidx.compose.material3.Divider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.cfprogresstracker.R
 import com.example.cfprogresstracker.model.Contest
-import com.example.cfprogresstracker.viewmodel.Phase
-import java.text.SimpleDateFormat
+import com.example.cfprogresstracker.utils.Phase
+import com.example.cfprogresstracker.utils.convertMillisToHMS
+import com.example.cfprogresstracker.utils.loadUrl
+import com.example.cfprogresstracker.utils.unixToDateAndTime
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ContestInfoCard(contest: Contest, within3days: Boolean? = null) {
+fun ContestInfoCard(contest: Contest, modifier: Modifier = Modifier, within3days: Boolean? = null, onClickAddToCalender: () -> Unit = {}) {
 
     val totalTimeInMillis =
-        contest.startTimeSeconds!!.toLong() * 1000 - System.currentTimeMillis()
+        contest.startTimeInMillis() - System.currentTimeMillis()
     var timeLeftInMillis by remember { mutableStateOf(totalTimeInMillis) }
     val onTick: (Long) -> Unit = { timeLeftInMillis = it }
     var isStarted by remember { mutableStateOf(false) }
@@ -41,14 +41,20 @@ fun ContestInfoCard(contest: Contest, within3days: Boolean? = null) {
 
     val bgColor =
         if (contest.phase == Phase.CODING) MaterialTheme.colorScheme.secondaryContainer
-        else if (contest.phase == Phase.FINISHED && contest.hasSubmissions) MaterialTheme.colorScheme.tertiaryContainer
+        else if (contest.phase == Phase.FINISHED && contest.isAttempted) MaterialTheme.colorScheme.tertiaryContainer
         else MaterialTheme.colorScheme.surface
 
+    val contestUrl = if(contest.phase == Phase.BEFORE) contest.getContestLink() else contest.getLink()
+    val context = LocalContext.current
+
     Card(
-        onClick = { /*TODO*/ },
-        modifier = Modifier
+        onClick = {
+            loadUrl(context = context, url =  contestUrl)
+        },
+        modifier = modifier
             .fillMaxWidth()
-            .padding(8.dp),
+            .padding(8.dp)
+            .animateContentSize(),
         shape = RoundedCornerShape(8.dp),
         elevation = 4.dp,
         backgroundColor = bgColor,
@@ -68,13 +74,14 @@ fun ContestInfoCard(contest: Contest, within3days: Boolean? = null) {
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
             )
             Text(
-                text = "Length: ${convertMillisToHMS(contest.durationSeconds * 1000L)}",
+                text = "Length: ${convertMillisToHMS(contest.durationInMillis())}",
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp),
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
             )
+            val startOrFinished = if(contest.phase == Phase.FINISHED) "Dated" else "Starts On"
             Text(
-                text = "Starts On: ${unixToDateAndTime(contest.startTimeSeconds.toLong())}",
+                text = "$startOrFinished: ${unixToDateAndTime(contest.startTimeInMillis())}",
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp),
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
@@ -94,7 +101,7 @@ fun ContestInfoCard(contest: Contest, within3days: Boolean? = null) {
                 }
             }
             if (contest.phase == Phase.FINISHED) {
-                val status = if (contest.hasSubmissions) "ATTEMPTED" else "UNATTEMPTED"
+                /*val status = if (contest.isAttempted) "ATTEMPTED" else "UNATTEMPTED"
                 Text(
                     text = "Status: $status",
                     fontSize = 18.sp,
@@ -103,7 +110,48 @@ fun ContestInfoCard(contest: Contest, within3days: Boolean? = null) {
                         .fillMaxWidth()
                         .padding(8.dp),
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f)
-                )
+                )*/
+
+                if(contest.isAttempted) {
+                    Text(
+                        text = "Rank: ${contest.rank}",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Light,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f)
+                    )
+                    val ratingChange = if (contest.ratingChange > 0) "+${contest.ratingChange}" else "${contest.ratingChange}"
+                    Text(
+                        text = "Rating Change: $ratingChange",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Light,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp, start = 8.dp, end = 8.dp),
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f)
+                    )
+                    Text(
+                        text = "New Rating: ${contest.newRating}",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Light,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp, start = 8.dp, end = 8.dp),
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f)
+                    )
+                }
+            }
+            if(contest.phase == Phase.BEFORE) {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                    IconButton(onClick = onClickAddToCalender) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_calendar_add_on_24px),
+                            contentDescription = "Add Event to Calender"
+                        )
+                    }
+                }
             }
         }
     }
@@ -118,29 +166,5 @@ class MyCountDownTimer(totalTimeInMillis: Long, val onTik: (Long) -> Unit) :
     override fun onFinish() {}
 }
 
-@SuppressLint("DefaultLocale")
-private fun convertMillisToHMS(timeInMilliSec: Long): String {
-    var millis = timeInMilliSec
-    val days = millis / (24 * 3600000)
-    millis %= (24 * 3600000)
-    val hms = java.lang.String.format(
-        "%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(millis),
-        TimeUnit.MILLISECONDS.toMinutes(millis) - TimeUnit.HOURS.toMinutes(
-            TimeUnit.MILLISECONDS.toHours(millis)
-        ),
-        TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(
-            TimeUnit.MILLISECONDS.toMinutes(millis)
-        )
-    )
-    return (when {
-        days > 1 -> "$days days"
-        days == 1L -> "$days day"
-        else -> ""
-    }) + (if (hms != "00:00:00") ", and $hms hrs" else "")
-}
 
-@SuppressLint("SimpleDateFormat")
-private fun unixToDateAndTime(timeStamp: Long): String {
-    val format = SimpleDateFormat("d MMM yyyy, EEE hh:mm a z")
-    return format.format(Date(timeStamp * 1000))
-}
+

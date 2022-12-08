@@ -12,10 +12,10 @@ import com.example.cfprogresstracker.model.Submission
 import com.example.cfprogresstracker.model.User
 import com.example.cfprogresstracker.retrofit.repository.MainRepository
 import com.example.cfprogresstracker.retrofit.util.ApiState
+import com.example.cfprogresstracker.utils.Phase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -31,7 +31,9 @@ class MainViewModel @Inject constructor(
     }
 
     var user by mutableStateOf<User?>(null)
+
     var responseForUserInfo by mutableStateOf<ApiState>(ApiState.Empty)
+
     fun getUserInfo(handle: String) {
         viewModelScope.launch {
             mainRepository.getUserInfo(handle = handle)
@@ -94,7 +96,11 @@ class MainViewModel @Inject constructor(
     }
 
     var responseForUserSubmissions by mutableStateOf<ApiState>(ApiState.Empty)
-    val problemMapWithSubmissions = mutableMapOf<Problem, MutableList<Submission>>()
+    val submittedProblems = arrayListOf<Pair<Problem, ArrayList<Submission>>>()
+    val correctProblems = arrayListOf<Pair<Problem, ArrayList<Submission>>>()
+    val incorrectProblems = arrayListOf<Pair<Problem, ArrayList<Submission>>>()
+
+
     fun getUserSubmission(userHandle: String) {
         viewModelScope.launch {
             mainRepository.getUserSubmissions(userHandle = userHandle)
@@ -105,6 +111,22 @@ class MainViewModel @Inject constructor(
                     Log.d(TAG, it.toString())
                 }.collect {
                     responseForUserSubmissions = ApiState.Success(it)
+                    Log.d(TAG, it.toString())
+                }
+        }
+    }
+
+    var responseForUserRatingChanges by mutableStateOf<ApiState>(ApiState.Empty)
+    fun getUserRatingChanges(handle: String){
+        viewModelScope.launch {
+            mainRepository.getUserRatingChanges(userHandle = handle)
+                .onStart {
+                    responseForUserRatingChanges = ApiState.Loading
+                }.catch {
+                    responseForUserRatingChanges = ApiState.Failure(it)
+                    Log.d(TAG, it.toString())
+                }.collect {
+                    responseForUserRatingChanges = ApiState.Success(it)
                     Log.d(TAG, it.toString())
                 }
         }

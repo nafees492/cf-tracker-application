@@ -1,8 +1,11 @@
 package com.example.cfprogresstracker.ui.navigation
 
 import android.annotation.SuppressLint
-import android.util.Log
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -12,27 +15,28 @@ import com.example.cfprogresstracker.ui.navigation.navsections.contests
 import com.example.cfprogresstracker.ui.navigation.navsections.problemSet
 import com.example.cfprogresstracker.ui.navigation.navsections.progress
 import com.example.cfprogresstracker.viewmodel.MainViewModel
+import com.google.accompanist.pager.ExperimentalPagerApi
 
+@OptIn(ExperimentalPagerApi::class)
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun NavigationHost(
     toolbarController: ToolbarController,
     navController: NavHostController,
-    navigateToLoginActivity: () -> Unit,
-    mainViewModel: MainViewModel
+    mainViewModel: MainViewModel,
+    paddingValues: PaddingValues,
+    navigateToLoginActivity: () -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
     val userPreferences = UserPreferences(LocalContext.current.applicationContext)
 
-    var requestedForUserInfo by remember { mutableStateOf(false) }
-    var requestedForUserSubmission by remember { mutableStateOf(false) }
-
-    Log.d("", requestedForUserInfo.toString())
-    Log.d("", requestedForUserSubmission.toString())
-
+    var requestedForUserInfo by rememberSaveable { mutableStateOf(false) }
+    var requestedForUserSubmission by rememberSaveable { mutableStateOf(false) }
+    var requestedForUserRatingChanges by rememberSaveable { mutableStateOf(false) }
 
     NavHost(
-        navController = navController, startDestination = Screens.ContestsScreen.name
+        navController = navController, startDestination = Screens.ContestsScreen.name,
+        modifier = Modifier.padding(top = paddingValues.calculateTopPadding())
     ) {
         val homeScreens = listOf(
             Screens.ContestsScreen.title,
@@ -49,8 +53,8 @@ fun NavigationHost(
             coroutineScope = coroutineScope,
             userPreferences = userPreferences,
             navController = navController,
-            requestedForUserSubmission = requestedForUserSubmission,
-            toggleRequestedForUserSubmissionTo = { requestedForUserSubmission = it }
+            requestedForUserRatingChanges = requestedForUserRatingChanges,
+            toggleRequestedForUserRatingChangesTo = { requestedForUserRatingChanges = it },
         )
 
         problemSet(
@@ -64,11 +68,11 @@ fun NavigationHost(
             mainViewModel = mainViewModel,
             userPreferences = userPreferences,
             navController = navController,
-            navigateToLoginActivity = navigateToLoginActivity,
             requestedForUserInfo = requestedForUserInfo,
             toggleRequestedForUserInfoTo = { requestedForUserInfo = it },
             requestedForUserSubmission = requestedForUserSubmission,
-            toggleRequestedForUserSubmissionTo = { requestedForUserSubmission = it }
+            toggleRequestedForUserSubmissionTo = { requestedForUserSubmission = it },
+            navigateToLoginActivity = navigateToLoginActivity,
         )
 
     }
