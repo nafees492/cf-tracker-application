@@ -53,17 +53,17 @@ fun RowScope.ContestScreenActions(
             )
             Divider()
             DropdownMenuItem(
-                text = { Text(FinishedContestFilter.ALL) },
-                onClick = onClickAll,
-                trailingIcon = {
-                    trailingIcon(currentSelectionForFinishedContests == FinishedContestFilter.ALL)
-                }
-            )
-            DropdownMenuItem(
                 text = { Text(FinishedContestFilter.GIVEN) },
                 onClick = onClickGiven,
                 trailingIcon = {
                     trailingIcon(currentSelectionForFinishedContests == FinishedContestFilter.GIVEN)
+                }
+            )
+            DropdownMenuItem(
+                text = { Text(FinishedContestFilter.ALL) },
+                onClick = onClickAll,
+                trailingIcon = {
+                    trailingIcon(currentSelectionForFinishedContests == FinishedContestFilter.ALL)
                 }
             )
         }

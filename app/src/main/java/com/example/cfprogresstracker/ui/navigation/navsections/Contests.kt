@@ -57,7 +57,7 @@ fun NavGraphBuilder.contests(
         val tabIndex = pagerState.currentPage
 
         var currentSelection by rememberSaveable {
-            mutableStateOf(FinishedContestFilter.ALL)
+            mutableStateOf(FinishedContestFilter.GIVEN)
         }
         toolbarController.actions = {
             ContestScreenActions(
@@ -187,14 +187,16 @@ fun NavGraphBuilder.contests(
                                                 }
                                             }
                                             is ApiState.Failure -> {
-                                                NormalButton(
-                                                    text = "Retry",
-                                                    onClick = {
-                                                        toggleRequestedForUserRatingChangesTo(false)
-                                                        requestForUserRatingChanges()
-                                                    },
-                                                    modifier = Modifier.padding(vertical = 8.dp)
-                                                )
+                                                Row(){
+                                                    NormalButton(
+                                                        text = "Retry",
+                                                        onClick = {
+                                                            toggleRequestedForUserRatingChangesTo(false)
+                                                            requestForUserRatingChanges()
+                                                        },
+                                                        modifier = Modifier.padding(vertical = 8.dp)
+                                                    )
+                                                }
                                             }
                                             is ApiState.Empty -> {
                                                 requestForUserRatingChanges()

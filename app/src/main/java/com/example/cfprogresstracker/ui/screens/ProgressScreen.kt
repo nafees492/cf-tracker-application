@@ -12,7 +12,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import com.example.cfprogresstracker.R
 import com.example.cfprogresstracker.model.User
 import com.example.cfprogresstracker.retrofit.util.ApiState
@@ -22,6 +21,11 @@ import com.example.cfprogresstracker.ui.components.NormalButton
 import com.example.cfprogresstracker.ui.navigation.navsections.processSubmittedProblem
 import com.example.cfprogresstracker.ui.theme.*
 import com.example.cfprogresstracker.viewmodel.MainViewModel
+import com.skydoves.landscapist.animation.circular.CircularRevealPlugin
+import com.skydoves.landscapist.components.rememberImageComponent
+import com.skydoves.landscapist.glide.GlideImage
+import com.skydoves.landscapist.placeholder.placeholder.PlaceholderPlugin
+import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
 
 @Composable
 fun ProgressScreen(
@@ -45,14 +49,31 @@ fun ProgressScreen(
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                AsyncImage(
-                    model = user.titlePhoto,
-                    contentDescription = null,
-                    modifier = Modifier.clip(RoundedCornerShape(8.dp))
+                GlideImage( // CoilImage, FrescoImage
+                    imageModel = { user.titlePhoto },
+                    modifier = Modifier
+                        .size(120.dp)
+                        .clip(RoundedCornerShape(8.dp)),
+                    component = rememberImageComponent {
+                        +CircularRevealPlugin(duration = 350)
+                        // shows a shimmering effect when loading an image.
+                        +ShimmerPlugin(
+                            baseColor = MaterialTheme.colorScheme.surface,
+                            highlightColor = MaterialTheme.colorScheme.onSurface
+                        )
+                        // Failure Image
+                        +PlaceholderPlugin.Failure(
+                            painterResource(
+                                id = R.drawable.broken_image_48px
+                            )
+                        )
+                    },
                 )
-                Column(modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth()) {
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth()
+                ) {
                     var fullName = ""
                     user.firstName?.let { fullName = fullName.plus("$it ") }
                     user.lastName?.let { fullName = fullName.plus(it) }
@@ -106,7 +127,7 @@ fun ProgressScreen(
                 .fillMaxSize()
                 .padding(bottom = 60.dp),
             contentAlignment = Alignment.Center
-        ){
+        ) {
             when (val apiResultForUserSubmission = mainViewModel.responseForUserSubmissions) {
                 is ApiState.Loading -> {
                     CircularIndeterminateProgressBar(isDisplayed = true)
@@ -119,7 +140,7 @@ fun ProgressScreen(
                         )
                         val questionCount: Array<Int> = Array(8) { 0 }
                         mainViewModel.correctProblems.forEach {
-                            when(it.first.rating){
+                            when (it.first.rating) {
                                 in 800..1199 -> questionCount[0]++
                                 in 1200..1399 -> questionCount[1]++
                                 in 1400..1599 -> questionCount[2]++
@@ -132,8 +153,8 @@ fun ProgressScreen(
                         questionCount[7] = mainViewModel.incorrectProblems.size
                         val heightsForBarGraph: Array<Int> = Array(8) { 0 }
                         val maxQuestionCount = questionCount.max()
-                        questionCount.forEachIndexed{ it, count ->
-                            heightsForBarGraph[it] = (count * 750) / maxQuestionCount
+                        questionCount.forEachIndexed { it, count ->
+                            heightsForBarGraph[it] = (count * 500) / maxQuestionCount
                         }
                         val colors = arrayOf(
                             NewbieGray,
