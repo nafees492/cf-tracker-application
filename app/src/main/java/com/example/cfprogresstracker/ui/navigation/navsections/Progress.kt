@@ -50,17 +50,7 @@ fun NavGraphBuilder.progress(
 
     composable(route = Screens.ProgressScreen.name) {
         toolbarController.title = Screens.ProgressScreen.title
-
-        val onClickLogoutBtn: () -> Unit = {
-            coroutineScope.launch {
-                userPreferences.setHandleName("")
-                navigateToLoginActivity()
-            }
-        }
-
-        toolbarController.actions = {
-            ProgressScreenActions(onClickLogOut = onClickLogoutBtn)
-        }
+        toolbarController.expandToolbar = false
 
         val requestForUserInfo: () -> Unit = {
             if (!requestedForUserInfo) {
@@ -82,6 +72,22 @@ fun NavGraphBuilder.progress(
                     }
                 }
             }
+        }
+
+        val onClickLogoutBtn: () -> Unit = {
+            coroutineScope.launch {
+                userPreferences.setHandleName("")
+                navigateToLoginActivity()
+            }
+        }
+
+        val onClickRefresh: () -> Unit = {
+            toggleRequestedForUserInfoTo(false)
+            requestForUserInfo()
+        }
+        toolbarController.actions = {
+            ProgressScreenActions(onClickLogOut = onClickLogoutBtn,
+            onClickRefresh = onClickRefresh)
         }
 
         when (val apiResult = mainViewModel.responseForUserInfo) {
@@ -129,6 +135,7 @@ fun NavGraphBuilder.progress(
 
     composable(Screens.UserSubmissionsScreen.name) {
         toolbarController.title = Screens.UserSubmissionsScreen.title
+        toolbarController.expandToolbar = false
 
         var currentSelection by rememberSaveable {
             mutableStateOf(UserSubmissionFilter.ALL)

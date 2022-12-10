@@ -4,24 +4,15 @@ import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.cfprogresstracker.R
 import com.example.cfprogresstracker.ui.navigation.Screens
-import kotlin.math.roundToInt
 
 sealed class BottomNavigationItem(val screen: Screens, val icon: Int) {
     object Contest :
@@ -38,9 +29,7 @@ sealed class BottomNavigationItem(val screen: Screens, val icon: Int) {
 @Composable
 fun BottomNavigationBar(
     navController: NavHostController,
-    currentScreen: String,
-    bottomBarHeight: Dp,
-    bottomBarOffsetHeightPx: Float,
+    currentScreen: String
 ) {
     var selectedItem by remember { mutableStateOf(0) }
     val items = remember {
@@ -64,16 +53,7 @@ fun BottomNavigationBar(
         enter = slideInVertically(initialOffsetY = { it }),
         exit = slideOutVertically(targetOffsetY = { it }),
     ) {
-        NavigationBar(
-            modifier = Modifier
-                .height(bottomBarHeight)
-                .offset { IntOffset(x = 0, y = -bottomBarOffsetHeightPx.roundToInt()) }
-                .graphicsLayer {
-                    shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
-                    clip = true
-                },
-            tonalElevation = 24.dp
-        ) {
+        NavigationBar {
             items.forEachIndexed { index, item ->
                 NavigationBarItem(
                     icon = {

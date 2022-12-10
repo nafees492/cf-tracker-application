@@ -1,12 +1,14 @@
 package com.example.cfprogresstracker.ui.screens
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Done
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,12 +23,16 @@ import com.example.cfprogresstracker.ui.components.ProblemCard
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun ProblemSetScreen(listOfProblem: List<Problem>, contestListById: MutableMap<Int, Contest>) {
+fun ProblemSetScreen(
+    listOfProblem: List<Problem>,
+    contestListById: MutableMap<Int, Contest>,
+    tagList: ArrayList<String>
+) {
     var selectedChips by rememberSaveable { mutableStateOf(emptySet<String>()) }
 
     val isSelected: (String) -> Boolean = { selectedChips.contains(it) }
 
-    var filteredList = if (selectedChips.isEmpty()) {
+    val filteredList = if (selectedChips.isEmpty()) {
         listOfProblem
     } else {
         val resultList = ArrayList<Problem>()
@@ -38,15 +44,46 @@ fun ProblemSetScreen(listOfProblem: List<Problem>, contestListById: MutableMap<I
         resultList
     }
 
-    var onClickFilterChip: (String) -> Unit = {
+    val onClickFilterChip: (String) -> Unit = {
         selectedChips = if (isSelected(it)) selectedChips.minus(it) else selectedChips.plus(it)
+    }
+
+    val trailingIcon: @Composable ((visible: Boolean) -> Unit) = {
+        AnimatedVisibility(visible = it) {
+            Icon(
+                imageVector = Icons.Rounded.Done,
+                contentDescription = ""
+            )
+        }
     }
 
     LazyColumn {
         item {
+            LazyRow(
+                modifier = Modifier
+                    .background(color = MaterialTheme.colorScheme.surface)
+                    .padding(horizontal = 4.dp)
+            ) {
+                items(tagList.size) {
+                    FilterChip(
+                        selected = isSelected(tagList[it]),
+                        onClick = { onClickFilterChip(tagList[it]) },
+                        label = { Text(text = tagList[it]) },
+                        trailingIcon = { trailingIcon(isSelected(tagList[it])) },
+                        modifier = Modifier.padding(horizontal = 4.dp)
+                    )
+                }
+            }
+            Divider()
+        }
+
+        item {
             if (filteredList.isEmpty()) {
                 Column(
-                    modifier = Modifier.height(120.dp).fillMaxWidth().animateItemPlacement(),
+                    modifier = Modifier
+                        .height(120.dp)
+                        .fillMaxWidth()
+                        .animateItemPlacement(),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -58,17 +95,6 @@ fun ProblemSetScreen(listOfProblem: List<Problem>, contestListById: MutableMap<I
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 }
-            }
-        }
-
-        item {
-            if(selectedChips.isNotEmpty()){
-                AssistChip(
-                    onClick = { selectedChips = emptySet() },
-                    label = { Text("Clear All") },
-                    enabled = true,
-                    modifier = Modifier.padding(8.dp).animateItemPlacement()
-                )
             }
         }
 

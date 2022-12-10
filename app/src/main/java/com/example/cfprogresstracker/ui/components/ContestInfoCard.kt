@@ -40,9 +40,10 @@ fun ContestInfoCard(contest: Contest, modifier: Modifier = Modifier, within3days
     }
 
     val bgColor =
-        if (contest.phase == Phase.CODING) MaterialTheme.colorScheme.secondaryContainer
-        else if (contest.phase == Phase.FINISHED && contest.isAttempted) MaterialTheme.colorScheme.tertiaryContainer
-        else MaterialTheme.colorScheme.surface
+        if (contest.phase == Phase.CODING) MaterialTheme.colorScheme.primaryContainer
+        else if (contest.phase == Phase.FINISHED && contest.isAttempted) MaterialTheme.colorScheme.secondaryContainer
+        else MaterialTheme.colorScheme.surfaceVariant
+
 
     val contestUrl = if(contest.phase == Phase.BEFORE) contest.getContestLink() else contest.getLink()
     val context = LocalContext.current
@@ -56,7 +57,7 @@ fun ContestInfoCard(contest: Contest, modifier: Modifier = Modifier, within3days
             .padding(8.dp)
             .animateContentSize(),
         shape = RoundedCornerShape(8.dp),
-        elevation = 4.dp,
+        elevation = 8.dp,
         backgroundColor = bgColor,
         contentColor = contentColorFor(backgroundColor = bgColor)
     ) {

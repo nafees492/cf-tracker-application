@@ -15,6 +15,7 @@ import com.example.cfprogresstracker.model.Problem
 import com.example.cfprogresstracker.retrofit.util.ApiState
 import com.example.cfprogresstracker.ui.components.CircularIndeterminateProgressBar
 import com.example.cfprogresstracker.ui.components.ProblemSetScreenActions
+import com.example.cfprogresstracker.ui.components.RatingRangeSlider
 import com.example.cfprogresstracker.ui.controllers.ToolbarController
 import com.example.cfprogresstracker.ui.navigation.Screens
 import com.example.cfprogresstracker.ui.screens.NetworkFailScreen
@@ -27,7 +28,7 @@ fun NavGraphBuilder.problemSet(
     toolbarController: ToolbarController,
     mainViewModel: MainViewModel,
 
-) {
+    ) {
 
     composable(route = Screens.ProblemSetScreen.name) {
         toolbarController.title = Screens.ProblemSetScreen.title
@@ -36,15 +37,38 @@ fun NavGraphBuilder.problemSet(
             mutableStateOf(ProblemSetFilter.ALL)
         }
 
-        val onClickFilters : ArrayList<() -> Unit> = ArrayList()
-        for(i in 0..27) onClickFilters.add { currentSelection = ProblemSetFilter.RATING[i] }
-        toolbarController.actions = {
-            ProblemSetScreenActions(
-                currentSelectionForProblemSet = currentSelection,
-                onClickAll = { currentSelection = ProblemSetFilter.ALL },
-                onClick = onClickFilters
+        val onClickFilterIcon: () -> Unit = {
+            toolbarController.expandToolbar = !toolbarController.expandToolbar
+        }
+
+        var startRatingValue by rememberSaveable {
+            mutableStateOf(800)
+        }
+        var endRatingValue by rememberSaveable {
+            mutableStateOf(3500)
+        }
+
+        toolbarController.expandedContent = {
+            RatingRangeSlider(
+                start = startRatingValue, end = endRatingValue,
+                updateStartAndEnd = { start, end ->
+                    startRatingValue = start
+                    endRatingValue = end
+                }
             )
         }
+
+        val onClickFilters: ArrayList<() -> Unit> = ArrayList()
+        for (i in 0..27) onClickFilters.add { currentSelection = ProblemSetFilter.RATING[i] }
+
+        toolbarController.actions = {
+            ProblemSetScreenActions(
+                onClickFilterIcon = onClickFilterIcon,
+                isToolbarExpanded = toolbarController.expandToolbar
+            )
+        }
+
+
 
         when (val apiResult = mainViewModel.responseForProblemSet) {
             is ApiState.Loading -> {
@@ -59,20 +83,28 @@ fun NavGraphBuilder.problemSet(
                 if (apiResult.response.status == "OK") {
                     val allProblems: ArrayList<Problem> =
                         apiResult.response.result!!.problems as ArrayList<Problem>
-                    val filteredProblemList =
-                        if (currentSelection == ProblemSetFilter.ALL) {
-                            allProblems
+
+                    val setOfTags = mutableSetOf<String>()
+                    allProblems.forEach { problem ->
+                        problem.tags?.forEach {
+                            setOfTags.add(it)
                         }
-                        else {
-                            val resultList = ArrayList<Problem>()
-                            allProblems.forEach {
-                                it.rating?.let { rating ->
-                                    if(rating == currentSelection.toInt()) resultList.add(it)
-                                }
-                            }
-                            resultList
+                    }
+                    mainViewModel.tagList.clear()
+                    mainViewModel.tagList.addAll(setOfTags)
+
+                    val filteredProblemList = arrayListOf<Problem>()
+                    allProblems.forEach {
+                        it.rating?.let { rating ->
+                            if (rating in startRatingValue..endRatingValue) filteredProblemList.add(it)
                         }
-                    ProblemSetScreen(listOfProblem = filteredProblemList, contestListById = mainViewModel.contestListById)
+                    }
+
+                    ProblemSetScreen(
+                        listOfProblem = filteredProblemList,
+                        contestListById = mainViewModel.contestListById,
+                        tagList = mainViewModel.tagList
+                    )
                 } else {
                     mainViewModel.responseForProblemSet = ApiState.Failure(Throwable())
                 }

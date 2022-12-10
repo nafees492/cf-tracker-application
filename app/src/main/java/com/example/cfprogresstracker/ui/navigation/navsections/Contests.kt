@@ -50,6 +50,7 @@ fun NavGraphBuilder.contests(
 
     composable(route = Screens.ContestsScreen.name) {
         toolbarController.title = Screens.ContestsScreen.title
+        toolbarController.expandToolbar = false
 
         val tabTitles =
             listOf(Screens.UpcomingContestsScreen.title, Screens.FinishedContestsScreen.title)

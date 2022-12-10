@@ -79,6 +79,8 @@ class MainViewModel @Inject constructor(
     }
 
     var responseForProblemSet by mutableStateOf<ApiState>(ApiState.Empty)
+    val tagList = arrayListOf<String>()
+
     fun getProblemSet() {
         viewModelScope.launch {
             delay(1000)
@@ -99,7 +101,6 @@ class MainViewModel @Inject constructor(
     val submittedProblems = arrayListOf<Pair<Problem, ArrayList<Submission>>>()
     val correctProblems = arrayListOf<Pair<Problem, ArrayList<Submission>>>()
     val incorrectProblems = arrayListOf<Pair<Problem, ArrayList<Submission>>>()
-
 
     fun getUserSubmission(userHandle: String) {
         viewModelScope.launch {

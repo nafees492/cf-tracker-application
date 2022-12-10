@@ -2,13 +2,15 @@ package com.example.cfprogresstracker.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.example.cfprogresstracker.ui.controllers.SearchWidgetState
 import com.example.cfprogresstracker.ui.controllers.ToolbarController
 import com.example.cfprogresstracker.ui.controllers.ToolbarStyles
 import com.example.cfprogresstracker.ui.navigation.Screens
@@ -77,12 +79,14 @@ fun Toolbar(
                 )
         }
 
-        when (val state = toolbarController.searchWidgetState) {
-            is SearchWidgetState.Closed -> {}
-            is SearchWidgetState.Opened -> SearchAppBar(
-                onSearchClicked = state.onSearchClicked,
-                onCloseClicked = state.onCloseClicked,
-            )
+        AnimatedVisibility(
+            visible = toolbarController.expandToolbar,
+            enter = fadeIn(),
+            exit = fadeOut(
+                animationSpec = tween(100)
+            ),
+        ) {
+            toolbarController.expandedContent()
         }
     }
 }

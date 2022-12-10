@@ -14,6 +14,7 @@ import com.example.cfprogresstracker.R
 @Composable
 fun RowScope.ProgressScreenActions(
     onClickLogOut: () -> Unit,
+    onClickRefresh: () -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -30,6 +31,16 @@ fun RowScope.ProgressScreenActions(
             expanded = expanded,
             onDismissRequest = { expanded = false },
         ) {
+            DropdownMenuItem(
+                text = { Text("Refresh") },
+                onClick = onClickRefresh,
+                trailingIcon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_refresh_24px),
+                        contentDescription = "Refresh",
+                    )
+                }
+            )
             DropdownMenuItem(
                 text = { Text("Log Out") },
                 onClick = onClickLogOut,

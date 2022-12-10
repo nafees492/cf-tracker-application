@@ -1,14 +1,16 @@
 package com.example.cfprogresstracker.ui.theme
 
+import android.os.Build
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 private val CFPTDarkColorScheme = darkColorScheme(
     primary = Blue30,
@@ -75,9 +77,21 @@ fun CodeforcesProgressTrackerTheme(
     content: @Composable () -> Unit
 ) {
 
+    val useDynamicColors = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+
     val myColorScheme = when {
+        useDynamicColors && isDarkTheme -> dynamicDarkColorScheme(LocalContext.current)
+        useDynamicColors && !isDarkTheme-> dynamicLightColorScheme(LocalContext.current)
         isDarkTheme -> CFPTDarkColorScheme
         else -> CFPTLightColorScheme
+    }
+
+    val systemUiController = rememberSystemUiController()
+    SideEffect {
+        systemUiController.setSystemBarsColor(
+            color = myColorScheme.surface,
+            darkIcons = !isDarkTheme
+        )
     }
 
     MaterialTheme(
@@ -91,4 +105,5 @@ fun CodeforcesProgressTrackerTheme(
             content = content
         )
     }
+
 }

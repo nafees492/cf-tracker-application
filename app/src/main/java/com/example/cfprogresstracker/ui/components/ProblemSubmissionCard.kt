@@ -46,8 +46,8 @@ fun SubmissionCard(
             .animateContentSize(),
         shape = RoundedCornerShape(8.dp),
         elevation = 4.dp,
-        backgroundColor =  MaterialTheme.colorScheme.surface,
-        contentColor = MaterialTheme.colorScheme.onSurface
+        backgroundColor =  MaterialTheme.colorScheme.surfaceVariant,
+        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
     ) {
         Column(modifier = Modifier.padding(4.dp)) {
             Text(

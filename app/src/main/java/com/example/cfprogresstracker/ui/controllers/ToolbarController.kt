@@ -11,7 +11,8 @@ interface ToolbarController {
     var scrollBehavior: TopAppBarScrollBehavior
     var toolbarStyle: ToolbarStyles
     var onClickNavUp: () -> Unit
-    var searchWidgetState: SearchWidgetState
+    var expandToolbar: Boolean
+    var expandedContent: @Composable () -> Unit
     var actions: @Composable RowScope.() -> Unit
     fun clearActions()
 }
