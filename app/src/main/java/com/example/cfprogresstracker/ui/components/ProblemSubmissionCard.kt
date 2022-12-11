@@ -2,13 +2,13 @@ package com.example.cfprogresstracker.ui.components
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,11 +20,13 @@ import androidx.compose.ui.unit.sp
 import com.example.cfprogresstracker.model.Contest
 import com.example.cfprogresstracker.model.Problem
 import com.example.cfprogresstracker.model.Submission
+import com.example.cfprogresstracker.ui.theme.CorrectGreen
+import com.example.cfprogresstracker.ui.theme.IncorrectRed
 import com.example.cfprogresstracker.utils.Verdict
 import com.example.cfprogresstracker.utils.loadUrl
 import com.example.cfprogresstracker.utils.unixToDateAndTime
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SubmissionCard(
     problem: Problem,
@@ -52,7 +54,7 @@ fun SubmissionCard(
         Column(modifier = Modifier.padding(4.dp)) {
             Text(
                 text = "${problem.index}. ${problem.name}",
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp),
                 modifier = Modifier
                     .padding(top = 8.dp, start = 8.dp, end = 8.dp, bottom = 4.dp)
             )
@@ -63,8 +65,7 @@ fun SubmissionCard(
             problem.contestId?.let {
                 Text(
                     text = "Contest: ${contestListById[it]?.name}",
-                    fontWeight = FontWeight.Light,
-                    fontSize = 14.sp,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                 )
@@ -72,34 +73,38 @@ fun SubmissionCard(
 
             Text(
                 text = "Last Submission: ${unixToDateAndTime(submissions[0].creationTimeInMillis())}",
-                fontSize = 14.sp,
+                style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Light,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                modifier = Modifier.padding(start = 8.dp, end = 8.dp, bottom = 4.dp)
             )
 
             val status = if(problem.hasVerdictOK) Verdict.OK else submissions[0].verdict
+            val statusColor = if (problem.hasVerdictOK) CorrectGreen else IncorrectRed
 
-            Text(
-                text = "Status: $status",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Light,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f),
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-            )
-
+            Row(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)){
+                Text(
+                    text = "Status: ",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                Text(
+                    text = "$status",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = statusColor,
+                )
+            }
             Text(
                 text = "Submissions: ${submissions.size}",
                 fontWeight = FontWeight.Light,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f),
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(start = 8.dp, end = 8.dp, bottom = 4.dp)
             )
 
             problem.rating?.let {
                 Text(
-                    text = "Rating: ${problem.rating}",
-                    fontWeight = FontWeight.Light,
-                    fontSize = 18.sp,
+                    text = "Rating: $it",
+                    style = MaterialTheme.typography.titleMedium.copy(fontSize = 18.sp),
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.padding(8.dp)
                 )

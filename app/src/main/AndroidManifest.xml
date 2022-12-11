@@ -17,16 +17,31 @@
             android:name=".ui.LoginActivity"
             android:exported="true"
             android:theme="@style/Theme.CodeforcesProgressTracker">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
         <activity
             android:name=".ui.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.CodeforcesProgressTracker.NoActionBar" />
+
+        <activity
+            android:name=".ui.SettingsActivity"
+            android:exported="true"
+            android:theme="@style/Theme.CodeforcesProgressTracker.NoActionBar">
+
+            <!-- For Email -->
+            <intent-filter>
+                <action android:name="android.intent.action.SENDTO" />
+                <data android:scheme="mailto"/>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+        </activity>
     </application>
 
 </manifest>

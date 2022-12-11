@@ -49,3 +49,6 @@ val ExpertBlue = Color(0xff0000ff)
 val CandidMasterViolet = Color(0xffaa00aa)
 val MasterOrange = Color(0xffffa500)
 val GrandmasterRed = Color(0xffff0000)
+
+val CorrectGreen = Color(0xff008000)
+val IncorrectRed = Color(0xffc00000)

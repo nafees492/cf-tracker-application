@@ -1,7 +1,5 @@
 package com.example.cfprogresstracker.ui.components
 
-import android.graphics.Color.BLACK
-import android.graphics.Color.WHITE
 import android.graphics.Point
 import android.graphics.Typeface
 import androidx.compose.animation.core.FloatTweenSpec
@@ -9,7 +7,6 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -23,6 +20,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -55,7 +53,7 @@ fun BarGraph(heights: Array<Int>, colors: Array<Color>, questionCount: Array<Int
     }
 
     val context = LocalContext.current
-    val isDark = isSystemInDarkTheme()
+    val textColor = MaterialTheme.colorScheme.onSurface.toArgb()
 
     var begin by remember { mutableStateOf(false) }
 
@@ -74,8 +72,7 @@ fun BarGraph(heights: Array<Int>, colors: Array<Color>, questionCount: Array<Int
     val textPaint: (size: Float, alignment: Paint1.Align) -> Paint1 = { size, alignment ->
         Paint1().apply {
             textSize = size
-            color =
-                if (isDark) WHITE else BLACK
+            color = textColor
             typeface = Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL)
             textAlign = alignment
         }

@@ -6,6 +6,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
+import com.example.cfprogresstracker.data.UserPreferences
+import com.example.cfprogresstracker.ui.theme.AppTheme
+import com.example.cfprogresstracker.ui.theme.CodeforcesProgressTrackerTheme
 import com.example.cfprogresstracker.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
@@ -14,6 +20,7 @@ import java.util.*
 class MainActivity : ComponentActivity() {
 
     private val mainViewModel: MainViewModel by viewModels()
+    private lateinit var userPreferences: UserPreferences
 
     @SuppressLint("CoroutineCreationDuringComposition")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,13 +31,25 @@ class MainActivity : ComponentActivity() {
             startActivity(intent).also { this.finish() }
         }
 
+        val navigateToSettingsActivity: () -> Unit = {
+            val intent = Intent(this, SettingsActivity::class.java)
+            startActivity(intent)
+        }
+
 
 
         setContent {
-            Application(
-                mainViewModel = mainViewModel,
-                navigateToLoginActivity = navigateToLoginActivity,
-            )
+            userPreferences = UserPreferences(LocalContext.current.applicationContext)
+
+            val currentTheme by userPreferences.currentThemeFlow.collectAsState(initial = AppTheme.SystemDefault.name)
+
+            CodeforcesProgressTrackerTheme (currentTheme = currentTheme!!) {
+                Application(
+                    mainViewModel = mainViewModel,
+                    navigateToLoginActivity = navigateToLoginActivity,
+                    navigateToSettingsActivity = navigateToSettingsActivity
+                )
+            }
         }
     }
 

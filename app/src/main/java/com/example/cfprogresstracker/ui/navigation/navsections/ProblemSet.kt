@@ -20,7 +20,6 @@ import com.example.cfprogresstracker.ui.controllers.ToolbarController
 import com.example.cfprogresstracker.ui.navigation.Screens
 import com.example.cfprogresstracker.ui.screens.NetworkFailScreen
 import com.example.cfprogresstracker.ui.screens.ProblemSetScreen
-import com.example.cfprogresstracker.utils.ProblemSetFilter
 import com.example.cfprogresstracker.viewmodel.MainViewModel
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -32,10 +31,6 @@ fun NavGraphBuilder.problemSet(
 
     composable(route = Screens.ProblemSetScreen.name) {
         toolbarController.title = Screens.ProblemSetScreen.title
-
-        var currentSelection by rememberSaveable {
-            mutableStateOf(ProblemSetFilter.ALL)
-        }
 
         val onClickFilterIcon: () -> Unit = {
             toolbarController.expandToolbar = !toolbarController.expandToolbar
@@ -58,13 +53,11 @@ fun NavGraphBuilder.problemSet(
             )
         }
 
-        val onClickFilters: ArrayList<() -> Unit> = ArrayList()
-        for (i in 0..27) onClickFilters.add { currentSelection = ProblemSetFilter.RATING[i] }
-
         toolbarController.actions = {
             ProblemSetScreenActions(
                 onClickFilterIcon = onClickFilterIcon,
-                isToolbarExpanded = toolbarController.expandToolbar
+                isToolbarExpanded = toolbarController.expandToolbar,
+                ratingRange = startRatingValue..endRatingValue
             )
         }
 

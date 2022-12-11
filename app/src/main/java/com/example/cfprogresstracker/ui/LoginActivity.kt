@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.OutlinedTextField
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -25,6 +24,7 @@ import androidx.compose.ui.text.input.ImeAction
 import com.example.cfprogresstracker.data.UserPreferences
 import com.example.cfprogresstracker.retrofit.util.ApiState
 import com.example.cfprogresstracker.ui.components.CircularIndeterminateProgressBar
+import com.example.cfprogresstracker.ui.theme.AppTheme
 import com.example.cfprogresstracker.ui.theme.CodeforcesProgressTrackerTheme
 import com.example.cfprogresstracker.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -46,7 +46,9 @@ class LoginActivity : ComponentActivity() {
             coroutineScope = rememberCoroutineScope()
             userPreferences = UserPreferences(LocalContext.current.applicationContext)
 
-            CodeforcesProgressTrackerTheme {
+            val currentTheme by userPreferences.currentThemeFlow.collectAsState(initial = AppTheme.SystemDefault.name)
+
+            CodeforcesProgressTrackerTheme (currentTheme = currentTheme!!) {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     color = MaterialTheme.colorScheme.background

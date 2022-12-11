@@ -46,21 +46,30 @@ fun RowScope.UserSubmissionsScreenActions(
         ) {
             DropdownMenuItem(
                 text = { Text(UserSubmissionFilter.ALL) },
-                onClick = onClickAll,
+                onClick = {
+                    onClickAll()
+                    expanded = false
+                },
                 trailingIcon = {
                     trailingIcon(currentSelectionForUserSubmissions == UserSubmissionFilter.ALL)
                 }
             )
             DropdownMenuItem(
                 text = { Text(UserSubmissionFilter.CORRECT) },
-                onClick = onClickCorrect,
+                onClick = {
+                    onClickCorrect()
+                    expanded = false
+                },
                 trailingIcon = {
                     trailingIcon(currentSelectionForUserSubmissions == UserSubmissionFilter.CORRECT)
                 }
             )
             DropdownMenuItem(
                 text = { Text(UserSubmissionFilter.INCORRECT) },
-                onClick = onClickIncorrect,
+                onClick = {
+                    onClickIncorrect()
+                    expanded = false
+                },
                 trailingIcon = {
                     trailingIcon(currentSelectionForUserSubmissions == UserSubmissionFilter.INCORRECT)
                 }

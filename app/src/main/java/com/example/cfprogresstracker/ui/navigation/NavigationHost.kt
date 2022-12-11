@@ -25,7 +25,9 @@ fun NavigationHost(
     navController: NavHostController,
     mainViewModel: MainViewModel,
     paddingValues: PaddingValues,
-    navigateToLoginActivity: () -> Unit
+    navigateToLoginActivity: () -> Unit,
+    navigateToSettingsActivity: () -> Unit,
+
 ) {
     val coroutineScope = rememberCoroutineScope()
     val userPreferences = UserPreferences(LocalContext.current.applicationContext)
@@ -73,6 +75,7 @@ fun NavigationHost(
             requestedForUserSubmission = requestedForUserSubmission,
             toggleRequestedForUserSubmissionTo = { requestedForUserSubmission = it },
             navigateToLoginActivity = navigateToLoginActivity,
+            navigateToSettingsActivity = navigateToSettingsActivity
         )
 
     }

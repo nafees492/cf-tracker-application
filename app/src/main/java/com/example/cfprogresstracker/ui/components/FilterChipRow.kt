@@ -2,7 +2,6 @@ package com.example.cfprogresstracker.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Done
 import androidx.compose.material3.*
@@ -30,11 +29,8 @@ fun FilterChipRow(
     }
 
     FlowRow(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        crossAxisSpacing = 8.dp,
-        mainAxisSpacing = 8.dp
+        modifier = Modifier.fillMaxWidth(),
+        mainAxisSpacing = 4.dp
     ) {
         chipList.forEach {
             FilterChip(

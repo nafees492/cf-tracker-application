@@ -43,6 +43,7 @@ fun UpcomingContestScreen(
             item {
                 Text(
                     text = "Current Contests",
+                    style = MaterialTheme.typography.labelLarge,
                     modifier = Modifier.padding(8.dp),
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f)
                 )
@@ -60,6 +61,7 @@ fun UpcomingContestScreen(
             item {
                 Text(
                     text = "Upcoming Contests",
+                    style = MaterialTheme.typography.labelLarge,
                     modifier = Modifier.padding(8.dp),
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f)
                 )
@@ -69,6 +71,7 @@ fun UpcomingContestScreen(
                 item {
                     Text(
                         text = "Next 3 Days",
+                        style = MaterialTheme.typography.labelLarge,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                     )
@@ -106,6 +109,7 @@ fun UpcomingContestScreen(
                     ) {
                         Text(
                             text = "After that",
+                            style = MaterialTheme.typography.labelLarge,
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                         )
@@ -155,8 +159,7 @@ fun NoContestTag(list: List<Contest>) {
             text = "No Contest",
             style = MaterialTheme.typography.titleLarge,
             textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = Modifier.fillMaxWidth()
                 .padding(16.dp),
         )
     }

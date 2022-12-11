@@ -47,21 +47,27 @@ fun RowScope.ContestScreenActions(
         ) {
             Text(
                 text = "Finished Contests",
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                 modifier = Modifier.padding(8.dp)
             )
             Divider()
             DropdownMenuItem(
                 text = { Text(FinishedContestFilter.GIVEN) },
-                onClick = onClickGiven,
+                onClick = {
+                    onClickGiven()
+                    expanded = false
+                },
                 trailingIcon = {
                     trailingIcon(currentSelectionForFinishedContests == FinishedContestFilter.GIVEN)
                 }
             )
             DropdownMenuItem(
                 text = { Text(FinishedContestFilter.ALL) },
-                onClick = onClickAll,
+                onClick = {
+                    onClickAll()
+                    expanded = false
+                },
                 trailingIcon = {
                     trailingIcon(currentSelectionForFinishedContests == FinishedContestFilter.ALL)
                 }

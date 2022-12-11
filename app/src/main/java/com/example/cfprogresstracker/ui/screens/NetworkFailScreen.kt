@@ -27,8 +27,7 @@ fun NetworkFailScreen(onClickRetry: () -> Unit) {
         Text(
             text = "Something Went Wrong!",
             style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier
-                .padding(8.dp),
+            modifier = Modifier.padding(8.dp),
             color = MaterialTheme.colorScheme.onSurface
         )
         NormalButton(

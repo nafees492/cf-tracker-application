@@ -14,7 +14,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.cfprogresstracker.model.Contest
@@ -49,9 +48,8 @@ fun ProblemCard(
         Column(modifier = Modifier.padding(4.dp)) {
             Text(
                 text = "${problem.index}. ${problem.name}",
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier
-                    .padding(top = 8.dp, start = 8.dp, end = 8.dp, bottom = 4.dp)
+                style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp),
+                modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp, bottom = 4.dp)
             )
             Divider(
                 modifier = Modifier.padding(horizontal = 8.dp),
@@ -60,19 +58,17 @@ fun ProblemCard(
             problem.contestId?.let {
                 Text(
                     text = "Contest: ${contestListById[it]?.name}",
-                    fontWeight = FontWeight.Light,
-                    fontSize = 14.sp,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                    modifier = Modifier.padding(8.dp)
+                    modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 4.dp)
                 )
             }
 
             problem.rating?.let {
                 Text(
-                    text = "Rating: ${it}",
-                    fontWeight = FontWeight.Light,
-                    fontSize = 18.sp,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f),
+                    text = "Rating: $it",
+                    style = MaterialTheme.typography.titleMedium.copy(fontSize = 18.sp),
+                    color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.padding(8.dp)
                 )
             }

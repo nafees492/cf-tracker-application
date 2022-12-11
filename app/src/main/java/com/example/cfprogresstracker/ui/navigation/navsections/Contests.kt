@@ -79,7 +79,7 @@ fun NavGraphBuilder.contests(
             }
         }
 
-        Column {
+        Column() {
             TabRow(
                 selectedTabIndex = tabIndex,
                 indicator = { tabPositions -> // 3.

@@ -12,7 +12,6 @@ import com.example.cfprogresstracker.ui.controllers.ToolbarController
 import com.example.cfprogresstracker.ui.controllers.ToolbarStyles
 import com.example.cfprogresstracker.ui.navigation.NavigationHost
 import com.example.cfprogresstracker.ui.navigation.Screens
-import com.example.cfprogresstracker.ui.theme.CodeforcesProgressTrackerTheme
 import com.example.cfprogresstracker.viewmodel.MainViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -20,7 +19,8 @@ import com.example.cfprogresstracker.viewmodel.MainViewModel
 @Composable
 fun Application(
     mainViewModel: MainViewModel,
-    navigateToLoginActivity: () -> Unit
+    navigateToLoginActivity: () -> Unit,
+    navigateToSettingsActivity: () -> Unit,
 ) {
     val navController = rememberNavController()
 
@@ -63,21 +63,20 @@ fun Application(
         )
     }
 
-    CodeforcesProgressTrackerTheme {
-        // A surface container using the 'background' color from the theme
-        Surface() {
-            Scaffold(
-                topBar = topBar,
-                bottomBar = bottomNavBar,
-            ) {
-                NavigationHost(
-                    toolbarController = toolbarController,
-                    navController = navController,
-                    mainViewModel = mainViewModel,
-                    paddingValues = it,
-                    navigateToLoginActivity = navigateToLoginActivity
-                )
-            }
+    Surface() {
+        Scaffold(
+            topBar = topBar,
+            bottomBar = bottomNavBar,
+        ) {
+            NavigationHost(
+                toolbarController = toolbarController,
+                navController = navController,
+                mainViewModel = mainViewModel,
+                paddingValues = it,
+                navigateToLoginActivity = navigateToLoginActivity,
+                navigateToSettingsActivity = navigateToSettingsActivity
+            )
         }
     }
+
 }

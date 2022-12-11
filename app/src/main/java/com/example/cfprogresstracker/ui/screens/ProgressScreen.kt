@@ -38,12 +38,13 @@ fun ProgressScreen(
     val context = LocalContext.current
 
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.SpaceEvenly
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(horizontal = 16.dp, vertical = 8.dp),
             contentAlignment = Alignment.Center
         ) {
             Row(
@@ -81,30 +82,26 @@ fun ProgressScreen(
                     Text(
                         text = fullName,
                         style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier
-                            .padding(top = 8.dp, bottom = 4.dp),
+                        modifier = Modifier.padding(top = 8.dp, bottom = 4.dp),
                         color = user.ratingCategory.color
                     )
                     Text(
                         text = user.handle,
                         style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier
-                            .padding(bottom = 8.dp),
+                        modifier = Modifier.padding(bottom = 8.dp),
                         color = user.ratingCategory.color
                     )
 
                     Text(
                         text = "Current Rating: ${user.rating}",
                         style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier
-                            .padding(vertical = 4.dp)
+                        modifier = Modifier.padding(bottom = 4.dp)
                     )
 
                     Text(
                         text = "Maximum Rating: ${user.maxRating}",
                         style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier
-                            .padding(vertical = 4.dp)
+                        modifier = Modifier.padding(bottom = 8.dp)
                     )
 
                 }
@@ -153,7 +150,7 @@ fun ProgressScreen(
                         questionCount[7] = mainViewModel.incorrectProblems.size
                         val heightsForBarGraph: Array<Int> = Array(8) { 0 }
                         val maxQuestionCount = questionCount.max()
-                        questionCount.forEachIndexed { it, count ->
+                        if(maxQuestionCount != 0) questionCount.forEachIndexed { it, count ->
                             heightsForBarGraph[it] = (count * 500) / maxQuestionCount
                         }
                         val colors = arrayOf(

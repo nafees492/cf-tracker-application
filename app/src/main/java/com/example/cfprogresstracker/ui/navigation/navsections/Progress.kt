@@ -46,6 +46,7 @@ fun NavGraphBuilder.progress(
     requestedForUserSubmission: Boolean,
     toggleRequestedForUserSubmissionTo: (Boolean) -> Unit,
     navigateToLoginActivity: () -> Unit,
+    navigateToSettingsActivity: () -> Unit,
 ) {
 
     composable(route = Screens.ProgressScreen.name) {
@@ -74,6 +75,12 @@ fun NavGraphBuilder.progress(
             }
         }
 
+        val onClickSettings: () -> Unit = {
+            coroutineScope.launch {
+                navigateToSettingsActivity()
+            }
+        }
+
         val onClickLogoutBtn: () -> Unit = {
             coroutineScope.launch {
                 userPreferences.setHandleName("")
@@ -86,7 +93,9 @@ fun NavGraphBuilder.progress(
             requestForUserInfo()
         }
         toolbarController.actions = {
-            ProgressScreenActions(onClickLogOut = onClickLogoutBtn,
+            ProgressScreenActions(
+               onClickSettings = onClickSettings,
+                onClickLogOut = onClickLogoutBtn,
             onClickRefresh = onClickRefresh)
         }
 
