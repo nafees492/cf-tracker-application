@@ -13,11 +13,11 @@ data class Contest(
     val relativeTimeSeconds: Int?,
     val difficulty: Int?,
     val kind: String?,
-    var isAttempted: Boolean = false,
-    var ratingChange: Int = 0,
-    var rank: Int = 0,
-    var newRating: Int = 0
 ) {
+    var isAttempted: Boolean = false
+    var ratingChange: Int = 0
+    var rank: Int = 0
+    var newRating: Int = 0
     fun getLink() = "https://codeforces.com/contest/$id"
     fun getContestLink() = "https://codeforces.com/contests/$id"
     fun startTimeInMillis() = startTimeSeconds!!.toLong() * 1000L

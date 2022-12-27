@@ -43,12 +43,34 @@ val Grey95 = Color(0xFFEFF1F1)
 val Grey99 = Color(0xFFFBFDFD)
 
 val NewbieGray = Color(0xff808080)
-val PupilGreen = Color(0xff008000)
-val SpecialistCyan = Color(0xff03a8aa)
-val ExpertBlue = Color(0xff0000ff)
-val CandidMasterViolet = Color(0xffaa00aa)
-val MasterOrange = Color(0xffffa500)
-val GrandmasterRed = Color(0xffff0000)
+val NewbieGrayL = Color(0xffedeeee)
+val NewbieGrayD = Color(0xff9ea2a3)
 
+val PupilGreen = Color(0xff008000)
+    val PupilGreenL = Color(0xffa2e0b1)
+val PupilGreenD = Color(0xff66cc80)
+
+val SpecialistCyan = Color(0xff03a8aa)
+val SpecialistCyanL = Color(0xff85dee2)
+val SpecialistCyanD = Color(0xff68d6df)
+
+val ExpertBlue = Color(0xff0000ff)
+val ExpertBlueL = Color(0xffb4d3ee)
+val ExpertBlueD = Color(0xff63a1d9)
+
+val CandidMasterViolet = Color(0xffaa00aa)
+val CandidMasterVioletL = Color(0xffbda3be)
+val CandidMasterVioletD = Color(0xff9a719c)
+
+val MasterOrange = Color(0xffffa500)
+val MasterOrangeL = Color(0xffffb88a)
+val MasterOrangeD = Color(0xffff9e60)
+
+val GrandmasterRed = Color(0xffff0000)
+val GrandmasterRedL = Color(0xfffb8b9e)
+val GrandmasterRedD = Color(0xfffa6b83)
+
+val TextYellow = Color(0xfff1c232)
+val TestingGreen = Color(0xff004C00)
 val CorrectGreen = Color(0xff008000)
 val IncorrectRed = Color(0xffc00000)

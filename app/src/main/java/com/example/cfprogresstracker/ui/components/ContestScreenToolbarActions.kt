@@ -40,7 +40,9 @@ fun RowScope.ContestScreenActions(
             contentDescription = "",
         )
     }
-    AnimatedVisibility(visible = expanded) {
+    AnimatedVisibility(
+        visible = expanded,
+    ) {
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },

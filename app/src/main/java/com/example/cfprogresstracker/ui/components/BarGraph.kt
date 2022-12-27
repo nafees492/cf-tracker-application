@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import android.graphics.Paint as Paint1
 
 @Composable
-fun BarGraph(heights: Array<Int>, colors: Array<Color>, questionCount: Array<Int>) {
+fun BarGraph(heights: Array<Int>, colors: Array<Color>, questionCount: Array<Int>, stepSizeOfGraph: Int) {
 
     val width = 69
     val gap = 22
@@ -90,8 +90,11 @@ fun BarGraph(heights: Array<Int>, colors: Array<Color>, questionCount: Array<Int
                 break
             }
         }
-        status = if(index != -1) "For Rating (${ratingArray[index]}): ${questionCount[index]}"
-        else "Total Question Attempted = " + questionCount.sum()
+        status = when(index) {
+            -1 -> "Total Question Attempted = " + questionCount.sum()
+            7 -> "Incorrect/Partial Submissions: ${questionCount[index]}"
+            else -> "For Rating (${ratingArray[index]}): ${questionCount[index]}"
+        }
     }
 
     Canvas(
@@ -131,7 +134,7 @@ fun BarGraph(heights: Array<Int>, colors: Array<Color>, questionCount: Array<Int
             )
             drawIntoCanvas {
                 it.nativeCanvas.drawText(
-                    /* text = */ "${(maxQuestionCount * i) / 10}",
+                    /* text = */ "${stepSizeOfGraph * i}",
                     /* x = */ 100f,            // x-coordinates of the origin (top left)
                     /* y = */ bottom - 50f * i + 7f, // y-coordinates of the origin (top left)
                     /* paint = */ textPaint(20f, Paint1.Align.RIGHT)

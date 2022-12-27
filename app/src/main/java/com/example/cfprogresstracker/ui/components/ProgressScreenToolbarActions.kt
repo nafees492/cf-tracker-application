@@ -35,12 +35,14 @@ fun RowScope.ProgressScreenActions(
             contentDescription = "",
         )
     }
-    AnimatedVisibility(visible = expanded) {
+    AnimatedVisibility(
+        visible = expanded,
+    ) {
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
         ) {
-            DropdownMenuItem(
+            /*DropdownMenuItem(
                 text = { Text("Refresh") },
                 onClick = {
                     onClickRefresh()
@@ -52,7 +54,7 @@ fun RowScope.ProgressScreenActions(
                         contentDescription = "Refresh",
                     )
                 }
-            )
+            )*/
             DropdownMenuItem(
                 text = { Text("Log Out") },
                 onClick = {

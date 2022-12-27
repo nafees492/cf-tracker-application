@@ -4,7 +4,7 @@ import androidx.compose.ui.graphics.Color
 import com.example.cfprogresstracker.ui.theme.*
 
 enum class RatingCategories(val title: String, val startValue: Int, val endValue: Int, val color: Color){
-    Unrated("Unrated", 0, 800, Color.White),
+    Unrated("Unrated", 0, 800, TextYellow),
     Newbie("Newbie", 800, 1199, NewbieGray),
     Pupil("Pupil", 1200, 1399, PupilGreen),
     Specialist("Specialist", 1400, 1599, SpecialistCyan),

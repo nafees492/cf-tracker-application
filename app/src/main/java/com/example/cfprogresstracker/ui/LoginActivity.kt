@@ -89,11 +89,13 @@ class LoginActivity : ComponentActivity() {
                             userPreferences.setHandleName(inputHandle)
                         }
                     } else {
+                        Log.e(TAG, apiResult.response.comment.toString())
                         Toast.makeText(this, apiResult.response.comment, Toast.LENGTH_SHORT).show()
                         mainViewModel.responseForUserInfo = ApiState.Empty
                     }
                 }
                 is ApiState.Failure -> {
+                    Log.e(TAG, apiResult.msg.toString())
                     Toast.makeText(this, apiResult.msg.toString(), Toast.LENGTH_SHORT).show()
                     mainViewModel.responseForUserInfo = ApiState.Empty
                 }

@@ -70,7 +70,7 @@ class MainViewModel @Inject constructor(
                     responseForContestList = ApiState.Loading
                 }.catch {
                     responseForContestList = ApiState.Failure(it)
-                    Log.d(TAG, it.toString())
+                    Log.e(TAG, it.toString())
                 }.collect {
                     responseForContestList = ApiState.Success(it)
                     Log.d(TAG, it.toString())
@@ -89,7 +89,7 @@ class MainViewModel @Inject constructor(
                     responseForProblemSet = ApiState.Loading
                 }.catch {
                     responseForProblemSet = ApiState.Failure(it)
-                    Log.d(TAG, it.toString())
+                    Log.e(TAG, it.toString())
                 }.collect {
                     responseForProblemSet = ApiState.SuccessPS(it)
                     Log.d(TAG, it.toString())
@@ -109,7 +109,7 @@ class MainViewModel @Inject constructor(
                     responseForUserSubmissions = ApiState.Loading
                 }.catch {
                     responseForUserSubmissions = ApiState.Failure(it)
-                    Log.d(TAG, it.toString())
+                    Log.e(TAG, it.toString())
                 }.collect {
                     responseForUserSubmissions = ApiState.Success(it)
                     Log.d(TAG, it.toString())
@@ -125,7 +125,7 @@ class MainViewModel @Inject constructor(
                     responseForUserRatingChanges = ApiState.Loading
                 }.catch {
                     responseForUserRatingChanges = ApiState.Failure(it)
-                    Log.d(TAG, it.toString())
+                    Log.e(TAG, it.toString())
                 }.collect {
                     responseForUserRatingChanges = ApiState.Success(it)
                     Log.d(TAG, it.toString())

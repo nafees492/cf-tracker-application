@@ -2,14 +2,14 @@ package com.example.cfprogresstracker.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.example.cfprogresstracker.ui.controllers.ToolbarController
 import com.example.cfprogresstracker.ui.controllers.ToolbarStyles
@@ -81,10 +81,8 @@ fun Toolbar(
 
         AnimatedVisibility(
             visible = toolbarController.expandToolbar,
-            enter = fadeIn(),
-            exit = fadeOut(
-                animationSpec = tween(100)
-            ),
+            enter = expandVertically(expandFrom = Alignment.Top),
+            exit = shrinkVertically(shrinkTowards = Alignment.Top),
         ) {
             toolbarController.expandedContent()
         }

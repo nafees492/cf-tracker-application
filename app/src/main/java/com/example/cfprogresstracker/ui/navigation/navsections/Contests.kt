@@ -178,7 +178,7 @@ fun NavGraphBuilder.contests(
                                                 userRatingChanges.forEachIndexed { index, userRatingChange ->
                                                     mainViewModel.contestListsByPhase[Phase.FINISHED]!!.find {
                                                         it.id == userRatingChange.contestId
-                                                    }?.let {
+                                                    }?.also {
                                                         it.isAttempted = true
                                                         it.ratingChange =
                                                             userRatingChange.newRating - userRatingChange.oldRating
