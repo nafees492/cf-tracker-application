@@ -1,26 +1,28 @@
 package com.example.cfprogresstracker.ui.components
 
-import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
+import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.contentColorFor
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Done
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.ClipboardManager
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.cfprogresstracker.model.Contest
 import com.example.cfprogresstracker.model.Problem
-import com.example.cfprogresstracker.utils.getRatingGradientColor
+import com.example.cfprogresstracker.utils.getRatingContainerColor
 import com.example.cfprogresstracker.utils.loadUrl
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
@@ -30,75 +32,74 @@ fun ProblemCard(
     contestListById: MutableMap<Int, Contest>,
     modifier: Modifier = Modifier,
     selectedChips: Set<String> = emptySet(),
-    onClickFilterChip: (String) -> Unit = {}
+    onClickFilterChip: (String) -> Unit = {},
 ) {
+    val isSelected: (String) -> Boolean = { selectedChips.contains(it) }
+
+    val trailingIcon: @Composable ((visible: Boolean) -> Unit) = {
+        AnimatedVisibility(visible = it) {
+            Icon(
+                imageVector = Icons.Rounded.Done,
+                contentDescription = ""
+            )
+        }
+    }
 
     val context = LocalContext.current
 
-    val gradientColors = getRatingGradientColor(rating = problem.rating)
+    val ratingContainerColor = getRatingContainerColor(rating = problem.rating)
 
-    val gradientBrush = Brush.radialGradient(
-        0.0f to gradientColors[1],
-        1f to gradientColors[0],
-        radius = 800f
-    )
+    val clipboardManager: ClipboardManager = LocalClipboardManager.current
+    val haptic = LocalHapticFeedback.current
 
-    Card(
+    ProblemCardDesign(
+        rating = problem.rating,
+        color = ratingContainerColor,
         onClick = {
             loadUrl(context = context, url = problem.getLinkViaProblemSet())
         },
+        onLongClick = {
+            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+            clipboardManager.setText(AnnotatedString(problem.getLinkViaProblemSet()))
+            Toast.makeText(context, "Problem Link Copied", Toast.LENGTH_SHORT).show()
+        },
         modifier = modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .animateContentSize(),
-        shape = RoundedCornerShape(8.dp),
-        // backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
-        // contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-        contentColor = contentColorFor(backgroundColor = gradientColors[1])
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(brush = gradientBrush)
-        ){
-            Column(modifier = Modifier.padding(4.dp)) {
-                Text(
-                    text = "${problem.index}. ${problem.name}",
-                    style = MaterialTheme.typography.titleLarge.copy(fontSize = 18.sp),
-                    modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp, bottom = 4.dp)
-                )
+        Text(
+            text = "${problem.index}. ${problem.name}",
+            style = MaterialTheme.typography.titleLarge.copy(fontSize = 18.sp),
+            modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp, bottom = 4.dp),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
 
-                problem.contestId?.let {
-                    Text(
-                        text = "Contest: ${contestListById[it]?.name}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                        modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 4.dp),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-
-                problem.tags?.let { tags->
-                    FilterChipRow(
-                        chipList = tags,
-                        selectedChips = selectedChips,
-                        onClickFilterChip = onClickFilterChip
-                    )
-                }
-
-                problem.rating?.let {
-                    Row(modifier = Modifier.fillMaxWidth().padding(8.dp), horizontalArrangement = Arrangement.End){
-                        Text(
-                            text = "Rating: $it",
-                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                            color = MaterialTheme.colorScheme.surface
-                        )
-                    }
-                }
-
-            }
+        problem.contestId?.let {
+            Text(
+                text = "Contest: ${contestListById[it]?.name}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 4.dp),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
         }
 
+        problem.tags?.let { tags ->
+            LazyRow(
+                modifier = Modifier
+                    .padding(horizontal = 4.dp)
+            ) {
+                items(tags.size) {
+                    FilterChip(
+                        selected = isSelected(tags[it]),
+                        onClick = { onClickFilterChip(tags[it]) },
+                        label = { Text(text = tags[it], style = MaterialTheme.typography.labelSmall) },
+                        trailingIcon = { trailingIcon(isSelected(tags[it])) },
+                        modifier = Modifier.padding(horizontal = 4.dp),
+                        shape = RectangleShape,
+                    )
+                }
+            }
+        }
     }
 }

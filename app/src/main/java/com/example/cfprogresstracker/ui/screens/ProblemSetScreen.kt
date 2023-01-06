@@ -16,6 +16,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import com.example.cfprogresstracker.model.Contest
 import com.example.cfprogresstracker.model.Problem
@@ -68,9 +69,10 @@ fun ProblemSetScreen(
                     FilterChip(
                         selected = isSelected(tagList[it]),
                         onClick = { onClickFilterChip(tagList[it]) },
-                        label = { Text(text = tagList[it]) },
+                        label = { Text(text = tagList[it], style = MaterialTheme.typography.labelMedium) },
                         trailingIcon = { trailingIcon(isSelected(tagList[it])) },
-                        modifier = Modifier.padding(horizontal = 4.dp)
+                        modifier = Modifier.padding(horizontal = 4.dp),
+                        shape = RectangleShape
                     )
                 }
             }

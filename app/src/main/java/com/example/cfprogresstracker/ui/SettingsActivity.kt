@@ -86,7 +86,7 @@ class SettingsActivity : ComponentActivity() {
             }
         }
     }
-    
+
     companion object {
         const val TAG = "Settings Activity"
     }
@@ -141,8 +141,9 @@ fun SettingsScreen(paddingValues: PaddingValues, userPreferences: UserPreference
                 onClickOption = onClickOption
             )
 
-            if(isAbove12) Text(
-                text = "Dynamic Theme selects theme colors from your Wallpaper Color Palate.",
+            if (isAbove12) Text(
+                text = "Dynamic Theme selects theme colors from your Wallpaper Color Palate.\n"
+                        + "NOTE: This is only Available in Android 12 and above.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                 modifier = Modifier.padding(8.dp)
@@ -193,7 +194,7 @@ fun SettingsScreen(paddingValues: PaddingValues, userPreferences: UserPreference
                     onClick = { /* TODO */ },
                     subTitle = "Version: ${BuildConfig.VERSION_NAME}"
                 )
-                
+
                 RowWithLeadingIcon(
                     title = "Rate and Review",
                     leadingIconId = R.drawable.ic_star_half_24px,

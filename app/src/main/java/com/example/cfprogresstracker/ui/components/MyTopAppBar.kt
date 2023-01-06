@@ -17,7 +17,7 @@ import com.example.cfprogresstracker.ui.navigation.Screens
 
 @ExperimentalMaterial3Api
 @Composable
-fun Toolbar(
+fun MyTopAppBar(
     toolbarController: ToolbarController
 ) {
     val homeScreens = listOf(
@@ -25,6 +25,7 @@ fun Toolbar(
         Screens.ProblemSetScreen.title,
         Screens.ProgressScreen.title
     )
+
     val navigationIcon: @Composable (() -> Unit) = {
         AnimatedVisibility(visible = !homeScreens.contains(toolbarController.title)) {
             IconButton(onClick = toolbarController.onClickNavUp) {

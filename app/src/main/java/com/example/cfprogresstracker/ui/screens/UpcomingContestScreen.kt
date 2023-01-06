@@ -19,7 +19,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.cfprogresstracker.model.Contest
-import com.example.cfprogresstracker.ui.components.ContestInfoCard
+import com.example.cfprogresstracker.ui.components.ContestCard
 import com.example.cfprogresstracker.ui.components.RotatingArrow
 import com.example.cfprogresstracker.utils.Phase
 import com.example.cfprogresstracker.utils.addEventToCalendar
@@ -42,14 +42,14 @@ fun UpcomingContestScreen(
         contestLists[Phase.CODING]?.let { list ->
             item {
                 Text(
-                    text = "Current Contests",
+                    text = "Ongoing Contests",
                     style = MaterialTheme.typography.labelLarge,
                     modifier = Modifier.padding(8.dp),
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f)
                 )
             }
             items(count = list.size) {
-                ContestInfoCard(contest = list[list.size - it - 1])
+                ContestCard(contest = list[list.size - it - 1])
             }
 
             item {
@@ -88,7 +88,7 @@ fun UpcomingContestScreen(
                             description = ""
                         )
                     }
-                    ContestInfoCard(contest = contest, within3days = true, onClickAddToCalender = onClickAddToCalender)
+                    ContestCard(contest = contest, within3days = true, onClickAddToCalender = onClickAddToCalender)
                 }
                 item {
                     NoContestTag(list = list)
@@ -134,7 +134,7 @@ fun UpcomingContestScreen(
                                 description = ""
                             )
                         }
-                        ContestInfoCard(
+                        ContestCard(
                             contest = contest,
                             within3days = false,
                             onClickAddToCalender = onClickAddToCalender

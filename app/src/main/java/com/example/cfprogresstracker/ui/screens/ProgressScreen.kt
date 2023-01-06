@@ -19,9 +19,9 @@ import com.example.cfprogresstracker.retrofit.util.ApiState
 import com.example.cfprogresstracker.ui.components.BarGraph
 import com.example.cfprogresstracker.ui.components.CircularIndeterminateProgressBar
 import com.example.cfprogresstracker.ui.components.NormalButton
-import com.example.cfprogresstracker.ui.navigation.navsections.processSubmittedProblem
 import com.example.cfprogresstracker.ui.theme.*
-import com.example.cfprogresstracker.utils.getRatingColor
+import com.example.cfprogresstracker.utils.getRatingTextColor
+import com.example.cfprogresstracker.utils.processSubmittedProblemFromAPI
 import com.example.cfprogresstracker.viewmodel.MainViewModel
 import com.skydoves.landscapist.animation.circular.CircularRevealPlugin
 import com.skydoves.landscapist.components.rememberImageComponent
@@ -86,27 +86,27 @@ fun ProgressScreen(
                             text = fullName,
                             style = MaterialTheme.typography.titleLarge,
                             modifier = Modifier.padding(top = 8.dp, bottom = 4.dp),
-                            color = getRatingColor(rating = user.rating)
+                            color = getRatingTextColor(rating = user.rating)
                         )
                         Text(
                             text = user.handle,
                             style = MaterialTheme.typography.titleMedium,
                             modifier = Modifier.padding(bottom = 8.dp),
-                            color = getRatingColor(rating = user.rating)
+                            color = getRatingTextColor(rating = user.rating)
                         )
 
                         Text(
                             text = "Current Rating: ${user.rating}",
                             style = MaterialTheme.typography.bodyLarge,
                             modifier = Modifier.padding(bottom = 4.dp),
-                            color = getRatingColor(rating = user.rating)
+                            color = getRatingTextColor(rating = user.rating)
                         )
 
                         Text(
                             text = "Maximum Rating: ${user.maxRating}",
                             style = MaterialTheme.typography.bodyLarge,
                             modifier = Modifier.padding(bottom = 8.dp),
-                            color = getRatingColor(rating = user.maxRating)
+                            color = getRatingTextColor(rating = user.maxRating)
                         )
 
                     }
@@ -128,6 +128,7 @@ fun ProgressScreen(
                 }
             )
         }
+
         item {
             Box(
                 modifier = Modifier
@@ -141,7 +142,7 @@ fun ProgressScreen(
                     }
                     is ApiState.Success<*> -> {
                         if (apiResultForUserSubmission.response.status == "OK") {
-                            processSubmittedProblem(
+                            processSubmittedProblemFromAPI(
                                 mainViewModel = mainViewModel,
                                 apiResult = apiResultForUserSubmission
                             )
@@ -204,6 +205,10 @@ fun ProgressScreen(
                     }
                 }
             }
+        }
+
+        item {
+            Spacer(modifier = Modifier.height(120.dp))
         }
     }
 }

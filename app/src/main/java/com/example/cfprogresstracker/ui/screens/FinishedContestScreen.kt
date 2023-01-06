@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.cfprogresstracker.model.Contest
-import com.example.cfprogresstracker.ui.components.ContestInfoCard
+import com.example.cfprogresstracker.ui.components.ContestCard
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -16,7 +16,7 @@ fun FinishedContestScreen(
 ) {
     LazyColumn {
         items(finishedContests.size) {
-            ContestInfoCard(contest = finishedContests[it], modifier = Modifier.animateItemPlacement())
+            ContestCard(contest = finishedContests[it], modifier = Modifier.animateItemPlacement())
         }
 
         item {

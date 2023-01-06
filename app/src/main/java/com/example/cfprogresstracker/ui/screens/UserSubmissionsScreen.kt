@@ -14,6 +14,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import com.example.cfprogresstracker.model.Contest
 import com.example.cfprogresstracker.model.Problem
@@ -70,9 +71,10 @@ fun UserSubmissionScreen(
             if(selectedChips.isNotEmpty()){
                 AssistChip(
                     onClick = { selectedChips = emptySet() },
-                    label = { Text("Clear All") },
+                    label = { Text("Clear All", style = MaterialTheme.typography.labelMedium) },
                     enabled = true,
-                    modifier = Modifier.padding(8.dp).animateItemPlacement()
+                    modifier = Modifier.padding(8.dp).animateItemPlacement(),
+                    shape = RectangleShape
                 )
             }
         }

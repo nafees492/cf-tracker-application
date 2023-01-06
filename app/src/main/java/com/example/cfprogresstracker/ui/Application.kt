@@ -7,7 +7,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.navigation.compose.rememberNavController
 import com.example.cfprogresstracker.ui.components.BottomNavigationBar
-import com.example.cfprogresstracker.ui.components.Toolbar
+import com.example.cfprogresstracker.ui.components.MyTopAppBar
 import com.example.cfprogresstracker.ui.controllers.ToolbarController
 import com.example.cfprogresstracker.ui.controllers.ToolbarStyles
 import com.example.cfprogresstracker.ui.navigation.NavigationHost
@@ -24,14 +24,14 @@ fun Application(
 ) {
     val navController = rememberNavController()
 
-    val topAppBarDefault = TopAppBarDefaults.pinnedScrollBehavior()
+    val topAppBarScrollBehaviour = TopAppBarDefaults.pinnedScrollBehavior()
 
     val toolbarController = remember {
         object : ToolbarController {
             override var title: String by mutableStateOf(Screens.ContestsScreen.title)
 
             override var scrollBehavior: TopAppBarScrollBehavior by mutableStateOf(
-                topAppBarDefault
+                topAppBarScrollBehaviour
             )
 
             override var toolbarStyle: ToolbarStyles by mutableStateOf(ToolbarStyles.Small)
@@ -51,7 +51,7 @@ fun Application(
     }
 
     val topBar: @Composable () -> Unit = {
-        Toolbar(
+        MyTopAppBar(
             toolbarController = toolbarController
         )
     }

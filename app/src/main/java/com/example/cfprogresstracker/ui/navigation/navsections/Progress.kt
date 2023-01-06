@@ -14,8 +14,6 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.example.cfprogresstracker.data.UserPreferences
-import com.example.cfprogresstracker.model.Problem
-import com.example.cfprogresstracker.model.Submission
 import com.example.cfprogresstracker.model.User
 import com.example.cfprogresstracker.retrofit.util.ApiState
 import com.example.cfprogresstracker.ui.components.CircularIndeterminateProgressBar
@@ -27,7 +25,7 @@ import com.example.cfprogresstracker.ui.screens.NetworkFailScreen
 import com.example.cfprogresstracker.ui.screens.ProgressScreen
 import com.example.cfprogresstracker.ui.screens.UserSubmissionScreen
 import com.example.cfprogresstracker.utils.UserSubmissionFilter
-import com.example.cfprogresstracker.utils.Verdict
+import com.example.cfprogresstracker.utils.processSubmittedProblemFromAPI
 import com.example.cfprogresstracker.viewmodel.MainViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -181,7 +179,7 @@ fun NavGraphBuilder.progress(
             }
             is ApiState.Success<*> -> {
                 if(apiResult.response.status == "OK") {
-                    processSubmittedProblem(mainViewModel = mainViewModel, apiResult = apiResult)
+                    processSubmittedProblemFromAPI(mainViewModel = mainViewModel, apiResult = apiResult)
 
                     UserSubmissionScreen(
                         submittedProblemsWithSubmissions = when (currentSelection) {
@@ -212,40 +210,3 @@ fun NavGraphBuilder.progress(
         }
     }
 }
-
-fun processSubmittedProblem(mainViewModel: MainViewModel, apiResult: ApiState.Success<*>){
-    mainViewModel.submittedProblems.clear()
-    mainViewModel.incorrectProblems.clear()
-    mainViewModel.correctProblems.clear()
-
-    val problemNameMapWithSubmissions =
-        mutableMapOf<String, ArrayList<Submission>>()
-    val problemNameMapWithProblem = mutableMapOf<String, Problem>()
-    val problemNameWithVerdictOK: MutableSet<String> = mutableSetOf()
-
-    val submissions: ArrayList<Submission> =
-        apiResult.response.result as ArrayList<Submission>
-
-    submissions.forEach {
-        if (it.verdict == Verdict.OK) problemNameWithVerdictOK.add(it.problem.name)
-        problemNameMapWithProblem[it.problem.name] = it.problem
-        if (problemNameMapWithSubmissions[it.problem.name].isNullOrEmpty()) {
-            problemNameMapWithSubmissions[it.problem.name] = arrayListOf(it)
-        } else {
-            problemNameMapWithSubmissions[it.problem.name]?.add(it)
-        }
-    }
-
-    problemNameWithVerdictOK.forEach {
-        problemNameMapWithProblem[it]?.hasVerdictOK = true
-    }
-
-    for (problem in problemNameMapWithProblem) {
-        Pair(problem.value, problemNameMapWithSubmissions[problem.key]!!).let {
-            mainViewModel.submittedProblems.add(it)
-            if (problem.value.hasVerdictOK) mainViewModel.correctProblems.add(it)
-            else mainViewModel.incorrectProblems.add(it)
-        }
-    }
-}
-
