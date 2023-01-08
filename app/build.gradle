@@ -11,7 +11,7 @@ android {
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.example.cfprogresstracker"
+        applicationId "com.theruralguys.competrace"
         minSdk 21
         targetSdk 33
         versionCode 1
@@ -49,7 +49,7 @@ android {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
     }
-    namespace 'com.example.cfprogresstracker'
+    namespace 'com.theruralguys.competrace'
 }
 
 dependencies {
