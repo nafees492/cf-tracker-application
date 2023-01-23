@@ -4,12 +4,13 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun AppDialog(
@@ -19,6 +20,7 @@ fun AppDialog(
     confirmButtonText: String,
     onClickConfirmButton: () -> Unit,
     dismissDialog: () -> Unit,
+    modifier: Modifier = Modifier,
     dismissButtonText: String? = null,
     content: @Composable () -> Unit
 ) {
@@ -42,10 +44,10 @@ fun AppDialog(
         }
     }
 
-    AnimatedVisibility (
+    AnimatedVisibility(
         visible = openDialog,
-        enter = fadeIn(animationSpec = tween(500), initialAlpha = 0f),
-        exit = fadeOut(animationSpec = tween(5))
+        enter = fadeIn(animationSpec = tween(800), initialAlpha = 0.4f),
+        exit = fadeOut(animationSpec = tween(400))
     ) {
         AlertDialog(
             onDismissRequest = {
@@ -56,7 +58,10 @@ fun AppDialog(
             },
             icon = icon,
             title = {
-                Text(text = title)
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                )
             },
             text = content,
             confirmButton = {
@@ -69,7 +74,9 @@ fun AppDialog(
                     Text(confirmButtonText)
                 }
             },
-            dismissButton = dismissButton
+            dismissButton = dismissButton,
+            shape = MaterialTheme.shapes.large.copy(CornerSize(16.dp)),
+            modifier = modifier
         )
     }
 }

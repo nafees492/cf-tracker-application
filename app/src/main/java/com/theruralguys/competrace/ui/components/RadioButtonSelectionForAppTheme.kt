@@ -16,37 +16,42 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
-import com.theruralguys.competrace.ui.theme.AppTheme
 
 @Composable
 fun RadioButtonSelectionForAppTheme(
-    themeOptions: ArrayList<AppTheme>,
-    isOptionSelected: (AppTheme) -> Boolean,
-    onClickOption: (AppTheme) -> Unit
-){
-    Column(modifier = Modifier.selectableGroup()) {
+    themeOptions: ArrayList<String>,
+    isOptionSelected: (String) -> Boolean,
+    onClickOption: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier.selectableGroup(),
+    ) {
         themeOptions.forEach { theme ->
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(16.dp))
+                    .clip(RoundedCornerShape(2.dp))
                     .selectable(
                         selected = isOptionSelected(theme),
                         onClick = { onClickOption(theme) },
                         role = Role.RadioButton
                     )
-                    .padding(8.dp),
-                verticalAlignment = Alignment.CenterVertically
             ) {
-                RadioButton(
-                    selected = isOptionSelected(theme),
-                    onClick = null // null recommended for accessibility with screen readers
-                )
-                Text(
-                    text = theme.title,
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(start = 8.dp)
-                )
+                Row(
+                    modifier = Modifier.padding(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    RadioButton(
+                        selected = isOptionSelected(theme),
+                        onClick = null // null recommended for accessibility with screen readers
+                    )
+                    Text(
+                        text = theme,
+                        style = MaterialTheme.typography.labelLarge,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                }
             }
         }
     }

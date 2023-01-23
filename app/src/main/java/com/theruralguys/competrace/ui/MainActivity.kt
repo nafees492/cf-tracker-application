@@ -3,6 +3,7 @@ package com.theruralguys.competrace.ui
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -10,8 +11,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import com.theruralguys.competrace.data.UserPreferences
-import com.theruralguys.competrace.ui.theme.AppTheme
-import com.theruralguys.competrace.ui.theme.CodeforcesProgressTrackerTheme
+import com.theruralguys.competrace.ui.theme.CompetraceTheme
+import com.theruralguys.competrace.ui.theme.DarkModePref
+import com.theruralguys.competrace.ui.theme.MyTheme
 import com.theruralguys.competrace.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
@@ -28,26 +30,23 @@ class MainActivity : ComponentActivity() {
 
         val navigateToLoginActivity: () -> Unit = {
             val intent = Intent(this, LoginActivity::class.java)
-            startActivity(intent).also { this.finish() }
+            Log.d(TAG, intent.toString())
+            startActivity(intent).also {
+                this.finish()
+            }
         }
-
-        val navigateToSettingsActivity: () -> Unit = {
-            val intent = Intent(this, SettingsActivity::class.java)
-            startActivity(intent)
-        }
-
 
 
         setContent {
-            userPreferences = UserPreferences(LocalContext.current.applicationContext)
+            userPreferences = UserPreferences(LocalContext.current)
 
-            val currentTheme by userPreferences.currentThemeFlow.collectAsState(initial = AppTheme.SystemDefault.name)
+            val currentTheme by userPreferences.currentThemeFlow.collectAsState(initial = MyTheme.DEFAULT)
+            val darkModePref by userPreferences.darkModePrefFlow.collectAsState(initial = DarkModePref.SYSTEM_DEFAULT)
 
-            CodeforcesProgressTrackerTheme(currentTheme = currentTheme!!) {
+            CompetraceTheme(currentTheme = currentTheme!!, darkModePref = darkModePref!!) {
                 Application(
                     mainViewModel = mainViewModel,
                     navigateToLoginActivity = navigateToLoginActivity,
-                    navigateToSettingsActivity = navigateToSettingsActivity
                 )
             }
         }

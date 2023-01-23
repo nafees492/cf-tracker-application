@@ -1,17 +1,14 @@
 package com.theruralguys.competrace.ui.components
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Done
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
@@ -27,7 +24,7 @@ import com.theruralguys.competrace.utils.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SubmissionCard(
+fun ProblemSubmissionCard(
     problem: Problem,
     submissions: ArrayList<Submission>,
     contestListById: MutableMap<Int, Contest>,
@@ -38,17 +35,6 @@ fun SubmissionCard(
     val context = LocalContext.current
     val clipboardManager: ClipboardManager = LocalClipboardManager.current
     val haptic = LocalHapticFeedback.current
-
-    val isSelected: (String) -> Boolean = { selectedChips.contains(it) }
-
-    val trailingIcon: @Composable ((visible: Boolean) -> Unit) = {
-        AnimatedVisibility(visible = it) {
-            Icon(
-                imageVector = Icons.Rounded.Done,
-                contentDescription = ""
-            )
-        }
-    }
 
     val ratingContainerColor = getRatingContainerColor(rating = problem.rating)
 
@@ -61,6 +47,7 @@ fun SubmissionCard(
         onLongClick = {
             copyTextToClipBoard(
                 text = problem.getLinkViaContest(),
+                type = "Problem",
                 context = context,
                 clipboardManager = clipboardManager,
                 haptic = haptic
@@ -71,29 +58,29 @@ fun SubmissionCard(
         Text(
             text = "${problem.index}. ${problem.name}",
             style = MaterialTheme.typography.titleLarge.copy(fontSize = 18.sp),
-            modifier = Modifier
-                .padding(top = 8.dp, start = 8.dp, end = 8.dp, bottom = 4.dp),
+            modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 8.dp, bottom = 4.dp),
+            color = MaterialTheme.colorScheme.onSurface,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
 
         problem.contestId?.let {
             Text(
-                text = "Contest: ${contestListById[it]?.name}",
+                text = "${contestListById[it]?.name}",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 4.dp),
+                modifier = Modifier.padding(start = 8.dp, end = 8.dp, bottom = 4.dp),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
         }
 
         Text(
-            text = "Last Submission: ${unixToDateAndTime(submissions[0].creationTimeInMillis())}",
+            text = "Last Submission: ${unixToDateDayTime(submissions[0].creationTimeInMillis())}",
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Light,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-            modifier = Modifier.padding(start = 8.dp, end = 8.dp, bottom = 4.dp),
+            modifier = Modifier.padding(start = 8.dp, end = 8.dp, bottom = 8.dp),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
@@ -108,11 +95,11 @@ fun SubmissionCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 4.dp),
+                .padding(horizontal = 8.dp, vertical = 0.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = "$status",
+                text = status,
                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
                 color = statusColor,
             )
@@ -131,23 +118,75 @@ fun SubmissionCard(
         }
 
         problem.tags?.let { tags ->
-            LazyRow(
+            FilterChipScrollableRow(
+                chipList = tags,
+                selectedChips = selectedChips,
+                onClickFilterChip = onClickFilterChip
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@Composable
+fun ProblemSubmissionCardDesign(
+    rating: Int?,
+    color: Color,
+    onClick: () -> Unit,
+    onLongClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable (ColumnScope.() -> Unit)
+) {
+    Card(
+        modifier = modifier
+            .padding(4.dp)
+            .fillMaxWidth()
+            .height(
+                getCardHeight(
+                    titleLargeTexts = 1,
+                    bodyMediumTexts = 3,
+                    extraPaddingValues = FilterChipDefaults.Height + 48.dp
+                )
+            )
+            .animateContentSize()
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = onLongClick,
+            )
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Column(
                 modifier = Modifier
-                    .padding(horizontal = 4.dp)
+                    .weight(1 - CardValues.TriangularFractionOfCard)
+                    .fillMaxHeight(),
+                content = content
+            )
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .width(
+                        getTextWidthInDp(
+                            testSize = MaterialTheme.typography.bodyMedium.fontSize,
+                            letters = 4
+                        )
+                    )
+                    .fillMaxHeight()
             ) {
-                items(tags.size) {
-                    FilterChip(
-                        selected = isSelected(tags[it]),
-                        onClick = { onClickFilterChip(tags[it]) },
-                        label = {
-                            Text(
-                                text = tags[it],
-                                style = MaterialTheme.typography.labelSmall
-                            )
-                        },
-                        trailingIcon = { trailingIcon(isSelected(tags[it])) },
-                        modifier = Modifier.padding(horizontal = 4.dp),
-                        shape = RectangleShape,
+                BackgroundDesignArrow(color = color)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    Text(
+                        text = "$rating",
+                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
             }

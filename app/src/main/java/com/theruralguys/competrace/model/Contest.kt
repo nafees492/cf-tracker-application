@@ -1,5 +1,7 @@
 package com.theruralguys.competrace.model
 
+import android.content.Context
+import com.theruralguys.competrace.utils.addEventToCalendar
 import java.util.*
 
 data class Contest(
@@ -18,10 +20,22 @@ data class Contest(
     var ratingChange: Int = 0
     var rank: Int = 0
     var newRating: Int = 0
+    val rated = arrayListOf<String>()
     fun getLink() = "https://codeforces.com/contest/$id"
     fun getContestLink() = "https://codeforces.com/contests/$id"
     fun startTimeInMillis() = startTimeSeconds!!.toLong() * 1000L
     fun endTimeInMillis() = (startTimeSeconds!!.toLong() + durationSeconds.toLong()) * 1000L
     fun durationInMillis() = (durationSeconds.toLong()) * 1000L
     fun getContestDate() = Date(startTimeInMillis())
+
+    fun addToCalender(context: Context) {
+        addEventToCalendar(
+            context = context,
+            title = name,
+            startTime = startTimeInMillis(),
+            endTime = endTimeInMillis(),
+            location = getContestLink(),
+            description = ""
+        )
+    }
 }

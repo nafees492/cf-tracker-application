@@ -15,12 +15,11 @@ import com.theruralguys.competrace.ui.navigation.Screens
 import com.theruralguys.competrace.viewmodel.MainViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun Application(
     mainViewModel: MainViewModel,
     navigateToLoginActivity: () -> Unit,
-    navigateToSettingsActivity: () -> Unit,
 ) {
     val navController = rememberNavController()
 
@@ -74,7 +73,6 @@ fun Application(
                 mainViewModel = mainViewModel,
                 paddingValues = it,
                 navigateToLoginActivity = navigateToLoginActivity,
-                navigateToSettingsActivity = navigateToSettingsActivity
             )
         }
     }

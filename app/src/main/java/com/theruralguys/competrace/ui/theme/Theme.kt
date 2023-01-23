@@ -4,11 +4,10 @@ import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.theruralguys.competrace.data.UserPreferences
 
 
 private val LightColorScheme = lightColorScheme(
@@ -77,30 +76,39 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 @Composable
-fun CodeforcesProgressTrackerTheme(
-    currentTheme: String = AppTheme.SystemDefault.name,
-    isDarkTheme: Boolean = isSystemInDarkTheme(),
+fun CompetraceTheme(
+    currentTheme: String = MyTheme.DEFAULT,
+    darkModePref: String = DarkModePref.SYSTEM_DEFAULT,
+    isSysInDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
+    val context = LocalContext.current
+
     val myColorScheme = when(currentTheme){
-        AppTheme.Dark.name -> {
-            DarkColorScheme
-        }
-        AppTheme.Light.name -> {
-            LightColorScheme
-        }
-        AppTheme.Dynamic.name -> {
-            if (isDarkTheme) dynamicDarkColorScheme(LocalContext.current)
-            else dynamicLightColorScheme(LocalContext.current)
+        MyTheme.DYNAMIC -> {
+            when(darkModePref){
+                DarkModePref.DARK -> dynamicDarkColorScheme(context)
+                DarkModePref.LIGHT -> dynamicLightColorScheme(context)
+                else -> {
+                    if(isSysInDarkTheme) dynamicDarkColorScheme(context)
+                    else dynamicLightColorScheme(context)
+                }
+            }
         }
         else -> {
-            if (isDarkTheme) DarkColorScheme
-            else LightColorScheme
+            when(darkModePref){
+                DarkModePref.DARK -> DarkColorScheme
+                DarkModePref.LIGHT -> LightColorScheme
+                else -> {
+                    if(isSysInDarkTheme) DarkColorScheme
+                    else LightColorScheme
+                }
+            }
         }
     }
 
     val systemUiController = rememberSystemUiController()
-
+    val isDarkTheme = isDarkTheme()
     SideEffect {
         systemUiController.setSystemBarsColor(
             color = myColorScheme.surface,
@@ -110,7 +118,8 @@ fun CodeforcesProgressTrackerTheme(
 
     MaterialTheme(
         colorScheme = myColorScheme,
-        typography = CFPTTypography
+        typography = CompetraceTypography,
+        shapes = CompetraceShapes
     ) {
         // TODO (M3): MaterialTheme doesn't provide LocalIndication, remove when it does
         val rippleIndication = rememberRipple()
@@ -119,5 +128,19 @@ fun CodeforcesProgressTrackerTheme(
             content = content
         )
     }
+}
 
+@Composable
+fun isDarkTheme(
+    isSysInDarkTheme: Boolean = isSystemInDarkTheme()
+): Boolean {
+
+    val userPreferences = UserPreferences(LocalContext.current)
+    val darkModePref by userPreferences.darkModePrefFlow.collectAsState(initial = DarkModePref.SYSTEM_DEFAULT)
+
+    return when (darkModePref) {
+        DarkModePref.DARK -> true
+        DarkModePref.LIGHT -> false
+        else -> isSysInDarkTheme
+    }
 }

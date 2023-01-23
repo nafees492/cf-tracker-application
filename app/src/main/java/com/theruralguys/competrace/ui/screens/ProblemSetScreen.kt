@@ -5,9 +5,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Done
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -16,10 +13,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.theruralguys.competrace.R
 import com.theruralguys.competrace.model.Contest
 import com.theruralguys.competrace.model.Problem
+import com.theruralguys.competrace.ui.components.FilterChipScrollableRow
 import com.theruralguys.competrace.ui.components.ProblemCard
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
@@ -49,33 +48,39 @@ fun ProblemSetScreen(
         selectedChips = if (isSelected(it)) selectedChips.minus(it) else selectedChips.plus(it)
     }
 
-    val trailingIcon: @Composable ((visible: Boolean) -> Unit) = {
-        AnimatedVisibility(visible = it) {
-            Icon(
-                imageVector = Icons.Rounded.Done,
-                contentDescription = ""
-            )
-        }
-    }
-
     LazyColumn {
         item {
-            LazyRow(
+            Row(
                 modifier = Modifier
                     .background(color = MaterialTheme.colorScheme.surface)
                     .padding(horizontal = 4.dp)
             ) {
-                items(tagList.size) {
-                    FilterChip(
-                        selected = isSelected(tagList[it]),
-                        onClick = { onClickFilterChip(tagList[it]) },
-                        label = { Text(text = tagList[it], style = MaterialTheme.typography.labelMedium) },
-                        trailingIcon = { trailingIcon(isSelected(tagList[it])) },
-                        modifier = Modifier.padding(horizontal = 4.dp),
-                        shape = RectangleShape
-                    )
+                AnimatedVisibility(visible = selectedChips.isNotEmpty()) {
+                    IconButton(onClick = { selectedChips = setOf() }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_close_24px),
+                            contentDescription = "Clear all"
+                        )
+                    }
+                    /*ElevatedAssistChip(
+                        onClick = { selectedChips = setOf() },
+                        label = { },
+                        leadingIcon = {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_close_24px),
+                                contentDescription = "Clear all"
+                            )
+                        }
+                    )*/
                 }
+
+                FilterChipScrollableRow(
+                    chipList = tagList,
+                    selectedChips = selectedChips,
+                    onClickFilterChip = onClickFilterChip,
+                )
             }
+
             Divider()
         }
 

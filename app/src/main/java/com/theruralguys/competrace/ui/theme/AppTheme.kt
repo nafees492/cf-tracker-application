@@ -1,8 +1,12 @@
 package com.theruralguys.competrace.ui.theme
 
-enum class AppTheme(val title: String) {
-    SystemDefault("System Default"),
-    Light("Light"),
-    Dark("Dark"),
-    Dynamic("Dynamic")
+object MyTheme {
+    const val DEFAULT = "Default"
+    const val DYNAMIC = "Dynamic"
+}
+
+object DarkModePref {
+    const val SYSTEM_DEFAULT = "System default"
+    const val LIGHT = "Light"
+    const val DARK = "Dark"
 }

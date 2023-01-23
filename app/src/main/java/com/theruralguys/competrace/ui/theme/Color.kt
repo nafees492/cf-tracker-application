@@ -68,24 +68,31 @@ val seed = Color(0xFF00468A)
 
 val NewbieGray = Color(0xff808080)
 val light_NewbieGrayContainer = Color(0xffCACACA)
+val dark_NewbieGrayContainer = Color(0xffB9B8B8)
 
 val PupilGreen = Color(0xff008000)
 val light_PupilGreenContainer = Color(0xff82A984)
+val dark_PupilGreenContainer = Color(0xff79AD7B)
 
 val SpecialistCyan = Color(0xff03a8aa)
 val light_SpecialistCyanContainer = Color(0xff9DE5E9)
+val dark_SpecialistCyanContainer = Color(0xff77B5B8)
 
 val ExpertBlue = Color(0xff0000ff)
 val light_ExpertBlueContainer = Color(0xff7F9CC7)
+val dark_ExpertBlueContainer = Color(0xff77B5B8)
 
 val CandidMasterViolet = Color(0xffaa00aa)
-val light_CandidMasterVioletContainer = Color(0xffAE8FB1)
+val  light_CandidMasterVioletContainer = Color(0xffAE8FB1)
+val dark_CandidMasterVioletContainer = Color(0xffAE8FB1)
 
 val MasterOrange = Color(0xffffa500)
 val light_MasterOrangeContainer = Color(0xffFFB381)
+val dark_MasterOrangeContainer = Color(0xffD78651)
 
 val GrandmasterRed = Color(0xffff0000)
 val light_GrandmasterRedContainer = Color(0xffFA6C6C)
+val dark_GrandmasterRedContainer = Color(0xffCE7171)
 
 
 val TestingGreen = Color(0xff004C00)
@@ -95,9 +102,11 @@ val light_PartialYellowContainer = Color(0xffF8EC82)
 
 val CorrectGreen = Color(0xff008000)
 val light_CorrectGreenContainer = Color(0xff90D894)
+val dark_CorrectGreenContainer = Color(0xff79AD7B)
 
 val IncorrectRed = Color(0xffc00000)
 val light_IncorrectRedContainer = Color(0xffF08787)
+val dark_IncorrectRedContainer = Color(0xffCE7171)
 
 
 

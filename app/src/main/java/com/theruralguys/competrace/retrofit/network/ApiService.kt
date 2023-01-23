@@ -18,11 +18,11 @@ interface ApiService {
     suspend fun getContestList(): ApiResult<Contest>
 
     @GET("user.status")
-    suspend fun getUserSubmissions(@Query("handle") userHandle: String): ApiResult<Submission>
+    suspend fun getUserSubmissions(@Query("handle") handle: String): ApiResult<Submission>
 
     @GET("problemset.problems")
     suspend fun getProblemSet(): ApiResultProblemSet
 
     @GET("user.rating")
-    suspend fun getUserRatingChanges(@Query("handle") userHandle: String): ApiResult<UserRatingChanges>
+    suspend fun getUserRatingChanges(@Query("handle") handle: String): ApiResult<UserRatingChanges>
 }

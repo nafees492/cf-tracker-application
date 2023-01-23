@@ -1,25 +1,24 @@
 package com.theruralguys.competrace.ui.components
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Done
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.theruralguys.competrace.model.Contest
 import com.theruralguys.competrace.model.Problem
-import com.theruralguys.competrace.utils.copyTextToClipBoard
-import com.theruralguys.competrace.utils.getRatingContainerColor
-import com.theruralguys.competrace.utils.loadUrl
+import com.theruralguys.competrace.utils.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -30,16 +29,6 @@ fun ProblemCard(
     selectedChips: Set<String> = emptySet(),
     onClickFilterChip: (String) -> Unit = {},
 ) {
-    val isSelected: (String) -> Boolean = { selectedChips.contains(it) }
-
-    val trailingIcon: @Composable ((visible: Boolean) -> Unit) = {
-        AnimatedVisibility(visible = it) {
-            Icon(
-                imageVector = Icons.Rounded.Done,
-                contentDescription = ""
-            )
-        }
-    }
 
     val context = LocalContext.current
     val clipboardManager = LocalClipboardManager.current
@@ -56,6 +45,7 @@ fun ProblemCard(
         onLongClick = {
             copyTextToClipBoard(
                 text = problem.getLinkViaProblemSet(),
+                type = "Problem",
                 context = context,
                 clipboardManager = clipboardManager,
                 haptic = haptic
@@ -66,35 +56,93 @@ fun ProblemCard(
         Text(
             text = "${problem.index}. ${problem.name}",
             style = MaterialTheme.typography.titleLarge.copy(fontSize = 18.sp),
-            modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp, bottom = 4.dp),
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 8.dp, bottom = 4.dp),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
 
         problem.contestId?.let {
             Text(
-                text = "Contest: ${contestListById[it]?.name}",
+                text = "${contestListById[it]?.name}",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 4.dp),
+                modifier = Modifier.padding(horizontal = 8.dp),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
         }
 
         problem.tags?.let { tags ->
-            LazyRow(
+            FilterChipScrollableRow(
+                chipList = tags,
+                selectedChips = selectedChips,
+                onClickFilterChip = onClickFilterChip
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@Composable
+fun ProblemCardDesign(
+    rating: Int?,
+    color: Color,
+    onClick: () -> Unit,
+    onLongClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable (ColumnScope.() -> Unit)
+) {
+    Card(
+        modifier = modifier
+            .padding(4.dp)
+            .fillMaxWidth()
+            .height(
+                getCardHeight(
+                    titleLargeTexts = 1,
+                    bodyMediumTexts = 1,
+                    extraPaddingValues = 32.dp + FilterChipDefaults.Height
+                )
+            )
+            .animateContentSize()
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = onLongClick,
+            ),
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Column(
                 modifier = Modifier
-                    .padding(horizontal = 4.dp)
+                    .weight(1 - CardValues.TriangularFractionOfCard)
+                    .fillMaxHeight(),
+                content = content
+            )
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .width(
+                        getTextWidthInDp(
+                            testSize = MaterialTheme.typography.bodyMedium.fontSize,
+                            letters = 4
+                        )
+                    )
+                    .fillMaxHeight()
             ) {
-                items(tags.size) {
-                    FilterChip(
-                        selected = isSelected(tags[it]),
-                        onClick = { onClickFilterChip(tags[it]) },
-                        label = { Text(text = tags[it], style = MaterialTheme.typography.labelSmall) },
-                        trailingIcon = { trailingIcon(isSelected(tags[it])) },
-                        modifier = Modifier.padding(horizontal = 4.dp),
-                        shape = RectangleShape,
+                BackgroundDesignArrow(color = color)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    Text(
+                        text = "$rating",
+                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                        color = MaterialTheme.colorScheme.onBackground,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
             }

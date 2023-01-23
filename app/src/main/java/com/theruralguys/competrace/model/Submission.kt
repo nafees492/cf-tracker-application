@@ -1,15 +1,20 @@
 package com.theruralguys.competrace.model
 
 data class Submission(
-    val id: Int,
-    val contestId: Int?,
+    val author: Author?,
+    val contestId: Int,
     val creationTimeSeconds: Int,
+    val id: Int,
+    val memoryConsumedBytes: Int,
+    val passedTestCount: Int,
+    val points: Double?,
+    val pointsInfo: String?,
     val problem: Problem,
     val programmingLanguage: String,
-    val verdict: String?,
-    val passedTestCount: Int,
+    val relativeTimeSeconds: Int,
+    val testset: String,
     val timeConsumedMillis: Int,
-    val memoryConsumedBytes: Int
+    val verdict: String
 ) {
     fun creationTimeInMillis() = creationTimeSeconds * 1000L
 }

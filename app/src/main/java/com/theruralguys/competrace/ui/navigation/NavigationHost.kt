@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
@@ -26,15 +25,10 @@ fun NavigationHost(
     mainViewModel: MainViewModel,
     paddingValues: PaddingValues,
     navigateToLoginActivity: () -> Unit,
-    navigateToSettingsActivity: () -> Unit,
-
     ) {
+
     val coroutineScope = rememberCoroutineScope()
     val userPreferences = UserPreferences(LocalContext.current.applicationContext)
-
-    var requestedForUserInfo by rememberSaveable { mutableStateOf(false) }
-    var requestedForUserSubmission by rememberSaveable { mutableStateOf(false) }
-    var requestedForUserRatingChanges by rememberSaveable { mutableStateOf(false) }
 
     NavHost(
         navController = navController, startDestination = Screens.ContestsScreen.name,
@@ -54,14 +48,12 @@ fun NavigationHost(
             mainViewModel = mainViewModel,
             coroutineScope = coroutineScope,
             userPreferences = userPreferences,
-            navController = navController,
-            requestedForUserRatingChanges = requestedForUserRatingChanges,
-            toggleRequestedForUserRatingChangesTo = { requestedForUserRatingChanges = it },
         )
 
         problemSet(
             topAppBarController = topAppBarController,
-            mainViewModel = mainViewModel
+            mainViewModel = mainViewModel,
+            userPreferences = userPreferences
         )
 
         progress(
@@ -70,12 +62,7 @@ fun NavigationHost(
             mainViewModel = mainViewModel,
             userPreferences = userPreferences,
             navController = navController,
-            requestedForUserInfo = requestedForUserInfo,
-            toggleRequestedForUserInfoTo = { requestedForUserInfo = it },
-            requestedForUserSubmission = requestedForUserSubmission,
-            toggleRequestedForUserSubmissionTo = { requestedForUserSubmission = it },
             navigateToLoginActivity = navigateToLoginActivity,
-            navigateToSettingsActivity = navigateToSettingsActivity
         )
 
     }

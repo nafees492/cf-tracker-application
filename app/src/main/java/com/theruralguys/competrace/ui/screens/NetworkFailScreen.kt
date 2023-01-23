@@ -9,8 +9,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.theruralguys.competrace.ui.components.NormalButton
 import com.theruralguys.competrace.R
+import com.theruralguys.competrace.ui.components.NormalButton
 
 @Composable
 fun NetworkFailScreen(onClickRetry: () -> Unit) {
@@ -20,7 +20,7 @@ fun NetworkFailScreen(onClickRetry: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Icon(
-            painter = painterResource(id = R.drawable.ic_sentiment_dissatisfied_48px),
+            painter = painterResource(id = R.drawable.ic_error_48px),
             contentDescription = "Network Error",
             modifier = Modifier.size(80.dp).padding(8.dp)
         )

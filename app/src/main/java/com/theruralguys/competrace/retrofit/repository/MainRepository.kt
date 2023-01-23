@@ -18,15 +18,15 @@ class MainRepository @Inject constructor(private val apiService: ApiService) {
         emit(apiService.getContestList())
     }.flowOn(Dispatchers.IO)
 
-    fun getUserSubmissions(userHandle: String): Flow<ApiResult<Submission>> = flow {
-        emit(apiService.getUserSubmissions(userHandle = userHandle))
+    fun getUserSubmissions(handle: String): Flow<ApiResult<Submission>> = flow {
+        emit(apiService.getUserSubmissions(handle = handle))
     }.flowOn(Dispatchers.IO)
 
     fun getProblemSet(): Flow<ApiResultProblemSet> = flow {
         emit(apiService.getProblemSet())
     }.flowOn(Dispatchers.IO)
 
-    fun getUserRatingChanges(userHandle: String): Flow<ApiResult<UserRatingChanges>> = flow {
-        emit(apiService.getUserRatingChanges(userHandle))
+    fun getUserRatingChanges(handle: String): Flow<ApiResult<UserRatingChanges>> = flow {
+        emit(apiService.getUserRatingChanges(handle = handle))
     }.flowOn(Dispatchers.IO)
 }

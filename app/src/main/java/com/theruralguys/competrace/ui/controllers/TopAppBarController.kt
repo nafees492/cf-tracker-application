@@ -23,7 +23,6 @@ sealed class ToolbarStyles {
     object Large : ToolbarStyles()
 }
 
-
 sealed class SearchWidgetState {
     class Opened(
         val onSearchClicked: (String) -> Unit,

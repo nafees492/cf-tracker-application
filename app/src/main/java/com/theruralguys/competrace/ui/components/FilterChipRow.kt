@@ -38,7 +38,7 @@ fun FilterChipRow(
                 onClick = { onClickFilterChip(it) },
                 label = { Text(text = it, style = MaterialTheme.typography.labelMedium) },
                 trailingIcon = { trailingIcon(isSelected(it)) },
-                border = FilterChipDefaults.filterChipBorder(borderWidth = 1.dp)
+                border = FilterChipDefaults.filterChipBorder(borderWidth = 1.dp),
             )
         }
     }

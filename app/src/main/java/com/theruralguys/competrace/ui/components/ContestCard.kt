@@ -4,12 +4,12 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.Card
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
@@ -17,26 +17,20 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.theruralguys.competrace.R
 import com.theruralguys.competrace.model.Contest
-import com.theruralguys.competrace.ui.theme.light_CorrectGreenContainer
-import com.theruralguys.competrace.ui.theme.light_IncorrectRedContainer
 import com.theruralguys.competrace.utils.*
-
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun ContestCard(
     contest: Contest,
     modifier: Modifier = Modifier,
-    within3days: Boolean? = null,
-    onClickAddToCalender: () -> Unit = {}
+    within7Days: Boolean = false
 ) {
-
     val totalTimeInMillis =
         contest.startTimeInMillis() - System.currentTimeMillis()
     var timeLeftInMillis by remember { mutableStateOf(totalTimeInMillis) }
@@ -54,37 +48,76 @@ fun ContestCard(
     val clipboardManager: ClipboardManager = LocalClipboardManager.current
     val haptic = LocalHapticFeedback.current
 
-    val commonContent: @Composable ColumnScope.() -> Unit = {
-        Text(
-            text = contest.name,
-            style = MaterialTheme.typography.titleLarge.copy(fontSize = 18.sp),
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp, start = 8.dp, end = 8.dp, bottom = 4.dp),
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
+    val ratedRow: @Composable (Modifier) -> Unit = {
+        LazyRow(
+            modifier = it.padding(bottom = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(contest.rated.size) {
+                ElevatedCard() {
+                    Text(
+                        text = contest.rated[it],
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 7.dp)
+                    )
+                }
+            }
+        }
+    }
 
-        val (dayslen, hlen, mlen, slen) = convertMillisToDHMS(contest.durationInMillis())
-        Text(
-            text = "Length: ${formatLength(dayslen, hlen, mlen, slen)}",
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp),
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
+    val commonContent: @Composable () -> Unit = {
+        Column(modifier = Modifier.padding(horizontal = 8.dp)) {
+            Text(
+                text = contest.name,
+                style = MaterialTheme.typography.titleLarge.copy(fontSize = 18.sp),
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp, bottom = 4.dp),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
 
-        val startOrFinished = if (contest.phase == Phase.FINISHED) "Dated" else "Starts On"
-        Text(
-            text = "$startOrFinished: ${unixToDateAndTime(contest.startTimeInMillis())}",
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(bottom = 4.dp, start = 8.dp, end = 8.dp),
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
+            if (contest.phase == Phase.BEFORE) {
+                val (dayslen, hlen, mlen, slen) = convertMillisToDHMS(contest.durationInMillis())
+                val startTime = unixToDateDayTime(contest.startTimeInMillis())
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = startTime,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                    )
+                    Text(
+                        text = "|",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(horizontal = 8.dp),
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                    )
+                    Text(
+                        text = "Length: ${formatLength(dayslen, hlen, mlen, slen)}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            } else {
+                Text(
+                    text = unixToDateAndTime(contest.startTimeInMillis()),
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(bottom = 8.dp),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
     }
 
     val onClickContestCard: () -> Unit = {
@@ -93,6 +126,7 @@ fun ContestCard(
     val onLongClickContestCard: () -> Unit = {
         copyTextToClipBoard(
             text = contestUrl,
+            type = "Contest",
             context = context,
             clipboardManager = clipboardManager,
             haptic = haptic
@@ -104,7 +138,7 @@ fun ContestCard(
             if (contest.ratingChange > 0) "+${contest.ratingChange}" else "${contest.ratingChange}"
 
         val ratingChangeContainerColor =
-            if (contest.ratingChange > 0) light_CorrectGreenContainer else light_IncorrectRedContainer
+            getRatingChangeContainerColor(ratingChange = contest.ratingChange)
 
         FinishedContestCardDesign(
             ratingChange = ratingChange,
@@ -114,7 +148,7 @@ fun ContestCard(
             modifier = modifier
         ) {
             commonContent()
-            Row(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
+            Row(modifier = Modifier.padding(start = 8.dp, end = 8.dp, bottom = 8.dp)) {
                 Text(
                     text = "Rank: " + "${contest.rank}",
                     style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
@@ -134,20 +168,23 @@ fun ContestCard(
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }
+            ratedRow(Modifier.padding(horizontal = 8.dp))
         }
     } else {
+        val cardBgColor = if (contest.phase == Phase.CODING) MaterialTheme.colorScheme.secondary
+        else MaterialTheme.colorScheme.surfaceVariant
         Card(
             modifier = modifier
                 .fillMaxWidth()
-                .padding(8.dp)
+                .padding(4.dp)
                 .animateContentSize()
                 .combinedClickable(
                     onClick = onClickContestCard,
                     onLongClick = onLongClickContestCard,
                 ),
-            shape = RectangleShape,
-            backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
-            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+            backgroundColor = cardBgColor,
+            contentColor = contentColorFor(backgroundColor = cardBgColor),
+            shape = MaterialTheme.shapes.medium
         ) {
             Column {
                 commonContent()
@@ -155,8 +192,8 @@ fun ContestCard(
                     val (days, h, m, s) = convertMillisToDHMS(timeLeftInMillis)
                     val startPhrase = if (h + m + s != 0L) when (days) {
                         0L -> ""
-                        1L -> "$days day and "
-                        else -> "$days days and "
+                        1L -> "$days day, "
+                        else -> "$days days, "
                     } else when (days) {
                         1L -> "$days day"
                         else -> "$days days"
@@ -170,7 +207,7 @@ fun ContestCard(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        AssistChip(
+                        if (within7Days) AssistChip(
                             onClick = { /*TODO*/ },
                             leadingIcon = {
                                 Icon(
@@ -183,35 +220,39 @@ fun ContestCard(
                                 Row(verticalAlignment = Alignment.Bottom) {
                                     Text(
                                         text = startPhrase,
-                                        style = MaterialTheme.typography.titleMedium,
+                                        style = MaterialTheme.typography.bodyMedium,
                                         color = MaterialTheme.colorScheme.onSurface
                                     )
                                     if (h + m + s != 0L) {
                                         Text(
                                             text = timeStamp,
-                                            style = MaterialTheme.typography.titleMedium.copy(
+                                            style = MaterialTheme.typography.bodyMedium.copy(
                                                 fontFamily = FontFamily.Monospace
                                             ),
                                             color = MaterialTheme.colorScheme.onSurface
                                         )
                                         Text(
                                             text = " hrs",
-                                            style = MaterialTheme.typography.titleMedium,
+                                            style = MaterialTheme.typography.bodyMedium,
                                             color = MaterialTheme.colorScheme.onSurface
                                         )
                                     }
                                 }
-                            }
-                        )
+                            },
+                        ) else ratedRow(Modifier)
 
-                        IconButton(onClick = onClickAddToCalender) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_calendar_add_on_24px),
-                                contentDescription = "Add Event to Calender"
-                            )
-                        }
+                        NormalIconButton(
+                            iconId = R.drawable.ic_calendar_add_on_24px,
+                            onClick = { contest.addToCalender(context = context) },
+                            contentDescription = "Add to calender",
+                        )
                     }
                 }
+                if (within7Days || contest.phase == Phase.FINISHED) ratedRow(
+                    Modifier.padding(
+                        horizontal = 8.dp
+                    )
+                )
             }
         }
     }

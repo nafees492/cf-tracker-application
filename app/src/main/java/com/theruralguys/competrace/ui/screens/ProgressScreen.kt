@@ -12,30 +12,30 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.skydoves.landscapist.animation.circular.CircularRevealPlugin
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.glide.GlideImage
 import com.skydoves.landscapist.placeholder.placeholder.PlaceholderPlugin
 import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
+import com.theruralguys.competrace.R
+import com.theruralguys.competrace.data.UserPreferences
 import com.theruralguys.competrace.model.User
 import com.theruralguys.competrace.retrofit.util.ApiState
-import com.theruralguys.competrace.ui.components.BarGraph
+import com.theruralguys.competrace.ui.components.BarGraphNoOfQueVsRatings
 import com.theruralguys.competrace.ui.components.CircularIndeterminateProgressBar
 import com.theruralguys.competrace.ui.components.NormalButton
-import com.theruralguys.competrace.ui.theme.*
 import com.theruralguys.competrace.utils.getRatingTextColor
-import com.theruralguys.competrace.utils.processSubmittedProblemFromAPI
+import com.theruralguys.competrace.utils.processSubmittedProblemFromAPIResult
 import com.theruralguys.competrace.viewmodel.MainViewModel
-import com.theruralguys.competrace.R
 
 @Composable
 fun ProgressScreen(
     user: User,
     goToSubmission: () -> Unit,
     mainViewModel: MainViewModel,
-    requestForUserSubmission: () -> Unit,
-    toggleRequestedForUserSubmissionTo: (Boolean) -> Unit
+    userPreferences: UserPreferences,
 ) {
     val context = LocalContext.current
 
@@ -53,13 +53,14 @@ fun ProgressScreen(
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    GlideImage( // CoilImage, FrescoImage
+                    GlideImage(
+                        // CoilImage, FrescoImage
                         imageModel = { user.titlePhoto },
                         modifier = Modifier
                             .size(120.dp)
-                            .clip(RoundedCornerShape(8.dp)),
+                            .clip(RoundedCornerShape(4.dp)),
                         component = rememberImageComponent {
-                            +CircularRevealPlugin(duration = 350)
+                            +CircularRevealPlugin(duration = 300)
                             // shows a shimmering effect when loading an image.
                             +ShimmerPlugin(
                                 baseColor = MaterialTheme.colorScheme.surface,
@@ -76,36 +77,41 @@ fun ProgressScreen(
                     Column(
                         modifier = Modifier
                             .padding(16.dp)
-                            .fillMaxWidth()
+                            .fillMaxWidth(),
+                        verticalArrangement = Arrangement.SpaceEvenly
                     ) {
                         var fullName = ""
                         user.firstName?.let { fullName = fullName.plus("$it ") }
                         user.lastName?.let { fullName = fullName.plus(it) }
-
+                        if (fullName.isBlank()) fullName = user.handle
                         Text(
                             text = fullName,
                             style = MaterialTheme.typography.titleLarge,
-                            modifier = Modifier.padding(top = 8.dp, bottom = 4.dp),
-                            color = getRatingTextColor(rating = user.rating)
+                            modifier = Modifier.padding(vertical = 4.dp),
+                            color = getRatingTextColor(rating = user.rating),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
-                        Text(
+                        if (fullName != user.handle) Text(
                             text = user.handle,
                             style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.padding(bottom = 8.dp),
+                            modifier = Modifier.padding(vertical = 4.dp),
+                            color = getRatingTextColor(rating = user.rating),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+
+                        Text(
+                            text = "Rating: ${user.rating}",
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.padding(vertical = 4.dp),
                             color = getRatingTextColor(rating = user.rating)
                         )
 
                         Text(
-                            text = "Current Rating: ${user.rating}",
+                            text = "Max Rating: ${user.maxRating}",
                             style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(bottom = 4.dp),
-                            color = getRatingTextColor(rating = user.rating)
-                        )
-
-                        Text(
-                            text = "Maximum Rating: ${user.maxRating}",
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(bottom = 8.dp),
+                            modifier = Modifier.padding(vertical = 4.dp),
                             color = getRatingTextColor(rating = user.maxRating)
                         )
 
@@ -142,7 +148,7 @@ fun ProgressScreen(
                     }
                     is ApiState.Success<*> -> {
                         if (apiResultForUserSubmission.response.status == "OK") {
-                            processSubmittedProblemFromAPI(
+                            processSubmittedProblemFromAPIResult(
                                 mainViewModel = mainViewModel,
                                 apiResult = apiResultForUserSubmission
                             )
@@ -162,43 +168,35 @@ fun ProgressScreen(
                             val heightsForBarGraph: Array<Int> = Array(8) { 0 }
                             val maxQuestionCount = questionCount.max()
                             val stepSizeOfGraph = (maxQuestionCount / 10 + 1)
-                            if(maxQuestionCount != 0) questionCount.forEachIndexed { it, count ->
+                            if (maxQuestionCount != 0) questionCount.forEachIndexed { it, count ->
                                 heightsForBarGraph[it] = (count * 500) / (10 * stepSizeOfGraph)
                             }
 
-                            val colors = arrayOf(
-                                NewbieGray,
-                                PupilGreen,
-                                SpecialistCyan,
-                                ExpertBlue,
-                                CandidMasterViolet,
-                                MasterOrange,
-                                GrandmasterRed,
-                                MaterialTheme.colorScheme.onSurface
-                            )
-
-                            BarGraph(
+                            BarGraphNoOfQueVsRatings(
                                 heights = heightsForBarGraph,
-                                colors = colors,
                                 questionCount = questionCount,
                                 stepSizeOfGraph = stepSizeOfGraph
                             )
 
                         } else {
-                            mainViewModel.responseForUserSubmissions =
-                                ApiState.Failure(Throwable())
+                            mainViewModel.responseForUserSubmissions = ApiState.Failure(Throwable())
                         }
                     }
                     is ApiState.Failure -> {
                         NetworkFailScreen(
                             onClickRetry = {
-                                toggleRequestedForUserSubmissionTo(false)
-                                requestForUserSubmission()
+                                mainViewModel.requestForUserSubmission(
+                                    userPreferences = userPreferences,
+                                    isRefreshed = true
+                                )
                             }
                         )
                     }
                     is ApiState.Empty -> {
-                        requestForUserSubmission()
+                        mainViewModel.requestForUserSubmission(
+                            userPreferences = userPreferences,
+                            isRefreshed = false
+                        )
                     }
                     else -> {
                         // Nothing

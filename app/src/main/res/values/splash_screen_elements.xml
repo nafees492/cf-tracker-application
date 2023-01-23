@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <drawable name="splash_screen_icon" >@drawable/ic_competrace_logo_96</drawable>
+    <color name="background_color_light"> @color/light_surface </color>
+    <color name="background_color_dark"> @color/dark_surface </color>
+</resources>

@@ -15,30 +15,25 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.theruralguys.competrace.model.Contest
 import com.theruralguys.competrace.ui.components.ContestCard
-import com.theruralguys.competrace.ui.components.RotatingArrow
+import com.theruralguys.competrace.ui.components.ExpandArrow
 import com.theruralguys.competrace.utils.Phase
-import com.theruralguys.competrace.utils.addEventToCalendar
 
 @Composable
 fun UpcomingContestScreen(
     contestLists: Map<String, List<Contest>>,
     contestListBefore: Map<String, List<Contest>>
 ) {
-
-    val context = LocalContext.current
-
     var expanded by rememberSaveable {
         mutableStateOf(false)
     }
 
     LazyColumn(
         modifier = Modifier.animateContentSize()
-    ){
+    ) {
         contestLists[Phase.CODING]?.let { list ->
             item {
                 Text(
@@ -57,7 +52,7 @@ fun UpcomingContestScreen(
             }
 
         }
-        contestLists[Phase.BEFORE]?.run {
+        contestLists[Phase.BEFORE]?.let {
             item {
                 Text(
                     text = "Upcoming Contests",
@@ -67,10 +62,10 @@ fun UpcomingContestScreen(
                 )
             }
 
-            contestListBefore[Phase.WITHIN_2DAYS]?.let { list ->
+            contestListBefore[Phase.WITHIN_7DAYS]?.let { list ->
                 item {
                     Text(
-                        text = "Next 3 Days",
+                        text = "Next 7 Days",
                         style = MaterialTheme.typography.labelLarge,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
@@ -78,76 +73,50 @@ fun UpcomingContestScreen(
                 }
                 items(count = list.size) {
                     val contest = list[list.size - it - 1]
-                    val onClickAddToCalender : () -> Unit = {
-                        addEventToCalendar(
-                            context = context,
-                            title = contest.name,
-                            startTime = contest.startTimeInMillis(),
-                            endTime = contest.endTimeInMillis(),
-                            location = contest.getContestLink(),
-                            description = ""
-                        )
-                    }
-                    ContestCard(contest = contest, within3days = true, onClickAddToCalender = onClickAddToCalender)
+                    ContestCard(contest = contest, within7Days = true)
                 }
                 item {
                     NoContestTag(list = list)
                 }
             }
 
-            contestListBefore[Phase.MORE]?.let { list ->
+            contestListBefore[Phase.AFTER_7DAYS]?.let { list ->
                 item {
                     Row(
-                        modifier = Modifier.fillMaxWidth()
-                            .padding(horizontal = 8.dp)
-                            .clip(RoundedCornerShape(12.dp))
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(2.dp))
                             .clickable {
                                 expanded = !expanded
                             },
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
                             text = "After that",
                             style = MaterialTheme.typography.labelLarge,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                         )
-                        RotatingArrow(
+                        ExpandArrow(
                             expanded = expanded,
-                            onClick = { expanded = !expanded },
-                            modifier = Modifier.padding(vertical = 4.dp, horizontal =  16.dp)
+                            modifier = Modifier.padding(horizontal = 24.dp)
                         )
                     }
-
                 }
-                if(expanded) {
+                if (expanded) {
                     items(count = list.size) {
                         val contest = list[list.size - it - 1]
-                        val onClickAddToCalender: () -> Unit = {
-                            addEventToCalendar(
-                                context = context,
-                                title = contest.name,
-                                startTime = contest.startTimeInMillis(),
-                                endTime = contest.endTimeInMillis(),
-                                location = contest.getContestLink(),
-                                description = ""
-                            )
-                        }
-                        ContestCard(
-                            contest = contest,
-                            within3days = false,
-                            onClickAddToCalender = onClickAddToCalender
-                        )
+                        ContestCard(contest = contest, within7Days = false)
                     }
                     item {
                         NoContestTag(list = list)
                     }
                 }
+                item {
+                    Spacer(modifier = Modifier.height(120.dp))
+                }
             }
-        }
-        item {
-            Spacer(modifier = Modifier.height(120.dp))
         }
     }
 }
@@ -159,7 +128,8 @@ fun NoContestTag(list: List<Contest>) {
             text = "No Contest",
             style = MaterialTheme.typography.titleLarge,
             textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .padding(16.dp),
         )
     }

@@ -8,9 +8,9 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
@@ -18,14 +18,23 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.theruralguys.competrace.R
 import com.theruralguys.competrace.data.UserPreferences
 import com.theruralguys.competrace.retrofit.util.ApiState
 import com.theruralguys.competrace.ui.components.CircularIndeterminateProgressBar
-import com.theruralguys.competrace.ui.theme.AppTheme
-import com.theruralguys.competrace.ui.theme.CodeforcesProgressTrackerTheme
+import com.theruralguys.competrace.ui.components.NormalButton
+import com.theruralguys.competrace.ui.theme.CompetraceTheme
+import com.theruralguys.competrace.ui.theme.DarkModePref
+import com.theruralguys.competrace.ui.theme.MyTheme
 import com.theruralguys.competrace.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -34,7 +43,6 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class LoginActivity : ComponentActivity() {
-
     private val mainViewModel: MainViewModel by viewModels()
     private lateinit var userPreferences: UserPreferences
     private lateinit var coroutineScope: CoroutineScope
@@ -42,13 +50,15 @@ class LoginActivity : ComponentActivity() {
     @SuppressLint("CoroutineCreationDuringComposition")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             coroutineScope = rememberCoroutineScope()
             userPreferences = UserPreferences(LocalContext.current.applicationContext)
 
-            val currentTheme by userPreferences.currentThemeFlow.collectAsState(initial = AppTheme.SystemDefault.name)
+            val currentTheme by userPreferences.currentThemeFlow.collectAsState(initial = MyTheme.DEFAULT)
+            val darkModePref by userPreferences.darkModePrefFlow.collectAsState(initial = DarkModePref.SYSTEM_DEFAULT)
 
-            CodeforcesProgressTrackerTheme (currentTheme = currentTheme!!) {
+            CompetraceTheme(currentTheme = currentTheme!!, darkModePref = darkModePref!!) {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     color = MaterialTheme.colorScheme.background
@@ -78,7 +88,7 @@ class LoginActivity : ComponentActivity() {
         if (userHandle.isNullOrBlank()) {
             when (val apiResult = mainViewModel.responseForUserInfo) {
                 is ApiState.Empty -> {
-                    InputHandle(inputHandle = inputHandle, onValueChange = onInputChange)
+                    LoginScreen(inputHandle = inputHandle, onValueChange = onInputChange)
                 }
                 is ApiState.Loading -> {
                     CircularIndeterminateProgressBar(isDisplayed = true)
@@ -105,35 +115,97 @@ class LoginActivity : ComponentActivity() {
             }
         } else {
             val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent).also { this.finish() }
+            startActivity(intent).also {
+                Log.d(TAG, intent.toString())
+                this.finish()
+                Log.d(TAG, "Finished")
+            }
         }
     }
 
-    @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
+    @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
     @Composable
-    fun InputHandle(
+    fun LoginScreen(
         inputHandle: String,
         onValueChange: (String) -> Unit
     ) {
+        val screenHeight = LocalConfiguration.current.screenHeightDp.dp
         val keyboardController = LocalSoftwareKeyboardController.current
-        Column {
-            TextField(
-                value = inputHandle,
-                onValueChange = onValueChange,
-                label = { Text("Enter Your Codeforces Handle") },
-                maxLines = 1,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        keyboardController?.hide()
-                        mainViewModel.getUserInfo(inputHandle)
+
+        Box(
+            modifier = Modifier.fillMaxSize(),
+        ) {
+            LazyColumn(
+                modifier = Modifier.padding(horizontal = 8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                item {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = screenHeight * 0.35f, bottom = screenHeight * 0.1f),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.competrace_logo_96),
+                            contentDescription = "Competrace Logo",
+                            modifier = Modifier.size(72.dp),
+                        )
+
+                        Text(
+                            text = stringResource(id = R.string.app_name),
+                            style = MaterialTheme.typography.displaySmall.copy(
+                                fontWeight = FontWeight.Black,
+                                letterSpacing = 2.sp
+                            ),
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
                     }
-                )
-            )
+                }
+
+                item {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(0.8f),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        OutlinedTextField(
+                            value = inputHandle,
+                            onValueChange = onValueChange,
+                            label = { Text("Enter Codeforces Handle") },
+                            maxLines = 1,
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                            keyboardActions = KeyboardActions(
+                                onDone = {
+                                    keyboardController?.hide()
+                                }
+                            ),
+                            leadingIcon = {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_round_leaderboard_24),
+                                    contentDescription = "Codeforces Logo"
+                                )
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        NormalButton(
+                            text = "Login",
+                            onClick = {
+                                if (inputHandle.isNotBlank()) mainViewModel.getUserInfo(inputHandle)
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+
+                }
+            }
         }
     }
+
 
     companion object {
         const val TAG = "Login Activity"
     }
+
 }
