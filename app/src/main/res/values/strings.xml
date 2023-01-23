@@ -2,9 +2,9 @@
     <string name="app_name">Competrace</string>
     <string name="channel_name">Main Channel</string>
     <string name="channel_description">It is just a channel description.</string>
-    <string name="app_link_on_playstore">https://play.google.com/store/apps/details?id=<com class="theruralguys competrace"></com></string>
     <string name="feedback_email_address">gourav.ranayara@gmail.com</string>
     <string name="feedback_email_subject">Competrace - Reporting an Issue</string>
     <string name="feedback_email_body">"Android Version: \nCodeforces Handle: \n\nIssue: "</string>
     <string name="title_activity_splash_screen">SplashScreenActivity</string>
+    <string name="app_link_on_playstore">https://play.google.com/store/apps/details?id=com.example.competrace</string>
 </resources>
