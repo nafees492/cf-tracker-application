@@ -1,7 +1,7 @@
 package com.example.competrace.model
 
 data class Author(
-    val contestId: Int,
+    val contestId: Int?,
     val ghost: Boolean?,
     val members: List<Member>?,
     val participantType: String?,

@@ -7,9 +7,9 @@ fun shareTextToOtherApp(text: String, context: Context){
     val intent: Intent = Intent().apply {
         action = Intent.ACTION_SEND
         putExtra(Intent.EXTRA_TEXT, text)
-        type = "text/plain"
+        type = "text/*"
     }
 
-    val shareIntent = Intent.createChooser(intent, null)
+    val shareIntent = Intent.createChooser(intent, "Share Link Via:")
     context.startActivity(shareIntent)
 }

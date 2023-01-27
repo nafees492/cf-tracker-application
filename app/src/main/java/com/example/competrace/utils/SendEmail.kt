@@ -3,7 +3,6 @@ package com.example.competrace.utils
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.widget.Toast
 
 
 fun sendEmail(
@@ -12,17 +11,11 @@ fun sendEmail(
     emailSubject: String? = null,
     emailBody: String? = null,
 
-){
-    val intent = Intent(Intent.ACTION_SENDTO).apply {
-        data = Uri.parse("mailto:") // only email apps should handle this
-        putExtra(Intent.EXTRA_EMAIL, toSendEmail)
-        emailSubject?.let { putExtra(Intent.EXTRA_SUBJECT, it) }
-        emailBody?.let { putExtra(Intent.EXTRA_TEXT, it) }
-    }
+    ) {
+    val mailIntent = Intent(Intent.ACTION_VIEW)
+    val data =
+        Uri.parse("mailto:?subject=" + "$emailSubject" + "&body=" + "$emailBody" + "&to=" + toSendEmail[0])
+    mailIntent.data = data
+    context.startActivity(Intent.createChooser(mailIntent, "Send mail..."))
 
-    if (intent.resolveActivity(context.applicationContext.packageManager) != null) {
-        context.startActivity(intent)
-    } else {
-        Toast.makeText(context, "No Email Application Found", Toast.LENGTH_SHORT).show()
-    }
 }

@@ -67,9 +67,11 @@ fun SettingsAlertDialog(
     }
 
     val appLink = stringResource(id = R.string.app_link_on_playstore)
+    val shareAppText = stringResource(id = R.string.share_app_text)
     val feedbackEmailAddress = stringResource(id = R.string.feedback_email_address)
     val feedbackEmailSubject = stringResource(id = R.string.feedback_email_subject)
     val feedbackEmailBody = stringResource(id = R.string.feedback_email_body)
+    val privacyPolicyLink = stringResource(id = R.string.privacy_policy_link)
 
     AppDialog(
         openDialog = openSettingsDialog,
@@ -117,10 +119,10 @@ fun SettingsAlertDialog(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 NormalIconButton(
-                    iconId = R.drawable.ic_info_24px,
-                    onClick = { /*TODO*/ },
-                    text = "About",
-                    contentDescription = "About",
+                    iconId = R.drawable.ic_shield_24px,
+                    onClick = { loadUrl(context = context, url = privacyPolicyLink) },
+                    text = "Privacy Policy",
+                    contentDescription = "Privacy Policy",
                 )
                 NormalIconButton(
                     iconId = R.drawable.ic_report_24px,
@@ -147,7 +149,7 @@ fun SettingsAlertDialog(
                     iconId = R.drawable.ic_share_24px,
                     onClick = {
                         shareTextToOtherApp(
-                            text = appLink,
+                            text = shareAppText,
                             context = context
                         )
                     },
@@ -156,7 +158,9 @@ fun SettingsAlertDialog(
                 )
             }
             Row(
-                modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp),
                 horizontalArrangement = Arrangement.Center
             ) {
                 Text(

@@ -2,7 +2,7 @@ package com.example.competrace.model
 
 data class Submission(
     val author: Author?,
-    val contestId: Int,
+    val contestId: Int?,
     val creationTimeSeconds: Int,
     val id: Int,
     val memoryConsumedBytes: Int,
@@ -12,7 +12,7 @@ data class Submission(
     val problem: Problem,
     val programmingLanguage: String,
     val relativeTimeSeconds: Int,
-    val testset: String,
+    val testset: String?,
     val timeConsumedMillis: Int,
     val verdict: String
 ) {

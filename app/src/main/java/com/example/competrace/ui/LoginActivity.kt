@@ -96,7 +96,7 @@ class LoginActivity : ComponentActivity() {
                 is ApiState.Success<*> -> {
                     if (apiResult.response.status == "OK") {
                         coroutineScope.launch(Dispatchers.IO) {
-                            userPreferences.setHandleName(inputHandle)
+                            userPreferences.setHandleName(inputHandle.trim())
                         }
                     } else {
                         Log.e(TAG, apiResult.response.comment.toString())
@@ -109,9 +109,7 @@ class LoginActivity : ComponentActivity() {
                     Toast.makeText(this, apiResult.msg.toString(), Toast.LENGTH_SHORT).show()
                     mainViewModel.responseForUserInfo = ApiState.Empty
                 }
-                else -> {
-                    // Nothing
-                }
+                else -> {}
             }
         } else {
             val intent = Intent(this, MainActivity::class.java)
@@ -192,7 +190,7 @@ class LoginActivity : ComponentActivity() {
                         NormalButton(
                             text = "Login",
                             onClick = {
-                                if (inputHandle.isNotBlank()) mainViewModel.getUserInfo(inputHandle)
+                                if (inputHandle.isNotBlank()) mainViewModel.getUserInfo(inputHandle.trim())
                             },
                             modifier = Modifier.fillMaxWidth()
                         )

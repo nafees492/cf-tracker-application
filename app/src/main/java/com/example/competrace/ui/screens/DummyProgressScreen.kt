@@ -11,10 +11,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.example.competrace.R
+import com.example.competrace.data.UserPreferences
 import com.example.competrace.retrofit.util.ApiState
 import com.example.competrace.ui.components.BarGraphNoOfQueVsRatings
 import com.example.competrace.ui.components.CircularIndeterminateProgressBar
@@ -22,16 +23,13 @@ import com.example.competrace.ui.components.NormalButton
 import com.example.competrace.utils.getRatingTextColor
 import com.example.competrace.utils.processSubmittedProblemFromAPIResult
 import com.example.competrace.viewmodel.MainViewModel
-import com.example.competrace.R
 
 @Composable
 fun DummyProgressScreen(
     goToSubmission: () -> Unit,
     mainViewModel: MainViewModel,
-    requestForUserSubmission: () -> Unit,
-    toggleRequestedForUserSubmissionTo: (Boolean) -> Unit
+    userPreferences: UserPreferences
 ) {
-    val context = LocalContext.current
 
     val fullName = "User Name"
     val handle = "user_handle"
@@ -43,62 +41,56 @@ fun DummyProgressScreen(
         verticalArrangement = Arrangement.Top
     ) {
         item {
-            Box(
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                contentAlignment = Alignment.Center
+                    .padding(vertical = 16.dp, horizontal = 24.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
+                Image(
+                    // CoilImage, FrescoImage
+                    painter = painterResource(id = R.drawable.img_avatar),
+                    contentDescription = "User Avatar",
+                    alignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(120.dp)
+                        .clip(RoundedCornerShape(4.dp)),
+                )
+                Column(
+                    verticalArrangement = Arrangement.SpaceEvenly,
+                    modifier = Modifier.padding(start = 16.dp)
                 ) {
-                    Image(
-                        // CoilImage, FrescoImage
-                        painter = painterResource(id = R.drawable.img_avatar),
-                        contentDescription = "User Avatar",
-                        alignment = Alignment.Center,
-                        modifier = Modifier
-                            .size(120.dp)
-                            .clip(RoundedCornerShape(4.dp)),
+                    Text(
+                        text = fullName,
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.padding(vertical = 4.dp),
+                        color = getRatingTextColor(rating = rating),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
-                    Column(
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .fillMaxWidth(),
-                        verticalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        Text(
-                            text = fullName,
-                            style = MaterialTheme.typography.titleLarge,
-                            modifier = Modifier.padding(vertical = 4.dp),
-                            color = getRatingTextColor(rating = rating),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        Text(
-                            text =  handle,
-                            style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.padding(vertical = 4.dp),
-                            color = getRatingTextColor(rating = rating),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
+                    Text(
+                        text = handle,
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(vertical = 4.dp),
+                        color = getRatingTextColor(rating = rating),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
 
-                        Text(
-                            text = "Rating: $rating",
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(vertical = 4.dp),
-                            color = getRatingTextColor(rating = rating)
-                        )
+                    Text(
+                        text = "Rating: $rating",
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(vertical = 4.dp),
+                        color = getRatingTextColor(rating = rating)
+                    )
 
-                        Text(
-                            text = "Max Rating: $maxRating",
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(vertical = 4.dp),
-                            color = getRatingTextColor(rating = maxRating)
-                        )
+                    Text(
+                        text = "Max Rating: $maxRating",
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(vertical = 4.dp),
+                        color = getRatingTextColor(rating = maxRating)
+                    )
 
-                    }
                 }
             }
         }
@@ -107,7 +99,7 @@ fun DummyProgressScreen(
             NormalButton(
                 text = "Your Submissions", onClick = goToSubmission,
                 modifier = Modifier
-                    .padding(horizontal = 48.dp)
+                    .padding(horizontal = 24.dp)
                     .fillMaxWidth(),
                 trailingIcon = {
                     Icon(
@@ -120,9 +112,7 @@ fun DummyProgressScreen(
 
         item {
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(bottom = 60.dp),
+                modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
                 when (val apiResultForUserSubmission = mainViewModel.responseForUserSubmissions) {
@@ -135,11 +125,12 @@ fun DummyProgressScreen(
                                 mainViewModel = mainViewModel,
                                 apiResult = apiResultForUserSubmission
                             )
-                            val questionCount: Array<Int> = arrayOf(228, 119, 150, 309, 202, 233, 577, 60)
+                            val questionCount: Array<Int> =
+                                arrayOf(228, 119, 150, 309, 202, 233, 577, 60)
                             val heightsForBarGraph: Array<Int> = Array(8) { 0 }
                             val maxQuestionCount = questionCount.max()
                             val stepSizeOfGraph = (maxQuestionCount / 10 + 1)
-                            if(maxQuestionCount != 0) questionCount.forEachIndexed { it, count ->
+                            if (maxQuestionCount != 0) questionCount.forEachIndexed { it, count ->
                                 heightsForBarGraph[it] = (count * 500) / (10 * stepSizeOfGraph)
                             }
 
@@ -156,17 +147,14 @@ fun DummyProgressScreen(
                     is ApiState.Failure -> {
                         NetworkFailScreen(
                             onClickRetry = {
-                                toggleRequestedForUserSubmissionTo(false)
-                                requestForUserSubmission()
+                                mainViewModel.requestForUserSubmission(userPreferences, true)
                             }
                         )
                     }
                     is ApiState.Empty -> {
-                        requestForUserSubmission()
+                        mainViewModel.requestForUserSubmission(userPreferences, false)
                     }
-                    else -> {
-                        // Nothing
-                    }
+                    else -> { }
                 }
             }
         }

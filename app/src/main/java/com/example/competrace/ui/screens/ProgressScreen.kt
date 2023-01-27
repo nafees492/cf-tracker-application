@@ -10,15 +10,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.skydoves.landscapist.animation.circular.CircularRevealPlugin
-import com.skydoves.landscapist.components.rememberImageComponent
-import com.skydoves.landscapist.glide.GlideImage
-import com.skydoves.landscapist.placeholder.placeholder.PlaceholderPlugin
-import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
+import com.example.competrace.R
 import com.example.competrace.data.UserPreferences
 import com.example.competrace.model.User
 import com.example.competrace.retrofit.util.ApiState
@@ -28,7 +23,11 @@ import com.example.competrace.ui.components.NormalButton
 import com.example.competrace.utils.getRatingTextColor
 import com.example.competrace.utils.processSubmittedProblemFromAPIResult
 import com.example.competrace.viewmodel.MainViewModel
-import com.example.competrace.R
+import com.skydoves.landscapist.animation.circular.CircularRevealPlugin
+import com.skydoves.landscapist.components.rememberImageComponent
+import com.skydoves.landscapist.glide.GlideImage
+import com.skydoves.landscapist.placeholder.placeholder.PlaceholderPlugin
+import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
 
 @Composable
 fun ProgressScreen(
@@ -37,85 +36,77 @@ fun ProgressScreen(
     mainViewModel: MainViewModel,
     userPreferences: UserPreferences,
 ) {
-    val context = LocalContext.current
-
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Top
     ) {
         item {
-            Box(
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                contentAlignment = Alignment.Center
+                    .padding(vertical = 16.dp, horizontal = 24.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
+                GlideImage(
+                    // CoilImage, FrescoImage
+                    imageModel = { user.titlePhoto },
+                    modifier = Modifier
+                        .size(120.dp)
+                        .clip(RoundedCornerShape(4.dp)),
+                    component = rememberImageComponent {
+                        +CircularRevealPlugin(duration = 300)
+                        // shows a shimmering effect when loading an image.
+                        +ShimmerPlugin(
+                            baseColor = MaterialTheme.colorScheme.surface,
+                            highlightColor = MaterialTheme.colorScheme.onSurface
+                        )
+                        // Failure Image
+                        +PlaceholderPlugin.Failure(
+                            painterResource(
+                                id = R.drawable.broken_image_48px
+                            )
+                        )
+                    },
+                )
+                Column(
+                    verticalArrangement = Arrangement.SpaceEvenly,
+                    modifier = Modifier.padding(start = 16.dp)
                 ) {
-                    GlideImage(
-                        // CoilImage, FrescoImage
-                        imageModel = { user.titlePhoto },
-                        modifier = Modifier
-                            .size(120.dp)
-                            .clip(RoundedCornerShape(4.dp)),
-                        component = rememberImageComponent {
-                            +CircularRevealPlugin(duration = 300)
-                            // shows a shimmering effect when loading an image.
-                            +ShimmerPlugin(
-                                baseColor = MaterialTheme.colorScheme.surface,
-                                highlightColor = MaterialTheme.colorScheme.onSurface
-                            )
-                            // Failure Image
-                            +PlaceholderPlugin.Failure(
-                                painterResource(
-                                    id = R.drawable.broken_image_48px
-                                )
-                            )
-                        },
+                    var fullName = ""
+                    user.firstName?.let { fullName = fullName.plus("$it ") }
+                    user.lastName?.let { fullName = fullName.plus(it) }
+                    if (fullName.isBlank()) fullName = user.handle
+                    Text(
+                        text = fullName,
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.padding(vertical = 4.dp),
+                        color = getRatingTextColor(rating = user.rating),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
-                    Column(
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .fillMaxWidth(),
-                        verticalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        var fullName = ""
-                        user.firstName?.let { fullName = fullName.plus("$it ") }
-                        user.lastName?.let { fullName = fullName.plus(it) }
-                        if (fullName.isBlank()) fullName = user.handle
-                        Text(
-                            text = fullName,
-                            style = MaterialTheme.typography.titleLarge,
-                            modifier = Modifier.padding(vertical = 4.dp),
-                            color = getRatingTextColor(rating = user.rating),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        if (fullName != user.handle) Text(
-                            text = user.handle,
-                            style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.padding(vertical = 4.dp),
-                            color = getRatingTextColor(rating = user.rating),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
+                    if (fullName != user.handle) Text(
+                        text = user.handle,
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(vertical = 4.dp),
+                        color = getRatingTextColor(rating = user.rating),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
 
-                        Text(
-                            text = "Rating: ${user.rating}",
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(vertical = 4.dp),
-                            color = getRatingTextColor(rating = user.rating)
-                        )
+                    Text(
+                        text = "Rating: ${user.rating}",
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(vertical = 4.dp),
+                        color = getRatingTextColor(rating = user.rating)
+                    )
 
-                        Text(
-                            text = "Max Rating: ${user.maxRating}",
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(vertical = 4.dp),
-                            color = getRatingTextColor(rating = user.maxRating)
-                        )
+                    Text(
+                        text = "Max Rating: ${user.maxRating}",
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(vertical = 4.dp),
+                        color = getRatingTextColor(rating = user.maxRating)
+                    )
 
-                    }
                 }
             }
         }
@@ -124,7 +115,7 @@ fun ProgressScreen(
             NormalButton(
                 text = "Your Submissions", onClick = goToSubmission,
                 modifier = Modifier
-                    .padding(horizontal = 48.dp)
+                    .padding(horizontal = 24.dp)
                     .fillMaxWidth(),
                 trailingIcon = {
                     Icon(
@@ -137,9 +128,7 @@ fun ProgressScreen(
 
         item {
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(bottom = 60.dp),
+                modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
                 when (val apiResultForUserSubmission = mainViewModel.responseForUserSubmissions) {
@@ -198,9 +187,7 @@ fun ProgressScreen(
                             isRefreshed = false
                         )
                     }
-                    else -> {
-                        // Nothing
-                    }
+                    else -> {}
                 }
             }
         }

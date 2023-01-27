@@ -5,6 +5,7 @@ data class Problem(
     val index: String,
     val name: String,
     val type: String,
+    val problemsetName: String?,
     val rating: Int?,
     val tags: List<String>?,
     val points: Double?,

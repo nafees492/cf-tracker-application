@@ -18,7 +18,10 @@ data class User(
     val rank: String?,
     val rating: Int?,
     val registrationTimeSeconds: Int,
-    val titlePhoto: String
+    val titlePhoto: String,
+    val email: String?,
+    val vkId: String?,
+    val openId: String?,
 ){
     val ratingCategory = rating?.let {
             when(it){

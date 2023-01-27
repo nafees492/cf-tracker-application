@@ -32,8 +32,8 @@ fun BarGraphNoOfQueVsRatings(heights: Array<Int>, questionCount: Array<Int>, ste
     val gap = 22
     val top = 150f
     val bottom = 750f
-    val start = 125f
-    val end = 875f
+    val start = 160f
+    val end = start + 750f
 
     val ratingArray = arrayListOf(
         "800 - 1199",
@@ -130,7 +130,7 @@ fun BarGraphNoOfQueVsRatings(heights: Array<Int>, questionCount: Array<Int>, ste
             drawIntoCanvas {
                 it.nativeCanvas.drawText(
                     /* text = */ "${stepSizeOfGraph * i}",
-                    /* x = */ 100f,            // x-coordinates of the origin (top left)
+                    /* x = */ 140f,            // x-coordinates of the origin (top left)
                     /* y = */ bottom - 50f * i + 7f, // y-coordinates of the origin (top left)
                     /* paint = */ getTextPaint(textColor, 20f, Paint1.Align.RIGHT)
                 )
@@ -152,9 +152,9 @@ fun BarGraphNoOfQueVsRatings(heights: Array<Int>, questionCount: Array<Int>, ste
 
         drawIntoCanvas {
             it.nativeCanvas.drawText(
-                /* text = */ "No Of Questions vs Rating",
-                /* x = */ 500f,            // x-coordinates of the origin (top left)
-                /* y = */ 975f, // y-coordinates of the origin (top left)
+                /* text = */ "Rating",
+                /* x = */ 540f,            // x-coordinates of the origin (top left)
+                /* y = */ 955f, // y-coordinates of the origin (top left)
                 /* paint = */ getTextPaint(textColor, 48f, Paint1.Align.CENTER,)
             )
         }
@@ -193,10 +193,18 @@ fun BarGraphNoOfQueVsRatings(heights: Array<Int>, questionCount: Array<Int>, ste
                 it.nativeCanvas.drawText(
                     /* text = */ ratingArray[i],
                     /* x = */ 270f,            // x-coordinates of the origin (top left)
-                    /* y = */ 240f + i * (width + gap), // y-coordinates of the origin (top left)
+                    /* y = */ 270f + i * (width + gap), // y-coordinates of the origin (top left)
                     /* paint = */ getTextPaint(textColor,20f, Paint1.Align.RIGHT)
                 )
             }
+        }
+        drawIntoCanvas {
+            it.nativeCanvas.drawText(
+                /* text = */ "No. of Questions",
+                /* x = */ 560f,            // x-coordinates of the origin (top left)
+                /* y = */ 120f, // y-coordinates of the origin (top left)
+                /* paint = */ getTextPaint(textColor,48f, Paint1.Align.CENTER)
+            )
         }
     }
 }
