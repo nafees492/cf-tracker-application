@@ -4,7 +4,7 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "com.example.competrace",
+  "applicationId": "com.gourav.competrace",
   "variantName": "release",
   "elements": [
     {

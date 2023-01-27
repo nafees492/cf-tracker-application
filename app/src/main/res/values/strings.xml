@@ -6,7 +6,7 @@
     <string name="feedback_email_subject">Competrace - Reporting an Issue</string>
     <string name="feedback_email_body">"Android Version: \nCodeforces Handle: \n\nIssue: "</string>
     <string name="title_activity_splash_screen">SplashScreenActivity</string>
-    <string name="app_link_on_playstore">https://play.google.com/store/apps/details?id=com.example.competrace</string>
+    <string name="app_link_on_playstore">https://play.google.com/store/apps/details?id=com.gourav.competrace</string>
     <string name="privacy_policy_link">https://github.com/gorv02/privacy_policy/blob/master/privacy-policy.md</string>
-    <string name="share_app_text">Competrace - CP Contest Tracker\n\nTrack Your Competitive Programming Progress with this App.\n\nDownload it Now: https://play.google.com/store/apps/details?id=com.example.competrace</string>
+    <string name="share_app_text">Competrace - CP Contest Tracker\n\nTrack Your Competitive Programming Progress with this App.\n\nDownload it Now: https://play.google.com/store/apps/details?id=com.gourav.competrace</string>
 </resources>
