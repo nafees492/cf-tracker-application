@@ -26,7 +26,7 @@ fun getRatingContainerColor(rating: Int?) =
         in 1900..2099 -> dark_CandidMasterVioletContainer
         in 2100..2399 -> dark_MasterOrangeContainer
         in 2400..4000 -> dark_GrandmasterRedContainer
-        else -> MaterialTheme.colorScheme.primaryContainer
+        else -> MaterialTheme.colorScheme.primary
     } else when (rating) {
         in 800..1199 -> light_NewbieGrayContainer
         in 1200..1399 -> light_PupilGreenContainer
@@ -35,7 +35,7 @@ fun getRatingContainerColor(rating: Int?) =
         in 1900..2099 -> light_CandidMasterVioletContainer
         in 2100..2399 -> light_MasterOrangeContainer
         in 2400..4000 -> light_GrandmasterRedContainer
-        else -> MaterialTheme.colorScheme.primaryContainer
+        else -> MaterialTheme.colorScheme.primary
     }
 
 @Composable

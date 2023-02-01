@@ -78,7 +78,6 @@ fun ProblemSubmissionCard(
         Text(
             text = "Last Submission: ${unixToDateDayTime(submissions[0].creationTimeInMillis())}",
             style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Light,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
             modifier = Modifier.padding(start = 8.dp, end = 8.dp, bottom = 8.dp),
             maxLines = 1,
@@ -95,7 +94,7 @@ fun ProblemSubmissionCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 0.dp),
+                .padding(horizontal = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
@@ -145,7 +144,7 @@ fun ProblemSubmissionCardDesign(
                 getCardHeight(
                     titleLargeTexts = 1,
                     bodyMediumTexts = 3,
-                    extraPaddingValues = FilterChipDefaults.Height + 48.dp
+                    extraPaddingValues = FilterChipDefaults.Height + 32.dp
                 )
             )
             .animateContentSize()

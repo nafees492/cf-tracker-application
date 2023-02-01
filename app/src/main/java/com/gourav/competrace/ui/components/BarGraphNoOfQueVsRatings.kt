@@ -1,39 +1,32 @@
 package com.gourav.competrace.ui.components
 
-import android.graphics.Point
-import android.graphics.Typeface
+import android.content.Context
 import androidx.compose.animation.core.FloatTweenSpec
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.content.res.ResourcesCompat
+import com.gourav.competrace.R
 import com.gourav.competrace.ui.theme.*
 import android.graphics.Paint as Paint1
 
 
 @Composable
-fun BarGraphNoOfQueVsRatings(heights: Array<Int>, questionCount: Array<Int>, stepSizeOfGraph: Int) {
-
-    val width = 69
-    val gap = 22
-    val top = 150f
-    val bottom = 750f
-    val start = 160f
-    val end = start + 750f
+fun BarGraphNoOfQueVsRatings(questionCount: Array<Int>) {
 
     val ratingArray = arrayListOf(
         "800 - 1199",
@@ -57,11 +50,6 @@ fun BarGraphNoOfQueVsRatings(heights: Array<Int>, questionCount: Array<Int>, ste
         MaterialTheme.colorScheme.onSurface
     )
 
-    val points = arrayListOf<Point>()
-    for (i in 0..7) {
-        points.add(Point((i + 1) * gap + i * width, heights[i]))
-    }
-
     val context = LocalContext.current
     val textColor = MaterialTheme.colorScheme.onSurface.toArgb()
 
@@ -72,41 +60,62 @@ fun BarGraphNoOfQueVsRatings(heights: Array<Int>, questionCount: Array<Int>, ste
         animationSpec = FloatTweenSpec(duration = 1000)
     )
 
-    val screenWidthDp: Int = context.resources.configuration.screenWidthDp + 32
+    val screenWidthInDp = context.resources.configuration.screenWidthDp.dp
 
-    val primary = MaterialTheme.colorScheme.primary
     val onSurface = MaterialTheme.colorScheme.onSurface
 
     var status by remember {
         mutableStateOf("Total Question Attempted: " + questionCount.sum())
     }
 
-    val onClickedCanvas: (Offset) -> Unit = {
-        var index = -1
-        for ((i, point) in points.withIndex()) {
-            if (it.x > point.x + start && it.x < point.x + start + width && it.y > bottom - point.y && it.y < bottom) {
-                index = i
-                break
-            }
-        }
-        status = when (index) {
-            -1 -> "Total Question Attempted: " + questionCount.sum()
-            7 -> "Incorrect/Partial Submissions: ${questionCount[index]}"
-            else -> "For Rating (${ratingArray[index]}): ${questionCount[index]}"
-        }
+    var selectedOffset by remember {
+        mutableStateOf(Offset(0f, 0f))
     }
 
     Canvas(
         modifier = Modifier
-            .fillMaxWidth()
-            .height(screenWidthDp.dp)
-            .padding(16.dp)
+            .size(screenWidthInDp * 0.9f)
             .pointerInput(Unit) {
                 detectTapGestures(
-                    onTap = onClickedCanvas
+                    onTap = { selectedOffset = it }
                 )
             }
     ) {
+        val start = size.width * 0.2f
+        val bottom = size.height * 0.7f
+        val top = bottom - size.height * 0.55f
+        val end = start + size.width * 0.7f
+
+        val barWidth = size.width * 0.065f
+        val gap = size.height * 0.02f
+        val verticalStep = size.height * 0.05f
+
+        val labelSize = size.width * 0.02f
+        val headingSize = size.width * 0.05f
+
+        val maxQuestionCount = questionCount.max()
+        val stepSizeOfGraph = (maxQuestionCount / 10 + 1)
+
+        val xValueAndHeight = arrayListOf<Offset>()
+        for (i in 0..7) {
+            xValueAndHeight.add(Offset((i + 1) * gap + i * barWidth, (questionCount[i] * verticalStep) / stepSizeOfGraph))
+        }
+
+        selectedOffset.let {
+            var index = -1
+            for ((i, point) in xValueAndHeight.withIndex()) {
+                if (it.x > point.x + start && it.x < point.x + start + barWidth && it.y > bottom - point.y && it.y < bottom) {
+                    index = i
+                    break
+                }
+            }
+            status = when (index) {
+                -1 -> "Total Question Attempted: " + questionCount.sum()
+                7 -> "Incorrect/Partial Submissions: ${questionCount[index]}"
+                else -> "For Rating (${ratingArray[index]}): ${questionCount[index]}"
+            }
+        }
+
         drawLine(
             start = Offset(x = start, y = bottom),
             end = Offset(x = start, y = top),
@@ -120,53 +129,43 @@ fun BarGraphNoOfQueVsRatings(heights: Array<Int>, questionCount: Array<Int>, ste
             strokeWidth = 1f
         )
 
-        for (i in 1..11) {
+        for (i in 1..10) {
             drawLine(
-                start = Offset(x = start, y = bottom - 50f * i),
-                end = Offset(x = end, y = bottom - 50f * i),
+                start = Offset(x = start, y = bottom - verticalStep * i),
+                end = Offset(x = end, y = bottom - verticalStep * i),
                 color = onSurface,
                 strokeWidth = 0.4f
             )
-            drawIntoCanvas {
-                it.nativeCanvas.drawText(
-                    /* text = */ "${stepSizeOfGraph * i}",
-                    /* x = */ 140f,            // x-coordinates of the origin (top left)
-                    /* y = */ bottom - 50f * i + 7f, // y-coordinates of the origin (top left)
-                    /* paint = */ getTextPaint(textColor, 20f, Paint1.Align.RIGHT)
-                )
-            }
-        }
-
-        /* drawRoundRect(
-             color = primary,
-             topLeft = Offset(
-                 x = 700f,
-                 y = 135f
-             ),
-             size = Size(width = 260f, height = 260f),
-             alpha = 0.5f,
-             cornerRadius = CornerRadius(x = 5f, y = 5f)
-         )*/
-
-
-
-        drawIntoCanvas {
-            it.nativeCanvas.drawText(
-                /* text = */ "Rating",
-                /* x = */ 540f,            // x-coordinates of the origin (top left)
-                /* y = */ 955f, // y-coordinates of the origin (top left)
-                /* paint = */ getTextPaint(textColor, 48f, Paint1.Align.CENTER,)
+            drawLabelInCanvas(
+                context = context,
+                text = "${stepSizeOfGraph * i}",
+                color = textColor,
+                size = labelSize,
+                position = Offset(
+                    start - size.width * 0.02f,
+                    bottom - verticalStep * i + size.width * 0.008f
+                ),
+                alignment = Paint1.Align.RIGHT
             )
         }
 
-        drawIntoCanvas {
-            it.nativeCanvas.drawText(
-                /* text = */ status,
-                /* x = */ 500f,            // x-coordinates of the origin (top left)
-                /* y = */ 80f, // y-coordinates of the origin (top left)
-                /* paint = */ getTextPaint(textColor, 48f, Paint1.Align.CENTER)
-            )
-        }
+        drawLabelInCanvas(
+            context = context,
+            text = "Rating",
+            color = textColor,
+            size = headingSize,
+            position = Offset(size.width * 0.5f, size.height * 0.9f),
+            alignment = Paint1.Align.CENTER
+        )
+
+        drawLabelInCanvas(
+            context = context,
+            text = status,
+            color = textColor,
+            size = headingSize,
+            position = Offset(size.width * 0.5f, size.height * 0.1f),
+            alignment = Paint1.Align.CENTER
+        )
 
         begin = true
 
@@ -174,47 +173,71 @@ fun BarGraphNoOfQueVsRatings(heights: Array<Int>, questionCount: Array<Int>, ste
             drawRect(
                 color = colors[i],
                 topLeft = Offset(
-                    x = points[i].x + start,
-                    y = bottom - (points[i].y) * animateHeight
+                    x = xValueAndHeight[i].x + start,
+                    y = bottom - (xValueAndHeight[i].y) * animateHeight
                 ),
-                size = Size(width = width.toFloat(), height = (points[i].y) * animateHeight)
+                size = Size(width = barWidth, height = (xValueAndHeight[i].y) * animateHeight)
             )
         }
     }
     Canvas(
         modifier = Modifier
-            .fillMaxWidth()
-            .height(screenWidthDp.dp)
-            .padding(16.dp)
             .rotate(-90f)
+            .size(screenWidthInDp * 0.9f)
     ) {
+        val barWidth = size.height * 0.065f
+        val gap = size.height * 0.02f
+        val barLabelStart = Offset(
+            size.width * 0.27f,
+            size.height * 0.20f + gap + barWidth * 0.6f
+        )
+        val labelSize = size.width * 0.02f
+        val headingSize = size.width * 0.05f
+
         for (i in 0..7) {
-            drawIntoCanvas {
-                it.nativeCanvas.drawText(
-                    /* text = */ ratingArray[i],
-                    /* x = */ 270f,            // x-coordinates of the origin (top left)
-                    /* y = */ 270f + i * (width + gap), // y-coordinates of the origin (top left)
-                    /* paint = */ getTextPaint(textColor,20f, Paint1.Align.RIGHT)
-                )
-            }
-        }
-        drawIntoCanvas {
-            it.nativeCanvas.drawText(
-                /* text = */ "No. of Questions",
-                /* x = */ 560f,            // x-coordinates of the origin (top left)
-                /* y = */ 120f, // y-coordinates of the origin (top left)
-                /* paint = */ getTextPaint(textColor,48f, Paint1.Align.CENTER)
+            drawLabelInCanvas(
+                context = context,
+                text = ratingArray[i],
+                color = textColor,
+                size = labelSize,
+                position = Offset(
+                    barLabelStart.x,
+                    barLabelStart.y + i * (barWidth + gap)
+                ),
+                alignment = Paint1.Align.RIGHT
             )
         }
+        drawLabelInCanvas(
+            context = context,
+            text = "No. of Questions",
+            color = textColor,
+            size = headingSize,
+            position = Offset(size.width * 0.6f, size.height * 0.1f),
+            alignment = Paint1.Align.CENTER
+        )
     }
+
 }
 
-fun getTextPaint(
-    textColor: Int, size: Float,
-    alignment: Paint1.Align,
-) = Paint1().apply {
-        textSize = size
-        color = textColor
-        typeface = Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL)
-        textAlign = alignment
+fun DrawScope.drawLabelInCanvas(
+    context: Context,
+    text: String,
+    color: Int,
+    size: Float,
+    position: Offset,
+    alignment: Paint1.Align
+) {
+    drawIntoCanvas {
+        it.nativeCanvas.drawText(
+            /* text = */ text,
+            /* x = */ position.x,            // x-coordinates of the origin (top left)
+            /* y = */ position.y, // y-coordinates of the origin (top left)
+            /* paint = */ Paint1().apply {
+                textSize = size
+                this.color = color
+                typeface = ResourcesCompat.getFont(context, R.font.montserrat_regular)
+                textAlign = alignment
+            }
+        )
     }
+}

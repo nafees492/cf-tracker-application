@@ -6,7 +6,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.google.accompanist.swiperefresh.SwipeRefresh
@@ -14,17 +17,16 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.gourav.competrace.data.UserPreferences
 import com.gourav.competrace.model.Problem
 import com.gourav.competrace.retrofit.util.ApiState
-import com.gourav.competrace.ui.components.CircularProgressIndicator
-import com.gourav.competrace.ui.components.ProblemSetScreenActions
-import com.gourav.competrace.ui.components.RatingRangeSlider
-import com.gourav.competrace.ui.components.SettingsAlertDialog
+import com.gourav.competrace.ui.components.*
 import com.gourav.competrace.ui.controllers.TopAppBarController
 import com.gourav.competrace.ui.navigation.Screens
 import com.gourav.competrace.ui.screens.NetworkFailScreen
 import com.gourav.competrace.ui.screens.ProblemSetScreen
 import com.gourav.competrace.viewmodel.MainViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalComposeUiApi::class)
 fun NavGraphBuilder.problemSet(
     topAppBarController: TopAppBarController,
     mainViewModel: MainViewModel,
@@ -33,9 +35,7 @@ fun NavGraphBuilder.problemSet(
     composable(route = Screens.ProblemSetScreen.name) {
         topAppBarController.title = Screens.ProblemSetScreen.title
 
-        val onClickFilterIcon: () -> Unit = {
-            topAppBarController.expandToolbar = !topAppBarController.expandToolbar
-        }
+        val coroutineScope = rememberCoroutineScope()
 
         var startRatingValue by rememberSaveable {
             mutableStateOf(800)
@@ -58,7 +58,7 @@ fun NavGraphBuilder.problemSet(
             userPreferences = userPreferences
         )
 
-        topAppBarController.expandedContent = {
+        topAppBarController.expandedTopAppBarContent = {
             RatingRangeSlider(
                 start = startRatingValue, end = endRatingValue,
                 updateStartAndEnd = { start, end ->
@@ -68,11 +68,42 @@ fun NavGraphBuilder.problemSet(
             )
         }
 
+        var searchQuery by remember {
+            mutableStateOf("")
+        }
+        val searchBarFocusRequester = remember { FocusRequester() }
+
+        topAppBarController.searchWidgetContent = {
+            SearchAppBar(
+                query = searchQuery,
+                onValueChange = { searchQuery = it },
+                onCloseClicked = {
+                    searchQuery = ""
+                    topAppBarController.isSearchWidgetOpen = false
+                },
+                modifier = Modifier.focusRequester(searchBarFocusRequester),
+                placeHolderText = "Search Problem / Contest"
+            )
+        }
+
+        val onClickSearch: () -> Unit = {
+            topAppBarController.isSearchWidgetOpen = true
+            coroutineScope.launch {
+                delay(100)
+                searchBarFocusRequester.requestFocus()
+            }
+        }
+
+        val onClickFilterIcon: () -> Unit = {
+            topAppBarController.isTopAppBarExpanded = !topAppBarController.isTopAppBarExpanded
+        }
+
         topAppBarController.actions = {
             ProblemSetScreenActions(
+                onClickSearch = onClickSearch,
                 onClickSettings = { isSettingsDialogueOpen = true },
                 onClickFilterIcon = onClickFilterIcon,
-                isToolbarExpanded = topAppBarController.expandToolbar,
+                isToolbarExpanded = topAppBarController.isTopAppBarExpanded,
                 ratingRange = startRatingValue..endRatingValue
             )
         }
@@ -107,17 +138,25 @@ fun NavGraphBuilder.problemSet(
                         mainViewModel.tagList.clear()
                         mainViewModel.tagList.addAll(setOfTags)
 
-                        val filteredProblemList = arrayListOf<Problem>()
+                        val filteredProblemListByRatingAndSearch = arrayListOf<Problem>()
+
                         allProblems.forEach {
                             it.rating?.let { rating ->
-                                if (rating in startRatingValue..endRatingValue) filteredProblemList.add(
-                                    it
-                                )
+                                val problemName = it.name.lowercase()
+                                val contestName = mainViewModel.contestListById[it.contestId]?.name?.lowercase() ?: ""
+                                if (rating in startRatingValue..endRatingValue) {
+                                    if (searchQuery.isBlank()
+                                        || problemName.contains(searchQuery.lowercase())
+                                        || contestName.contains(searchQuery.lowercase())
+                                    ) {
+                                        filteredProblemListByRatingAndSearch.add(it)
+                                    }
+                                }
                             }
                         }
 
                         ProblemSetScreen(
-                            listOfProblem = filteredProblemList,
+                            listOfProblem = filteredProblemListByRatingAndSearch,
                             contestListById = mainViewModel.contestListById,
                             tagList = mainViewModel.tagList
                         )

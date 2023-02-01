@@ -9,6 +9,6 @@ fun textUnitToDp(testUnit: TextUnit) =
     with(LocalDensity.current) { testUnit.toDp() }
 
 @Composable
-fun getTextWidthInDp(testSize: TextUnit, letters: Int) =
+fun getTextWidthInDp(testSize: TextUnit, letters: Int = 1) =
     textUnitToDp(testUnit = testSize) * letters
 

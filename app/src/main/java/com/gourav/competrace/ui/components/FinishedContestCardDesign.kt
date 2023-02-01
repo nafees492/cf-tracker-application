@@ -4,14 +4,11 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Card
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -19,7 +16,7 @@ import com.gourav.competrace.utils.CardValues.TriangularFractionOfCard
 import com.gourav.competrace.utils.getCardHeight
 import com.gourav.competrace.utils.getTextWidthInDp
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun FinishedContestCardDesign(
     ratingChange: String,
@@ -35,8 +32,8 @@ fun FinishedContestCardDesign(
             .fillMaxWidth()
             .height(getCardHeight(
                 titleLargeTexts = 1,
-                bodyMediumTexts = 3,
-                extraPaddingValues = 64.dp
+                bodyMediumTexts = 2,
+                extraPaddingValues = FilterChipDefaults.Height + 32.dp
             ))
             .animateContentSize()
             .combinedClickable(
@@ -73,7 +70,7 @@ fun FinishedContestCardDesign(
                 ) {
                     Text(
                         text = ratingChange,
-                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace),
+                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
                         color = MaterialTheme.colorScheme.onSurface,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis

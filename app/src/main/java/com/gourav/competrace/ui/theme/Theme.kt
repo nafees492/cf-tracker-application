@@ -118,7 +118,7 @@ fun CompetraceTheme(
 
     MaterialTheme(
         colorScheme = myColorScheme,
-        typography = CompetraceTypography,
+        typography = MontserratTypography,
         shapes = CompetraceShapes
     ) {
         // TODO (M3): MaterialTheme doesn't provide LocalIndication, remove when it does

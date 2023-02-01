@@ -5,9 +5,11 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Done
-import androidx.compose.material3.*
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.res.painterResource
 import com.gourav.competrace.R
 import com.gourav.competrace.utils.UserSubmissionFilter
 
@@ -15,6 +17,7 @@ import com.gourav.competrace.utils.UserSubmissionFilter
 @Composable
 fun RowScope.ProblemSubmissionsScreenActions(
     currentSelectionForUserSubmissions: String,
+    onClickSearch: () -> Unit,
     onClickAll: () -> Unit,
     onClickCorrect: () -> Unit,
     onClickIncorrect: () -> Unit
@@ -30,14 +33,9 @@ fun RowScope.ProblemSubmissionsScreenActions(
         }
     }
 
-    IconButton(onClick = {
-        expanded = true
-    }) {
-        Icon(
-            painter = painterResource(id = R.drawable.ic_filter_list_24px),
-            contentDescription = "",
-        )
-    }
+    NormalIconButton(iconId = R.drawable.ic_search_24px, onClick = onClickSearch)
+
+    NormalIconButton(iconId = R.drawable.ic_filter_list_24px, onClick = { expanded = true })
 
     AnimatedVisibility(visible = expanded) {
         DropdownMenu(

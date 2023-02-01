@@ -7,16 +7,21 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.gourav.competrace.data.UserPreferences
+import com.gourav.competrace.model.Problem
+import com.gourav.competrace.model.Submission
 import com.gourav.competrace.model.User
 import com.gourav.competrace.retrofit.util.ApiState
 import com.gourav.competrace.ui.components.ProblemSubmissionsScreenActions
 import com.gourav.competrace.ui.components.ProgressScreenActions
+import com.gourav.competrace.ui.components.SearchAppBar
 import com.gourav.competrace.ui.components.SettingsAlertDialog
 import com.gourav.competrace.ui.controllers.TopAppBarController
 import com.gourav.competrace.ui.navigation.Screens
@@ -27,6 +32,7 @@ import com.gourav.competrace.utils.UserSubmissionFilter
 import com.gourav.competrace.utils.processSubmittedProblemFromAPIResult
 import com.gourav.competrace.viewmodel.MainViewModel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -41,8 +47,11 @@ fun NavGraphBuilder.progress(
 ) {
 
     composable(route = Screens.ProgressScreen.name) {
-        topAppBarController.title = Screens.ProgressScreen.title
-        topAppBarController.expandToolbar = false
+        topAppBarController.apply {
+            title = Screens.ProgressScreen.title
+            isTopAppBarExpanded = false
+            isSearchWidgetOpen = false
+        }
 
         var isSettingsDialogueOpen by remember {
             mutableStateOf(false)
@@ -128,8 +137,37 @@ fun NavGraphBuilder.progress(
     }
 
     composable(Screens.UserSubmissionsScreen.name) {
-        topAppBarController.title = Screens.UserSubmissionsScreen.title
-        topAppBarController.expandToolbar = false
+        topAppBarController.apply {
+            title = Screens.UserSubmissionsScreen.title
+            isTopAppBarExpanded = false
+        }
+
+
+        var searchQuery by remember {
+            mutableStateOf("")
+        }
+        val searchBarFocusRequester = remember { FocusRequester() }
+
+        topAppBarController.searchWidgetContent = {
+            SearchAppBar(
+                query = searchQuery,
+                onValueChange = { searchQuery = it },
+                onCloseClicked = {
+                    searchQuery = ""
+                    topAppBarController.isSearchWidgetOpen = false
+                },
+                modifier =  Modifier.focusRequester(searchBarFocusRequester),
+                placeHolderText = "Search Problem / Contest"
+            )
+        }
+
+        val onClickSearch: () -> Unit = {
+            topAppBarController.isSearchWidgetOpen = true
+            coroutineScope.launch {
+                delay(100)
+                searchBarFocusRequester.requestFocus()
+            }
+        }
 
         var currentSelection by rememberSaveable {
             mutableStateOf(UserSubmissionFilter.ALL)
@@ -138,6 +176,7 @@ fun NavGraphBuilder.progress(
         topAppBarController.actions = {
             ProblemSubmissionsScreenActions(
                 currentSelectionForUserSubmissions = currentSelection,
+                onClickSearch = onClickSearch,
                 onClickAll = { currentSelection = UserSubmissionFilter.ALL },
                 onClickCorrect = { currentSelection = UserSubmissionFilter.CORRECT },
                 onClickIncorrect = { currentSelection = UserSubmissionFilter.INCORRECT }
@@ -168,12 +207,25 @@ fun NavGraphBuilder.progress(
                             apiResult = apiResult
                         )
 
-                        ProblemSubmissionScreen(
-                            submittedProblemsWithSubmissions = when (currentSelection) {
+                        val filteredSubmission = if (searchQuery.isBlank()) {
+                            when (currentSelection) {
                                 UserSubmissionFilter.ALL -> mainViewModel.submittedProblems
                                 UserSubmissionFilter.CORRECT -> mainViewModel.correctProblems
                                 else -> mainViewModel.incorrectProblems
-                            },
+                            }
+                        } else {
+                            val temp = arrayListOf<Pair<Problem, ArrayList<Submission>>>()
+                            mainViewModel.submittedProblems.forEach {
+                                val problemName = it.first.name.lowercase()
+                                val contestName = mainViewModel.contestListById[it.first.contestId]?.name?.lowercase() ?: ""
+                                if (problemName.contains(searchQuery.lowercase()) || contestName.contains(searchQuery.lowercase()))
+                                    temp.add(it)
+                            }
+                            temp
+                        }
+
+                        ProblemSubmissionScreen(
+                            submittedProblemsWithSubmissions = filteredSubmission,
                             contestListById = mainViewModel.contestListById
                         )
                     } else {

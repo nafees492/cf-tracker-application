@@ -44,7 +44,7 @@ fun UpcomingContestScreen(
                 )
             }
             items(count = list.size) {
-                ContestCard(contest = list[list.size - it - 1])
+                ContestCard(contest = list[list.size - it - 1], within7Days = true)
             }
 
             item {

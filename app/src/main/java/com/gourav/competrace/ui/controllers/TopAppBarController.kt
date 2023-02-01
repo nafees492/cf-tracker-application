@@ -9,25 +9,23 @@ import androidx.compose.runtime.Composable
 interface TopAppBarController {
     var title: String
     var scrollBehavior: TopAppBarScrollBehavior
-    var toolbarStyle: ToolbarStyles
+    var topAppBarStyle: TopAppBarStyles
     var onClickNavUp: () -> Unit
-    var expandToolbar: Boolean
-    var expandedContent: @Composable () -> Unit
+    var isTopAppBarExpanded: Boolean
+    var expandedTopAppBarContent: @Composable () -> Unit
     var actions: @Composable RowScope.() -> Unit
     fun clearActions()
+    var isSearchWidgetOpen: Boolean
+    var searchWidgetContent: @Composable () -> Unit
 }
 
-sealed class ToolbarStyles {
-    object Small : ToolbarStyles()
-    object Medium : ToolbarStyles()
-    object Large : ToolbarStyles()
+sealed class TopAppBarStyles {
+    object Small : TopAppBarStyles()
+    object Medium : TopAppBarStyles()
+    object Large : TopAppBarStyles()
 }
 
 sealed class SearchWidgetState {
-    class Opened(
-        val onSearchClicked: (String) -> Unit,
-        val onCloseClicked: () -> Unit
-    ) : SearchWidgetState()
-
-    class Closed : SearchWidgetState()
+    class Opened(val content: @Composable () -> Unit) : SearchWidgetState()
+    object Closed : SearchWidgetState()
 }

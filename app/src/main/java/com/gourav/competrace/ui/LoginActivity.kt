@@ -153,7 +153,7 @@ class LoginActivity : ComponentActivity() {
                         Text(
                             text = stringResource(id = R.string.app_name),
                             style = MaterialTheme.typography.displaySmall.copy(
-                                fontWeight = FontWeight.Black,
+                                fontWeight = FontWeight.Bold,
                                 letterSpacing = 2.sp
                             ),
                             color = MaterialTheme.colorScheme.onSurface

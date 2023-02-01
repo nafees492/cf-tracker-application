@@ -101,7 +101,7 @@ fun ProblemCardDesign(
                 getCardHeight(
                     titleLargeTexts = 1,
                     bodyMediumTexts = 1,
-                    extraPaddingValues = 32.dp + FilterChipDefaults.Height
+                    extraPaddingValues = 24.dp + FilterChipDefaults.Height
                 )
             )
             .animateContentSize()

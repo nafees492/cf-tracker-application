@@ -128,7 +128,9 @@ fun ProgressScreen(
 
         item {
             Box(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
                 contentAlignment = Alignment.Center
             ) {
                 when (val apiResultForUserSubmission = mainViewModel.responseForUserSubmissions) {
@@ -154,17 +156,9 @@ fun ProgressScreen(
                                 }
                             }
                             questionCount[7] = mainViewModel.incorrectProblems.size
-                            val heightsForBarGraph: Array<Int> = Array(8) { 0 }
-                            val maxQuestionCount = questionCount.max()
-                            val stepSizeOfGraph = (maxQuestionCount / 10 + 1)
-                            if (maxQuestionCount != 0) questionCount.forEachIndexed { it, count ->
-                                heightsForBarGraph[it] = (count * 500) / (10 * stepSizeOfGraph)
-                            }
 
                             BarGraphNoOfQueVsRatings(
-                                heights = heightsForBarGraph,
-                                questionCount = questionCount,
-                                stepSizeOfGraph = stepSizeOfGraph
+                                questionCount = questionCount
                             )
 
                         } else {

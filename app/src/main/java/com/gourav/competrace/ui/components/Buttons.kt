@@ -67,7 +67,9 @@ fun NormalIconButton(
                 text = it,
                 style = MaterialTheme.typography.labelSmall,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.width(48.dp)
+                modifier = Modifier.width(54.dp),
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis
             )
         }
     }

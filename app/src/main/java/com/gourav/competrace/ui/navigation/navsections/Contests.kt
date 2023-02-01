@@ -30,11 +30,10 @@ import com.gourav.competrace.ui.screens.NetworkFailScreen
 import com.gourav.competrace.ui.screens.UpcomingContestScreen
 import com.gourav.competrace.utils.FinishedContestFilter
 import com.gourav.competrace.utils.Phase
-import com.gourav.competrace.utils.processContestFromAPIResult
+import com.gourav.competrace.utils.pagerTabIndicatorOffset
 import com.gourav.competrace.viewmodel.MainViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import com.gourav.competrace.utils.pagerTabIndicatorOffset
 import java.util.*
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -48,8 +47,11 @@ fun NavGraphBuilder.contests(
 ) {
 
     composable(route = Screens.ContestsScreen.name) {
-        topAppBarController.title = Screens.ContestsScreen.title
-        topAppBarController.expandToolbar = false
+        topAppBarController.apply {
+            title = Screens.ContestsScreen.title
+            isTopAppBarExpanded = false
+            isSearchWidgetOpen = false
+        }
 
         val tabTitles =
             listOf(Screens.UpcomingContestsScreen.title, Screens.FinishedContestsScreen.title)
@@ -138,11 +140,6 @@ fun NavGraphBuilder.contests(
                         is ApiState.Success<*> -> {
                             if (apiResult.response.status == "OK") {
 
-                                processContestFromAPIResult(
-                                    apiResult = apiResult,
-                                    mainViewModel = mainViewModel
-                                )
-
                                 when (index) {
                                     0 -> {
                                         UpcomingContestScreen(
@@ -152,7 +149,7 @@ fun NavGraphBuilder.contests(
                                     }
                                     1 -> {
                                         Column {
-                                            when (val apiResult =
+                                            when (val apiResultForUserRatingChanges =
                                                 mainViewModel.responseForUserRatingChanges) {
                                                 is ApiState.Loading -> {
                                                     Box(
@@ -166,7 +163,7 @@ fun NavGraphBuilder.contests(
                                                 }
                                                 is ApiState.Success<*> -> {
                                                     val userRatingChanges =
-                                                        apiResult.response.result as List<UserRatingChanges>
+                                                        apiResultForUserRatingChanges.response.result as List<UserRatingChanges>
 
                                                     userRatingChanges.forEach { userRatingChange ->
                                                         mainViewModel.contestListsByPhase[Phase.FINISHED]!!.find {

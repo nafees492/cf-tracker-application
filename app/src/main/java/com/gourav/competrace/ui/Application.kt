@@ -8,8 +8,8 @@ import androidx.compose.runtime.*
 import androidx.navigation.compose.rememberNavController
 import com.gourav.competrace.ui.components.BottomNavigationBar
 import com.gourav.competrace.ui.components.CompetraceTopAppBar
-import com.gourav.competrace.ui.controllers.ToolbarStyles
 import com.gourav.competrace.ui.controllers.TopAppBarController
+import com.gourav.competrace.ui.controllers.TopAppBarStyles
 import com.gourav.competrace.ui.navigation.NavigationHost
 import com.gourav.competrace.ui.navigation.Screens
 import com.gourav.competrace.viewmodel.MainViewModel
@@ -33,19 +33,23 @@ fun Application(
                 topAppBarScrollBehaviour
             )
 
-            override var toolbarStyle: ToolbarStyles by mutableStateOf(ToolbarStyles.Small)
+            override var topAppBarStyle: TopAppBarStyles by mutableStateOf(TopAppBarStyles.Small)
 
             override var onClickNavUp: () -> Unit by mutableStateOf({})
 
-            override var expandToolbar: Boolean by mutableStateOf(false)
+            override var isTopAppBarExpanded: Boolean by mutableStateOf(false)
 
-            override var expandedContent: @Composable () -> Unit by mutableStateOf({})
+            override var expandedTopAppBarContent: @Composable () -> Unit by mutableStateOf({})
 
             override var actions: @Composable RowScope.() -> Unit by mutableStateOf({})
 
             override fun clearActions() {
                 actions = {}
             }
+
+            override var isSearchWidgetOpen: Boolean by mutableStateOf(false)
+
+            override var searchWidgetContent: @Composable () -> Unit by mutableStateOf({})
         }
     }
 

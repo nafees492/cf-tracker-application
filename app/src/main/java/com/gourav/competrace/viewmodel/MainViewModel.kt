@@ -14,6 +14,7 @@ import com.gourav.competrace.model.User
 import com.gourav.competrace.retrofit.repository.MainRepository
 import com.gourav.competrace.retrofit.util.ApiState
 import com.gourav.competrace.utils.Phase
+import com.gourav.competrace.utils.processContestFromAPIResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -115,7 +116,14 @@ class MainViewModel @Inject constructor(
                     _isContestListRefreshing.update { false }
                     Log.e(TAG, it.toString())
                 }.collect {
-                    responseForContestList = ApiState.Success(it)
+
+                    val apiResult = ApiState.Success(it)
+                    processContestFromAPIResult(
+                        apiResult = apiResult,
+                        mainViewModel = this@MainViewModel
+                    )
+
+                    responseForContestList = apiResult
                     _isContestListRefreshing.update { false }
                     Log.d(TAG, it.toString())
                 }
