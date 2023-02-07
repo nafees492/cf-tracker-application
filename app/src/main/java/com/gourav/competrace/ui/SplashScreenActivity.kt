@@ -10,7 +10,6 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.gourav.competrace.data.UserPreferences
@@ -32,7 +31,6 @@ class SplashScreenActivity : ComponentActivity() {
         val splashScreen = installSplashScreen()
 
         setContent {
-            val coroutineScope = rememberCoroutineScope()
             userPreferences = UserPreferences(LocalContext.current)
             val userHandle by userPreferences.handleNameFlow.collectAsState(initial = "")
 

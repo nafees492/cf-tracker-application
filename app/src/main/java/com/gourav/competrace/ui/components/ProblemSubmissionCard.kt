@@ -1,5 +1,6 @@
 package com.gourav.competrace.ui.components
 
+import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
@@ -28,9 +29,11 @@ fun ProblemSubmissionCard(
     problem: Problem,
     submissions: ArrayList<Submission>,
     contestListById: MutableMap<Int, Contest>,
+    showTags: Boolean,
+    onClick: () -> Unit,
+    selectedChips: Set<String>,
+    onClickFilterChip: (String) -> Unit,
     modifier: Modifier = Modifier,
-    selectedChips: Set<String> = emptySet(),
-    onClickFilterChip: (String) -> Unit = {}
 ) {
     val context = LocalContext.current
     val clipboardManager: ClipboardManager = LocalClipboardManager.current
@@ -41,13 +44,12 @@ fun ProblemSubmissionCard(
     ProblemSubmissionCardDesign(
         rating = problem.rating,
         color = ratingContainerColor,
-        onClick = {
-            loadUrl(context = context, url = problem.getLinkViaContest())
-        },
+        onClick = onClick,
         onLongClick = {
+            Log.d("Copy URL", problem.toString())
             copyTextToClipBoard(
                 text = problem.getLinkViaContest(),
-                type = "Problem",
+                toastMessage = "Problem",
                 context = context,
                 clipboardManager = clipboardManager,
                 haptic = haptic
@@ -76,7 +78,7 @@ fun ProblemSubmissionCard(
         }
 
         Text(
-            text = "Last Submission: ${unixToDateDayTime(submissions[0].creationTimeInMillis())}",
+            text = "Last Submission: ${unixToDateDay(submissions[0].creationTimeInMillis())}",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
             modifier = Modifier.padding(start = 8.dp, end = 8.dp, bottom = 8.dp),
@@ -117,7 +119,7 @@ fun ProblemSubmissionCard(
         }
 
         problem.tags?.let { tags ->
-            FilterChipScrollableRow(
+            if(showTags) FilterChipScrollableRow(
                 chipList = tags,
                 selectedChips = selectedChips,
                 onClickFilterChip = onClickFilterChip

@@ -15,6 +15,7 @@ import com.gourav.competrace.retrofit.repository.MainRepository
 import com.gourav.competrace.retrofit.util.ApiState
 import com.gourav.competrace.utils.Phase
 import com.gourav.competrace.utils.processContestFromAPIResult
+import com.gourav.competrace.utils.processSubmittedProblemFromAPIResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -45,8 +46,8 @@ class MainViewModel @Inject constructor(
     private val _requestedForUserInfo = MutableStateFlow(false)
     private val requestedForUserInfo = _requestedForUserInfo.asStateFlow()
 
-    fun requestForUserInfo(userPreferences: UserPreferences, isRefreshed: Boolean) {
-        if (isRefreshed || !requestedForUserInfo.value) {
+    fun requestForUserInfo(userPreferences: UserPreferences, isForced: Boolean) {
+        if (isForced || !requestedForUserInfo.value) {
             _requestedForUserInfo.update { true }
             viewModelScope.launch(Dispatchers.IO) {
                 userPreferences.handleNameFlow.collect { handle ->
@@ -108,7 +109,8 @@ class MainViewModel @Inject constructor(
     fun getContestList() {
         viewModelScope.launch {
             delay(1000)
-            mainRepository.getContestList()
+            // Normal Contests.
+            mainRepository.getContestList(gym = false)
                 .onStart {
                     responseForContestList = ApiState.Loading
                 }.catch {
@@ -122,9 +124,21 @@ class MainViewModel @Inject constructor(
                         apiResult = apiResult,
                         mainViewModel = this@MainViewModel
                     )
-
                     responseForContestList = apiResult
+
                     _isContestListRefreshing.update { false }
+                    Log.d(TAG, it.toString())
+                }
+            delay(1000)
+            // Gym Contests.
+            mainRepository.getContestList(gym = true)
+                .collect {
+                    if(it.status == "OK"){
+                        val contestList = it.result
+                        contestList?.forEach{ contest ->
+                            contestListById[contest.id] = contest
+                        }
+                    }
                     Log.d(TAG, it.toString())
                 }
         }
@@ -168,8 +182,8 @@ class MainViewModel @Inject constructor(
     private val _requestedForUserSubmission = MutableStateFlow(false)
     private val requestedForUserSubmission = _requestedForUserSubmission.asStateFlow()
 
-    fun requestForUserSubmission(userPreferences: UserPreferences, isRefreshed: Boolean) {
-        if (isRefreshed || !requestedForUserSubmission.value) {
+    fun requestForUserSubmission(userPreferences: UserPreferences, isForced: Boolean) {
+        if (isForced || !requestedForUserSubmission.value) {
             _requestedForUserSubmission.update { true }
             viewModelScope.launch(Dispatchers.IO) {
                 userPreferences.handleNameFlow.collect { handle ->
@@ -198,7 +212,14 @@ class MainViewModel @Inject constructor(
                     _isUserSubmissionRefreshing.update { false }
                     Log.e(TAG, it.toString())
                 }.collect {
-                    responseForUserSubmissions = ApiState.Success(it)
+
+                    val apiResult = ApiState.Success(it)
+                    processSubmittedProblemFromAPIResult(
+                        mainViewModel = this@MainViewModel,
+                        apiResult = apiResult
+                    )
+                    responseForUserSubmissions = apiResult
+
                     _isUserSubmissionRefreshing.update { false }
                     Log.d(TAG, it.toString())
                 }
@@ -208,8 +229,8 @@ class MainViewModel @Inject constructor(
     private val _requestedForUserRatingChanges = MutableStateFlow(false)
     private val requestedForUserRatingChanges = _requestedForUserRatingChanges.asStateFlow()
 
-    fun requestForUserRatingChanges(userPreferences: UserPreferences, isRefreshed: Boolean) {
-        if (isRefreshed || !requestedForUserRatingChanges.value) {
+    fun requestForUserRatingChanges(userPreferences: UserPreferences, isForced: Boolean) {
+        if (isForced || !requestedForUserRatingChanges.value) {
             _requestedForUserRatingChanges.update { true }
             viewModelScope.launch(Dispatchers.IO) {
                 userPreferences.handleNameFlow.collect { handle ->

@@ -8,13 +8,13 @@ import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 
 fun copyTextToClipBoard(
-    text: String,
-    type: String,
     context: Context,
+    text: String?,
+    toastMessage: String? = null,
     clipboardManager: ClipboardManager,
     haptic: HapticFeedback
 ) {
     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-    clipboardManager.setText(AnnotatedString(text))
-    Toast.makeText(context, "$type Link Copied", Toast.LENGTH_SHORT).show()
+    text?.let { clipboardManager.setText(AnnotatedString(text)) }
+    toastMessage?.let {  Toast.makeText(context, it, Toast.LENGTH_SHORT).show() }
 }

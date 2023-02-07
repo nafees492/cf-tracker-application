@@ -4,14 +4,15 @@ import android.annotation.SuppressLint
 import android.os.Build
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -48,6 +49,7 @@ fun SettingsAlertDialog(
 
     val currentTheme by userPreferences.currentThemeFlow.collectAsState(initial = CompetraceTheme.DEFAULT)
     val darkModePref by userPreferences.darkModePrefFlow.collectAsState(initial = DarkModePref.SYSTEM_DEFAULT)
+    val showTagsInProblemSet by userPreferences.showTagsFlow.collectAsState(initial = true)
 
     val context = LocalContext.current
 
@@ -69,12 +71,10 @@ fun SettingsAlertDialog(
         }
     }
 
-    val isThemeOptionSelected: (String) -> Boolean = {
-        it == currentTheme!!
-    }
-
-    val isDarkModePrefOptionSelected: (String) -> Boolean = {
-        it == darkModePref!!
+    val setShowTagsInProblemSet: (Boolean) -> Unit = {
+        coroutineScope.launch(Dispatchers.IO) {
+            userPreferences.setShowTagsFlow(it)
+        }
     }
 
     val appLink = stringResource(id = R.string.app_link_on_playstore)
@@ -94,6 +94,30 @@ fun SettingsAlertDialog(
     ) {
         LazyColumn {
             item {
+                Text(
+                    text = "General",
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .padding(horizontal = 8.dp)
+                        .fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Show Tags",
+                        style = MaterialTheme.typography.labelLarge,
+                    )
+                    Switch(
+                        checked = showTagsInProblemSet,
+                        onCheckedChange = setShowTagsInProblemSet
+                    )
+                }
+            }
+
+            item {
                 Divider(
                     modifier = Modifier.padding(vertical = 4.dp)
                 )
@@ -106,7 +130,7 @@ fun SettingsAlertDialog(
 
                     RadioButtonSelectionForAppTheme(
                         themeOptions = themeOptions,
-                        isOptionSelected = isThemeOptionSelected,
+                        isOptionSelected = { it == currentTheme },
                         onClickOption = setTheme
                     )
                 }
@@ -117,7 +141,7 @@ fun SettingsAlertDialog(
                 )
                 RadioButtonSelectionForDarkModePref(
                     darkModePrefOptions = darkModePrefOptions,
-                    isOptionSelected = isDarkModePrefOptionSelected,
+                    isOptionSelected = { it == darkModePref },
                     onClickOption = setDarkModePref,
                 )
                 Divider(
@@ -178,11 +202,11 @@ fun SettingsAlertDialog(
 
                 val text2 = buildAnnotatedString {
                     append("Designed By: Vidhi Khosla - ")
-                    withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)){
+                    withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
                         append("vid2001work@gmail.com")
                     }
                     append("\nDeveloped By: Lokesh Patidar - ")
-                    withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)){
+                    withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
                         append("gourav.ranayara@gmail.com")
                     }
                 }
@@ -198,13 +222,10 @@ fun SettingsAlertDialog(
                         horizontalArrangement = Arrangement.Center
                     ) {
                         SelectionContainer {
-                            Text(
+                            NormalClickableText(
                                 text = it,
+                                onClick = { version = if (version == text1) text2 else text1 },
                                 style = MaterialTheme.typography.labelLarge,
-                                modifier = Modifier
-                                    .clickable {
-                                        version = if (version == text1) text2 else text1
-                                    },
                                 textAlign = TextAlign.Center
                             )
                         }

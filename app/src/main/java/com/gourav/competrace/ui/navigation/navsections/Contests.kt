@@ -182,14 +182,14 @@ fun NavGraphBuilder.contests(
                                                     FailureTag(onClickRetry = {
                                                         mainViewModel.requestForUserRatingChanges(
                                                             userPreferences = userPreferences,
-                                                            isRefreshed = true
+                                                            isForced = true
                                                         )
                                                     })
                                                 }
                                                 is ApiState.Empty -> {
                                                     mainViewModel.requestForUserRatingChanges(
                                                         userPreferences = userPreferences,
-                                                        isRefreshed = false
+                                                        isForced = false
                                                     )
                                                 }
                                                 else -> {}

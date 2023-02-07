@@ -50,6 +50,7 @@ fun Application(
             override var isSearchWidgetOpen: Boolean by mutableStateOf(false)
 
             override var searchWidgetContent: @Composable () -> Unit by mutableStateOf({})
+            override var fab: @Composable () -> Unit by mutableStateOf({})
         }
     }
 

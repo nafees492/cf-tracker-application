@@ -35,7 +35,8 @@ fun BarGraphNoOfQueVsRatings(questionCount: Array<Int>) {
         "1600 - 1899",
         "1900 - 2099",
         "2100 - 2399",
-        "2400 - 4000",
+        "2400 - 3500",
+        "Unrated",
         "Incorrect Submissions"
     )
 
@@ -47,6 +48,7 @@ fun BarGraphNoOfQueVsRatings(questionCount: Array<Int>) {
         CandidMasterViolet,
         MasterOrange,
         GrandmasterRed,
+        MaterialTheme.colorScheme.primary,
         MaterialTheme.colorScheme.onSurface
     )
 
@@ -86,8 +88,8 @@ fun BarGraphNoOfQueVsRatings(questionCount: Array<Int>) {
         val top = bottom - size.height * 0.55f
         val end = start + size.width * 0.7f
 
-        val barWidth = size.width * 0.065f
-        val gap = size.height * 0.02f
+        val barWidth = size.width * 0.06f
+        val gap = size.width * 0.016f
         val verticalStep = size.height * 0.05f
 
         val labelSize = size.width * 0.02f
@@ -97,7 +99,7 @@ fun BarGraphNoOfQueVsRatings(questionCount: Array<Int>) {
         val stepSizeOfGraph = (maxQuestionCount / 10 + 1)
 
         val xValueAndHeight = arrayListOf<Offset>()
-        for (i in 0..7) {
+        for (i in 0..8) {
             xValueAndHeight.add(Offset((i + 1) * gap + i * barWidth, (questionCount[i] * verticalStep) / stepSizeOfGraph))
         }
 
@@ -111,7 +113,8 @@ fun BarGraphNoOfQueVsRatings(questionCount: Array<Int>) {
             }
             status = when (index) {
                 -1 -> "Total Question Attempted: " + questionCount.sum()
-                7 -> "Incorrect/Partial Submissions: ${questionCount[index]}"
+                7 -> "Unrated: ${questionCount[index]}"
+                8 -> "Incorrect/Partial Submissions: ${questionCount[index]}"
                 else -> "For Rating (${ratingArray[index]}): ${questionCount[index]}"
             }
         }
@@ -169,7 +172,7 @@ fun BarGraphNoOfQueVsRatings(questionCount: Array<Int>) {
 
         begin = true
 
-        for (i in 0..7) {
+        for (i in 0..8) {
             drawRect(
                 color = colors[i],
                 topLeft = Offset(
@@ -185,8 +188,9 @@ fun BarGraphNoOfQueVsRatings(questionCount: Array<Int>) {
             .rotate(-90f)
             .size(screenWidthInDp * 0.9f)
     ) {
-        val barWidth = size.height * 0.065f
-        val gap = size.height * 0.02f
+        val barWidth = size.height * 0.06f
+        val gap = size.height * 0.016f
+
         val barLabelStart = Offset(
             size.width * 0.27f,
             size.height * 0.20f + gap + barWidth * 0.6f
@@ -194,7 +198,7 @@ fun BarGraphNoOfQueVsRatings(questionCount: Array<Int>) {
         val labelSize = size.width * 0.02f
         val headingSize = size.width * 0.05f
 
-        for (i in 0..7) {
+        for (i in 0..8) {
             drawLabelInCanvas(
                 context = context,
                 text = ratingArray[i],

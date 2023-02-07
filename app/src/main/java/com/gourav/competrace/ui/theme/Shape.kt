@@ -6,7 +6,7 @@ import androidx.compose.material3.Shapes
 import androidx.compose.ui.unit.dp
 
 val CompetraceShapes = Shapes(
-    extraSmall = ShapeDefaults.ExtraSmall.copy(CornerSize(1.dp)),
+    extraSmall = ShapeDefaults.ExtraSmall.copy(CornerSize(2.dp)),
     small = ShapeDefaults.Small.copy(CornerSize(2.dp)),
     medium = ShapeDefaults.Medium.copy(CornerSize(1.dp)),
     large = ShapeDefaults.Large.copy(CornerSize(1.dp)),

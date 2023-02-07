@@ -29,7 +29,6 @@ import com.gourav.competrace.ui.screens.NetworkFailScreen
 import com.gourav.competrace.ui.screens.ProblemSubmissionScreen
 import com.gourav.competrace.ui.screens.ProgressScreen
 import com.gourav.competrace.utils.UserSubmissionFilter
-import com.gourav.competrace.utils.processSubmittedProblemFromAPIResult
 import com.gourav.competrace.viewmodel.MainViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -83,7 +82,7 @@ fun NavGraphBuilder.progress(
             )
         }
 
-        val isRefreshing = mainViewModel.isUserRefreshing.collectAsState().value
+        val isRefreshing by mainViewModel.isUserRefreshing.collectAsState()
         val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = isRefreshing)
 
         SwipeRefresh(
@@ -91,13 +90,13 @@ fun NavGraphBuilder.progress(
             onRefresh = {
                 mainViewModel.requestForUserInfo(
                     userPreferences = userPreferences,
-                    isRefreshed = true
+                    isForced = true
                 )
             },
         ) {
             when (val apiResult = mainViewModel.responseForUserInfo) {
                 is ApiState.Loading -> {
-                    Box(modifier = Modifier.fillMaxSize()) {}
+                    Box(modifier = Modifier.fillMaxSize())
                 }
                 is ApiState.Success<*> -> {
                     if (apiResult.response.status == "OK") {
@@ -120,7 +119,7 @@ fun NavGraphBuilder.progress(
                         onClickRetry = {
                             mainViewModel.requestForUserInfo(
                                 userPreferences = userPreferences,
-                                isRefreshed = true
+                                isForced = true
                             )
                         }
                     )
@@ -128,7 +127,7 @@ fun NavGraphBuilder.progress(
                 is ApiState.Empty -> {
                     mainViewModel.requestForUserInfo(
                         userPreferences = userPreferences,
-                        isRefreshed = false
+                        isForced = false
                     )
                 }
                 else -> {}
@@ -156,7 +155,7 @@ fun NavGraphBuilder.progress(
                     searchQuery = ""
                     topAppBarController.isSearchWidgetOpen = false
                 },
-                modifier =  Modifier.focusRequester(searchBarFocusRequester),
+                modifier = Modifier.focusRequester(searchBarFocusRequester),
                 placeHolderText = "Search Problem / Contest"
             )
         }
@@ -183,29 +182,27 @@ fun NavGraphBuilder.progress(
             )
         }
 
-        val isRefreshing = mainViewModel.isUserSubmissionRefreshing.collectAsState().value
+        val isRefreshing by mainViewModel.isUserSubmissionRefreshing.collectAsState()
         val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = isRefreshing)
+
+        val showTags by userPreferences.showTagsFlow.collectAsState(initial = true)
 
         SwipeRefresh(
             state = swipeRefreshState,
             onRefresh = {
                 mainViewModel.requestForUserSubmission(
                     userPreferences = userPreferences,
-                    isRefreshed = true
+                    isForced = true
                 )
 
             },
         ) {
             when (val apiResult = mainViewModel.responseForUserSubmissions) {
                 is ApiState.Loading -> {
-                    Box(modifier = Modifier.fillMaxSize()) {}
+                    Box(modifier = Modifier.fillMaxSize())
                 }
                 is ApiState.Success<*> -> {
                     if (apiResult.response.status == "OK") {
-                        processSubmittedProblemFromAPIResult(
-                            mainViewModel = mainViewModel,
-                            apiResult = apiResult
-                        )
 
                         val filteredSubmission = if (searchQuery.isBlank()) {
                             when (currentSelection) {
@@ -217,16 +214,21 @@ fun NavGraphBuilder.progress(
                             val temp = arrayListOf<Pair<Problem, ArrayList<Submission>>>()
                             mainViewModel.submittedProblems.forEach {
                                 val problemName = it.first.name.lowercase()
-                                val contestName = mainViewModel.contestListById[it.first.contestId]?.name?.lowercase() ?: ""
-                                if (problemName.contains(searchQuery.lowercase()) || contestName.contains(searchQuery.lowercase()))
-                                    temp.add(it)
+                                val contestName =
+                                    mainViewModel.contestListById[it.first.contestId]?.name?.lowercase()
+                                        ?: ""
+                                if (
+                                    problemName.contains(searchQuery.lowercase())
+                                    || contestName.contains(searchQuery.lowercase())
+                                ) temp.add(it)
                             }
                             temp
                         }
 
                         ProblemSubmissionScreen(
                             submittedProblemsWithSubmissions = filteredSubmission,
-                            contestListById = mainViewModel.contestListById
+                            contestListById = mainViewModel.contestListById,
+                            showTags = showTags
                         )
                     } else {
                         mainViewModel.responseForUserSubmissions = ApiState.Failure(Throwable())
@@ -237,7 +239,7 @@ fun NavGraphBuilder.progress(
                         onClickRetry = {
                             mainViewModel.requestForUserSubmission(
                                 userPreferences = userPreferences,
-                                isRefreshed = true
+                                isForced = true
                             )
 
                         }
@@ -246,7 +248,7 @@ fun NavGraphBuilder.progress(
                 is ApiState.Empty -> {
                     mainViewModel.requestForUserSubmission(
                         userPreferences = userPreferences,
-                        isRefreshed = false
+                        isForced = false
                     )
                 }
                 else -> {}

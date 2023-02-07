@@ -1,5 +1,6 @@
 package com.gourav.competrace.ui.components
 
+import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
@@ -32,7 +33,7 @@ fun ContestCard(
     within7Days: Boolean = false
 ) {
     val contestUrl =
-        if (contest.phase == Phase.BEFORE) contest.getContestLink() else contest.getLink()
+        if (contest.phase == Phase.BEFORE) contest.getLinkPhaseBefore() else contest.getLink()
 
     val context = LocalContext.current
     val clipboardManager: ClipboardManager = LocalClipboardManager.current
@@ -117,9 +118,10 @@ fun ContestCard(
         loadUrl(context = context, url = contestUrl)
     }
     val onLongClickContestCard: () -> Unit = {
+        Log.d("Copy URL", contest.toString())
         copyTextToClipBoard(
             text = contestUrl,
-            type = "Contest",
+            toastMessage = "Contest Link Copied",
             context = context,
             clipboardManager = clipboardManager,
             haptic = haptic

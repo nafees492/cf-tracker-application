@@ -15,8 +15,8 @@ class MainRepository @Inject constructor(private val apiService: ApiService) {
         emit(apiService.getUserInfo(handle = handle))
     }.flowOn(Dispatchers.IO)
 
-    fun getContestList(): Flow<ApiResult<Contest>> = flow {
-        emit(apiService.getContestList())
+    fun getContestList(gym: Boolean): Flow<ApiResult<Contest>> = flow {
+        emit(apiService.getContestList(gym = gym))
     }.flowOn(Dispatchers.IO)
 
     fun getUserSubmissions(handle: String): Flow<ApiResult<Submission>> = flow {

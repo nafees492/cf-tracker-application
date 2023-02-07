@@ -108,8 +108,10 @@ fun NavGraphBuilder.problemSet(
             )
         }
 
-        val isRefreshing = mainViewModel.isProblemSetRefreshing.collectAsState().value
+        val isRefreshing by mainViewModel.isProblemSetRefreshing.collectAsState()
         val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = isRefreshing)
+
+        val showTagsInProblemSet by userPreferences.showTagsFlow.collectAsState(initial = true)
 
         SwipeRefresh(
             state = swipeRefreshState,
@@ -141,10 +143,15 @@ fun NavGraphBuilder.problemSet(
                         val filteredProblemListByRatingAndSearch = arrayListOf<Problem>()
 
                         allProblems.forEach {
-                            it.rating?.let { rating ->
+                            it.rating.let { rating ->
                                 val problemName = it.name.lowercase()
-                                val contestName = mainViewModel.contestListById[it.contestId]?.name?.lowercase() ?: ""
-                                if (rating in startRatingValue..endRatingValue) {
+                                val contestName =
+                                    mainViewModel.contestListById[it.contestId]?.name?.lowercase()
+                                        ?: ""
+                                if (
+                                    (rating == null && startRatingValue == 800 && endRatingValue == 3500)
+                                    || (rating in startRatingValue..endRatingValue)
+                                ) {
                                     if (searchQuery.isBlank()
                                         || problemName.contains(searchQuery.lowercase())
                                         || contestName.contains(searchQuery.lowercase())
@@ -158,7 +165,8 @@ fun NavGraphBuilder.problemSet(
                         ProblemSetScreen(
                             listOfProblem = filteredProblemListByRatingAndSearch,
                             contestListById = mainViewModel.contestListById,
-                            tagList = mainViewModel.tagList
+                            tagList = mainViewModel.tagList,
+                            showTags = showTagsInProblemSet
                         )
                     } else {
                         mainViewModel.responseForProblemSet = ApiState.Failure(Throwable())

@@ -28,8 +28,9 @@ data class Contest(
     var rank: Int = 0
     var newRating: Int = 0
     val rated = arrayListOf<String>()
-    fun getLink() = "https://codeforces.com/contest/$id"
-    fun getContestLink() = "https://codeforces.com/contests/$id"
+    private val gymOrContest = if(id > 100000) "gym" else "contest"
+    fun getLink() = "https://codeforces.com/$gymOrContest/$id"
+    fun getLinkPhaseBefore() = "https://codeforces.com/contests/$id"
     fun startTimeInMillis() = startTimeSeconds!!.toLong() * 1000L
     fun endTimeInMillis() = (startTimeSeconds!!.toLong() + durationSeconds.toLong()) * 1000L
     fun durationInMillis() = (durationSeconds.toLong()) * 1000L
@@ -41,7 +42,7 @@ data class Contest(
             title = name,
             startTime = startTimeInMillis(),
             endTime = endTimeInMillis(),
-            location = getContestLink(),
+            location = getLinkPhaseBefore(),
             description = ""
         )
     }

@@ -20,7 +20,9 @@ fun processSubmittedProblemFromAPIResult(apiResult: ApiState.Success<*>, mainVie
 
     submissions.forEach {
         if (it.verdict == Verdict.OK) problemNameWithVerdictOK.add(it.problem.name)
+
         problemNameMapWithProblem[it.problem.name] = it.problem
+
         if (problemNameMapWithSubmissions[it.problem.name].isNullOrEmpty()) {
             problemNameMapWithSubmissions[it.problem.name] = arrayListOf(it)
         } else {

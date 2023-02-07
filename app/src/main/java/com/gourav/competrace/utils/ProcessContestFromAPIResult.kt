@@ -7,7 +7,6 @@ import com.gourav.competrace.viewmodel.MainViewModel
 import kotlin.math.abs
 
 fun processContestFromAPIResult(apiResult: ApiState.Success<*>, mainViewModel: MainViewModel) {
-
     mainViewModel.contestListById.clear()
     mainViewModel.contestListsByPhase.forEach {
         it.value.clear()

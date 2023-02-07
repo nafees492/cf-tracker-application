@@ -33,18 +33,24 @@ fun formatLength(days: Long, h: Long, m: Long, s: Long) =
 
 @SuppressLint("SimpleDateFormat")
 fun unixToDateAndTime(timeStampInMillis: Long): String {
-    val format = SimpleDateFormat("d MMMM yyyy, EEEE hh:mm a z")
+    val format = SimpleDateFormat("d-MMM-yyyy, EEEE hh:mm a z")
     return format.format(Date(timeStampInMillis))
 }
 
 @SuppressLint("SimpleDateFormat")
 fun unixToDateDayTime(timeStampInMillis: Long): String {
-    val format = SimpleDateFormat("d-MMM, EEEE hh:mm a")
+    val format = SimpleDateFormat("d-MMM-yyyy, EEEE hh:mm a z")
     return format.format(Date(timeStampInMillis))
 }
 
 @SuppressLint("SimpleDateFormat")
 fun unixToTime(timeStampInMillis: Long): String {
     val format = SimpleDateFormat("hh:mm a z")
+    return format.format(Date(timeStampInMillis))
+}
+
+@SuppressLint("SimpleDateFormat")
+fun unixToDateDay(timeStampInMillis: Long): String {
+    val format = SimpleDateFormat("d-MMM-yyyy, EEE")
     return format.format(Date(timeStampInMillis))
 }

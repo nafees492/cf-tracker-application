@@ -21,7 +21,6 @@ import com.gourav.competrace.ui.components.BarGraphNoOfQueVsRatings
 import com.gourav.competrace.ui.components.CircularProgressIndicator
 import com.gourav.competrace.ui.components.NormalButton
 import com.gourav.competrace.utils.getRatingTextColor
-import com.gourav.competrace.utils.processSubmittedProblemFromAPIResult
 import com.gourav.competrace.viewmodel.MainViewModel
 import com.skydoves.landscapist.animation.circular.CircularRevealPlugin
 import com.skydoves.landscapist.components.rememberImageComponent
@@ -139,11 +138,8 @@ fun ProgressScreen(
                     }
                     is ApiState.Success<*> -> {
                         if (apiResultForUserSubmission.response.status == "OK") {
-                            processSubmittedProblemFromAPIResult(
-                                mainViewModel = mainViewModel,
-                                apiResult = apiResultForUserSubmission
-                            )
-                            val questionCount: Array<Int> = Array(8) { 0 }
+
+                            val questionCount: Array<Int> = Array(9) { 0 }
                             mainViewModel.correctProblems.forEach {
                                 when (it.first.rating) {
                                     in 800..1199 -> questionCount[0]++
@@ -152,10 +148,11 @@ fun ProgressScreen(
                                     in 1600..1899 -> questionCount[3]++
                                     in 1900..2099 -> questionCount[4]++
                                     in 2100..2399 -> questionCount[5]++
-                                    in 2400..4000 -> questionCount[6]++
+                                    in 2400..3500 -> questionCount[6]++
+                                    else -> questionCount[7]++
                                 }
                             }
-                            questionCount[7] = mainViewModel.incorrectProblems.size
+                            questionCount[8] = mainViewModel.incorrectProblems.size
 
                             BarGraphNoOfQueVsRatings(
                                 questionCount = questionCount
@@ -170,7 +167,7 @@ fun ProgressScreen(
                             onClickRetry = {
                                 mainViewModel.requestForUserSubmission(
                                     userPreferences = userPreferences,
-                                    isRefreshed = true
+                                    isForced = true
                                 )
                             }
                         )
@@ -178,7 +175,7 @@ fun ProgressScreen(
                     is ApiState.Empty -> {
                         mainViewModel.requestForUserSubmission(
                             userPreferences = userPreferences,
-                            isRefreshed = false
+                            isForced = false
                         )
                     }
                     else -> {}

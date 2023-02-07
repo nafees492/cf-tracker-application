@@ -17,6 +17,7 @@ interface TopAppBarController {
     fun clearActions()
     var isSearchWidgetOpen: Boolean
     var searchWidgetContent: @Composable () -> Unit
+    var fab: @Composable () -> Unit
 }
 
 sealed class TopAppBarStyles {

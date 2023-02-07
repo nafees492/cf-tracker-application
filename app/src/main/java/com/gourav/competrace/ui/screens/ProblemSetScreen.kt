@@ -26,7 +26,8 @@ import com.gourav.competrace.ui.components.ProblemCard
 fun ProblemSetScreen(
     listOfProblem: List<Problem>,
     contestListById: MutableMap<Int, Contest>,
-    tagList: ArrayList<String>
+    tagList: ArrayList<String>,
+    showTags: Boolean
 ) {
     var selectedChips by rememberSaveable { mutableStateOf(emptySet<String>()) }
 
@@ -49,7 +50,7 @@ fun ProblemSetScreen(
     }
 
     LazyColumn {
-        item {
+        if (showTags) item {
             Row(
                 modifier = Modifier
                     .background(color = MaterialTheme.colorScheme.surface)
@@ -62,16 +63,6 @@ fun ProblemSetScreen(
                             contentDescription = "Clear all"
                         )
                     }
-                    /*ElevatedAssistChip(
-                        onClick = { selectedChips = setOf() },
-                        label = { },
-                        leadingIcon = {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_close_24px),
-                                contentDescription = "Clear all"
-                            )
-                        }
-                    )*/
                 }
 
                 FilterChipScrollableRow(
@@ -110,7 +101,8 @@ fun ProblemSetScreen(
                 contestListById = contestListById,
                 modifier = Modifier.animateItemPlacement(),
                 selectedChips = selectedChips,
-                onClickFilterChip = onClickFilterChip
+                onClickFilterChip = onClickFilterChip,
+                showTags = showTags
             )
         }
 

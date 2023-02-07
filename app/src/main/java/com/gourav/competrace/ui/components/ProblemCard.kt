@@ -1,5 +1,6 @@
 package com.gourav.competrace.ui.components
 
+import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
@@ -25,6 +26,7 @@ import com.gourav.competrace.utils.*
 fun ProblemCard(
     problem: Problem,
     contestListById: MutableMap<Int, Contest>,
+    showTags: Boolean,
     modifier: Modifier = Modifier,
     selectedChips: Set<String> = emptySet(),
     onClickFilterChip: (String) -> Unit = {},
@@ -43,9 +45,10 @@ fun ProblemCard(
             loadUrl(context = context, url = problem.getLinkViaProblemSet())
         },
         onLongClick = {
+            Log.d("Copy URL", problem.toString())
             copyTextToClipBoard(
                 text = problem.getLinkViaProblemSet(),
-                type = "Problem",
+                toastMessage = "Problem",
                 context = context,
                 clipboardManager = clipboardManager,
                 haptic = haptic
@@ -68,13 +71,13 @@ fun ProblemCard(
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                 modifier = Modifier.padding(horizontal = 8.dp),
-                maxLines = 1,
+                maxLines = if(showTags) 1 else 2,
                 overflow = TextOverflow.Ellipsis
             )
         }
 
         problem.tags?.let { tags ->
-            FilterChipScrollableRow(
+            if(showTags) FilterChipScrollableRow(
                 chipList = tags,
                 selectedChips = selectedChips,
                 onClickFilterChip = onClickFilterChip

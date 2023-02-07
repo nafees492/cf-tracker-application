@@ -15,7 +15,7 @@ interface ApiService {
     suspend fun getUserInfo(@Query("handles") handle: String): ApiResult<User>
 
     @GET("contest.list")
-    suspend fun getContestList(): ApiResult<Contest>
+    suspend fun getContestList(@Query("gym") gym: Boolean): ApiResult<Contest>
 
     @GET("user.status")
     suspend fun getUserSubmissions(@Query("handle") handle: String): ApiResult<Submission>

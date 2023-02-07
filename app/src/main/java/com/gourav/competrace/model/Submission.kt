@@ -17,4 +17,6 @@ data class Submission(
     val verdict: String
 ) {
     fun creationTimeInMillis() = creationTimeSeconds * 1000L
+    private val gymOrContest = contestId?.let { if(it > 100000) "gym" else "contest"}  ?: "contest"
+    fun getLink() = "https://codeforces.com/$gymOrContest/$contestId/submission/$id"
 }
