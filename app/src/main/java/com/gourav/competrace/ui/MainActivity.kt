@@ -22,12 +22,10 @@ class MainActivity : ComponentActivity() {
 
     private val mainViewModel: MainViewModel by viewModels()
     private lateinit var userPreferences: UserPreferences
-//    private lateinit var inAppUpdate: InAppUpdate
 
     @SuppressLint("CoroutineCreationDuringComposition")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        inAppUpdate = InAppUpdate(this)
 
         val navigateToLoginActivity: () -> Unit = {
             val intent = Intent(this, LoginActivity::class.java)
@@ -44,7 +42,7 @@ class MainActivity : ComponentActivity() {
             val currentTheme by userPreferences.currentThemeFlow.collectAsState(initial = CompetraceTheme.DEFAULT)
             val darkModePref by userPreferences.darkModePrefFlow.collectAsState(initial = DarkModePref.SYSTEM_DEFAULT)
 
-            CompetraceTheme(currentTheme = currentTheme!!, darkModePref = darkModePref!!) {
+            CompetraceTheme(currentTheme = currentTheme, darkModePref = darkModePref) {
                 Application(
                     mainViewModel = mainViewModel,
                     navigateToLoginActivity = navigateToLoginActivity,
@@ -53,17 +51,8 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-//        inAppUpdate.onResume()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-//        inAppUpdate.onDestroy()
-    }
-
     companion object {
         const val TAG = "Main Activity"
+        const val REQUEST_CODE = 3110
     }
 }

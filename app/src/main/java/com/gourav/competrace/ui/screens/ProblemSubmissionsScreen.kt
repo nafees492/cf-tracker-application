@@ -9,10 +9,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
-import androidx.compose.material3.ElevatedAssistChip
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -80,8 +77,12 @@ fun ProblemSubmissionScreen(
         coroutineScope.launch { modalSheetState.hide() }
     }
 
-    ModalBottomSheetLayout(sheetState = modalSheetState,
+    ModalBottomSheetLayout(
+        sheetState = modalSheetState,
         sheetShape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp),
+        sheetBackgroundColor = MaterialTheme.colorScheme.surfaceColorAtElevation(8.dp),
+        sheetContentColor = MaterialTheme.colorScheme.onSurface,
+        scrimColor = MaterialTheme.colorScheme.scrim.copy(alpha = 0.6f),
         sheetContent = {
             ProblemSubmissionScreenBottomSheetContent(
                 problem = selectedProblem?.first,

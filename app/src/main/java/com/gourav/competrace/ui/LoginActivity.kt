@@ -25,6 +25,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gourav.competrace.R
@@ -57,7 +58,7 @@ class LoginActivity : ComponentActivity() {
             val currentTheme by userPreferences.currentThemeFlow.collectAsState(initial = CompetraceTheme.DEFAULT)
             val darkModePref by userPreferences.darkModePrefFlow.collectAsState(initial = DarkModePref.SYSTEM_DEFAULT)
 
-            CompetraceTheme(currentTheme = currentTheme!!, darkModePref = darkModePref!!) {
+            CompetraceTheme(currentTheme = currentTheme, darkModePref = darkModePref) {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     color = MaterialTheme.colorScheme.background
@@ -169,7 +170,13 @@ class LoginActivity : ComponentActivity() {
                         OutlinedTextField(
                             value = inputHandle,
                             onValueChange = onValueChange,
-                            label = { Text("Enter Codeforces Handle") },
+                            label = {
+                                Text(
+                                    text = "Enter Codeforces Handle",
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            },
                             maxLines = 1,
                             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                             keyboardActions = KeyboardActions(

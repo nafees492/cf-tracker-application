@@ -49,7 +49,7 @@ fun ProblemSubmissionCard(
             Log.d("Copy URL", problem.toString())
             copyTextToClipBoard(
                 text = problem.getLinkViaContest(),
-                toastMessage = "Problem",
+                toastMessage = "Problem Link Copied",
                 context = context,
                 clipboardManager = clipboardManager,
                 haptic = haptic

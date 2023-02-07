@@ -48,7 +48,7 @@ fun ProblemCard(
             Log.d("Copy URL", problem.toString())
             copyTextToClipBoard(
                 text = problem.getLinkViaProblemSet(),
-                toastMessage = "Problem",
+                toastMessage = "Problem Link Copied",
                 context = context,
                 clipboardManager = clipboardManager,
                 haptic = haptic

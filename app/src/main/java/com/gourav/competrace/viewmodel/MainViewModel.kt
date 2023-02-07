@@ -78,7 +78,7 @@ class MainViewModel @Inject constructor(
                 }.collect {
                     responseForUserInfo = ApiState.Success(it)
                     _isUserRefreshing.update { false }
-                    Log.d(TAG, it.toString())
+                    Log.d(TAG, "Got - User Info")
                 }
         }
     }
@@ -127,7 +127,7 @@ class MainViewModel @Inject constructor(
                     responseForContestList = apiResult
 
                     _isContestListRefreshing.update { false }
-                    Log.d(TAG, it.toString())
+                    Log.d(TAG, "Got - Contest List")
                 }
             delay(1000)
             // Gym Contests.
@@ -139,7 +139,7 @@ class MainViewModel @Inject constructor(
                             contestListById[contest.id] = contest
                         }
                     }
-                    Log.d(TAG, it.toString())
+                    Log.d(TAG, "Got - Gym Contest List")
                 }
         }
     }
@@ -169,7 +169,7 @@ class MainViewModel @Inject constructor(
                 }.collect {
                     responseForProblemSet = ApiState.SuccessPS(it)
                     _isProblemSetRefreshing.update { false }
-                    Log.d(TAG, it.toString())
+                    Log.d(TAG, "Got - Problem Set")
                 }
         }
     }
@@ -221,7 +221,7 @@ class MainViewModel @Inject constructor(
                     responseForUserSubmissions = apiResult
 
                     _isUserSubmissionRefreshing.update { false }
-                    Log.d(TAG, it.toString())
+                    Log.d(TAG, "Got - User Submissions")
                 }
         }
     }
@@ -251,7 +251,7 @@ class MainViewModel @Inject constructor(
                     Log.e(TAG, it.toString())
                 }.collect {
                     responseForUserRatingChanges = ApiState.Success(it)
-                    Log.d(TAG, it.toString())
+                    Log.d(TAG, "Got - User Rating Changes")
                 }
         }
     }
