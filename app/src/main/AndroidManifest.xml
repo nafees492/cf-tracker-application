@@ -14,7 +14,7 @@
         android:theme="@style/CustomSplashScreenTheme">
 
         <activity
-            android:name=".ui.SplashScreenActivity"
+            android:name=".app_core.SplashScreenActivity"
             android:exported="true"
             android:theme="@style/CustomSplashScreenTheme">
 
@@ -26,14 +26,14 @@
         </activity>
 
         <activity
-            android:name=".ui.LoginActivity"
+            android:name=".login.LoginActivity"
             android:exported="true"
             android:theme="@style/Theme.Competrace">
 
         </activity>
 
         <activity
-            android:name=".ui.MainActivity"
+            android:name=".app_core.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.Competrace">
             <!-- For Email -->
