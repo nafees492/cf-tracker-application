@@ -94,7 +94,7 @@ fun NavGraphBuilder.contests(
                         scope.launch {
                             userPreferences.setSelectedContestSiteIndex(it)
                         }
-                    },
+                    }
                 )
             }
 

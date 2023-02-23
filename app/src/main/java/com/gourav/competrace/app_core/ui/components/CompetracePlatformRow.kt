@@ -17,17 +17,11 @@ fun CompetracePlatformRow(
     selectedTabIndex: Int,
     tabTitles: List<String>,
     onClickTab: (Int) -> Unit,
+    scrollState: LazyListState = rememberLazyListState()
 ) {
-    val scrollState: LazyListState = rememberLazyListState(
-        initialFirstVisibleItemIndex = selectedTabIndex,
-        initialFirstVisibleItemScrollOffset = 1
-    )
 
-    LaunchedEffect(Unit) {
-        scrollState.animateScrollToItem(
-            selectedTabIndex,
-            1
-        )
+    LaunchedEffect(key1 = selectedTabIndex){
+        scrollState.animateScrollToItem(selectedTabIndex)
     }
 
     LazyRow(
