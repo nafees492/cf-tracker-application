@@ -90,8 +90,8 @@ fun unixToDMYE(timeStampInMillis: Long): String {
 
 @SuppressLint("SimpleDateFormat")
 fun formattedStringToUnix(value: String): Long {
-    val format1 = SimpleDateFormat("yyyy-MM-dd HH:mm:ss z")
-    val format2 = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+    val format1 = SimpleDateFormat("yyyy-MM-dd HH:mm:ss z").apply { timeZone = TimeZone.getTimeZone("UTC") }
+    val format2 = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").apply { timeZone = TimeZone.getTimeZone("UTC") }
 
     return when {
         format1.isMatched(value) -> format1.parse(value)?.time ?: 0
