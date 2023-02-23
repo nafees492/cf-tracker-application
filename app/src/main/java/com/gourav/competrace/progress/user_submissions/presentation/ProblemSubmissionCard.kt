@@ -1,4 +1,4 @@
-package com.gourav.competrace.ui.components
+package com.gourav.competrace.progress.user_submissions.presentation
 
 import android.util.Log
 import androidx.compose.animation.animateContentSize
@@ -18,17 +18,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.gourav.competrace.contests.model.Contest
-import com.gourav.competrace.problemset.model.Problem
+import com.gourav.competrace.app_core.ui.components.FilterChipScrollableRow
+import com.gourav.competrace.app_core.util.unixToDMYE
+import com.gourav.competrace.contests.model.CompetraceContest
+import com.gourav.competrace.problemset.model.CodeforcesProblem
 import com.gourav.competrace.progress.user_submissions.model.Submission
+import com.gourav.competrace.ui.components.BackgroundDesignArrow
 import com.gourav.competrace.utils.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProblemSubmissionCard(
-    problem: Problem,
+    codeforcesProblem: CodeforcesProblem,
     submissions: ArrayList<Submission>,
-    contestListById: MutableMap<Int, Contest>,
+    codeforcesContestListById: Map<Any, CompetraceContest>,
     showTags: Boolean,
     onClick: () -> Unit,
     selectedChips: Set<String>,
@@ -39,16 +42,17 @@ fun ProblemSubmissionCard(
     val clipboardManager: ClipboardManager = LocalClipboardManager.current
     val haptic = LocalHapticFeedback.current
 
-    val ratingContainerColor = getRatingContainerColor(rating = problem.rating)
+    val ratingContainerColor = getRatingContainerColor(rating = codeforcesProblem.rating)
+    val codeforcesContest = codeforcesProblem.contestId?.let { codeforcesContestListById[it] }
 
     ProblemSubmissionCardDesign(
-        rating = problem.rating,
+        rating = codeforcesProblem.rating,
         color = ratingContainerColor,
         onClick = onClick,
         onLongClick = {
-            Log.d("Copy URL", problem.toString())
+            Log.d("Copy URL", codeforcesProblem.toString())
             copyTextToClipBoard(
-                text = problem.getLinkViaContest(),
+                text = codeforcesProblem.getLinkViaContest(),
                 toastMessage = "Problem Link Copied",
                 context = context,
                 clipboardManager = clipboardManager,
@@ -57,18 +61,36 @@ fun ProblemSubmissionCard(
         },
         modifier = modifier
     ) {
-        Text(
-            text = "${problem.index}. ${problem.name}",
-            style = MaterialTheme.typography.titleLarge.copy(fontSize = 18.sp),
+        Row(
             modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 8.dp, bottom = 4.dp),
-            color = MaterialTheme.colorScheme.onSurface,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
-
-        problem.contestId?.let {
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Text(
-                text = "${contestListById[it]?.name}",
+                text = "${codeforcesProblem.index}. ${codeforcesProblem.name}",
+                style = MaterialTheme.typography.titleLarge.copy(fontSize = 18.sp),
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            /*submissions[0].contestId?.let { id->
+                val contest = codeforcesContestListById[id]
+                contest?.let {
+                    if(submissions[0].isSubmittedDuringContest(it)){
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_blue_tick),
+                            contentDescription = "Submitted During Contest",
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                }
+            }*/
+        }
+
+
+        codeforcesProblem.contestId?.let {
+            Text(
+                text = "${codeforcesContest?.name}",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                 modifier = Modifier.padding(start = 8.dp, end = 8.dp, bottom = 4.dp),
@@ -78,7 +100,7 @@ fun ProblemSubmissionCard(
         }
 
         Text(
-            text = "Last Submission: ${unixToDateDay(submissions[0].creationTimeInMillis())}",
+            text = "Last Submission: ${unixToDMYE(submissions[0].creationTimeInMillis())}",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
             modifier = Modifier.padding(start = 8.dp, end = 8.dp, bottom = 8.dp),
@@ -86,11 +108,11 @@ fun ProblemSubmissionCard(
             overflow = TextOverflow.Ellipsis
         )
 
-        val status = if (problem.hasVerdictOK) Verdict.OK else submissions[0].verdict
+        val status = if (codeforcesProblem.hasVerdictOK) Verdict.OK else submissions[0].verdict
 
         val statusColor = getVerdictColor(
             lastVerdict = submissions[0].verdict,
-            hasVerdictOK = problem.hasVerdictOK
+            hasVerdictOK = codeforcesProblem.hasVerdictOK
         )
 
         Row(
@@ -118,8 +140,8 @@ fun ProblemSubmissionCard(
             )
         }
 
-        problem.tags?.let { tags ->
-            if(showTags) FilterChipScrollableRow(
+        codeforcesProblem.tags?.let { tags ->
+            if (showTags) FilterChipScrollableRow(
                 chipList = tags,
                 selectedChips = selectedChips,
                 onClickFilterChip = onClickFilterChip

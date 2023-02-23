@@ -1,22 +1,22 @@
-package com.gourav.competrace.utils
+package com.gourav.competrace.problemset.util
 
-import com.gourav.competrace.problemset.model.ApiResultProblemSet
-import com.gourav.competrace.problemset.model.Problem
-import com.gourav.competrace.app_core.MainViewModel
+import com.gourav.competrace.problemset.model.CodeforcesApiResultProblemSet
+import com.gourav.competrace.problemset.model.CodeforcesProblem
+import com.gourav.competrace.problemset.presentation.ProblemSetViewModel
 
-fun processProblemSetFromAPIResult(apiResult: ApiResultProblemSet, mainViewModel: MainViewModel) {
-    mainViewModel.allProblems.clear()
-    mainViewModel.tagList.clear()
+fun ProblemSetViewModel.processCodeforcesProblemSetFromAPIResult(apiResult: CodeforcesApiResultProblemSet) {
+    clearProblemsFromCodeforcesDatabase()
+    tagList.clear()
 
-    val allProblems: ArrayList<Problem> =
-        apiResult.result!!.problems as ArrayList<Problem>
-    mainViewModel.allProblems.addAll(allProblems)
+    val allCodeforcesProblems: ArrayList<CodeforcesProblem> =
+        apiResult.result!!.problems as ArrayList<CodeforcesProblem>
+    addAllProblemsToCodeforcesDatabase(allCodeforcesProblems)
 
     val setOfTags = mutableSetOf<String>()
-    allProblems.forEach { problem ->
+    allCodeforcesProblems.forEach { problem ->
         problem.tags?.forEach {
             setOfTags.add(it)
         }
     }
-    mainViewModel.tagList.addAll(setOfTags)
+    tagList.addAll(setOfTags)
 }

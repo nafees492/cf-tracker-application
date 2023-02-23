@@ -1,26 +1,27 @@
-package com.gourav.competrace.utils
+package com.gourav.competrace.progress.user_submissions.util
 
-import com.gourav.competrace.app_core.MainViewModel
-import com.gourav.competrace.app_core.model.ApiResult
-import com.gourav.competrace.problemset.model.Problem
+import com.gourav.competrace.app_core.model.CodeforcesApiResult
+import com.gourav.competrace.problemset.model.CodeforcesProblem
 import com.gourav.competrace.progress.user_submissions.model.Submission
+import com.gourav.competrace.progress.user_submissions.presentation.UserSubmissionsViewModel
+import com.gourav.competrace.utils.Verdict
 
-fun processUserSubmissionsFromAPIResult(apiResult: ApiResult<Submission>, mainViewModel: MainViewModel){
-    mainViewModel.submittedProblems.clear()
-    mainViewModel.incorrectProblems.clear()
-    mainViewModel.correctProblems.clear()
+fun UserSubmissionsViewModel.processUserSubmissionsFromAPIResult(codeforcesApiResult: CodeforcesApiResult<Submission>){
+    submittedProblemsFlow.value.clear()
+    incorrectProblems.clear()
+    correctProblems.clear()
 
     val problemNameMapWithSubmissions =
         mutableMapOf<String, ArrayList<Submission>>()
-    val problemNameMapWithProblem = mutableMapOf<String, Problem>()
+    val problemNameMapWithCodeforcesProblem = mutableMapOf<String, CodeforcesProblem>()
     val problemNameWithVerdictOK: MutableSet<String> = mutableSetOf()
 
-    val submissions: ArrayList<Submission> = apiResult.result as ArrayList<Submission>
+    val submissions: ArrayList<Submission> = codeforcesApiResult.result as ArrayList<Submission>
 
     submissions.forEach {
         if (it.verdict == Verdict.OK) problemNameWithVerdictOK.add(it.problem.name)
 
-        problemNameMapWithProblem[it.problem.name] = it.problem
+        problemNameMapWithCodeforcesProblem[it.problem.name] = it.problem
 
         if (problemNameMapWithSubmissions[it.problem.name].isNullOrEmpty()) {
             problemNameMapWithSubmissions[it.problem.name] = arrayListOf(it)
@@ -30,14 +31,14 @@ fun processUserSubmissionsFromAPIResult(apiResult: ApiResult<Submission>, mainVi
     }
 
     problemNameWithVerdictOK.forEach {
-        problemNameMapWithProblem[it]?.hasVerdictOK = true
+        problemNameMapWithCodeforcesProblem[it]?.hasVerdictOK = true
     }
 
-    problemNameMapWithProblem.forEach { problem ->
+    problemNameMapWithCodeforcesProblem.forEach { problem ->
         Pair(problem.value, problemNameMapWithSubmissions[problem.key]!!).let {
-            mainViewModel.submittedProblems.add(it)
-            if (problem.value.hasVerdictOK) mainViewModel.correctProblems.add(it)
-            else mainViewModel.incorrectProblems.add(it)
+            submittedProblemsFlow.value.add(it)
+            if (problem.value.hasVerdictOK) correctProblems.add(it)
+            else incorrectProblems.add(it)
         }
     }
 }

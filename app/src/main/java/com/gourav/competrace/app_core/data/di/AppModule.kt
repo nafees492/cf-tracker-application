@@ -1,6 +1,7 @@
 package com.gourav.competrace.app_core.data.di
 
-import com.gourav.competrace.app_core.data.network.ApiService
+import com.gourav.competrace.app_core.data.network.CodeforcesApiService
+import com.gourav.competrace.app_core.data.network.KontestsApiService
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
@@ -23,9 +24,17 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideApiService(moshi: Moshi): ApiService = Retrofit.Builder()
-        .baseUrl(ApiService.BASE_URL)
+    fun provideCodeforcesApiService(moshi: Moshi): CodeforcesApiService = Retrofit.Builder()
+        .baseUrl(CodeforcesApiService.BASE_URL)
         .addConverterFactory(MoshiConverterFactory.create(moshi))
         .build()
-        .create(ApiService::class.java)
+        .create(CodeforcesApiService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideKontestsApiService(moshi: Moshi): KontestsApiService = Retrofit.Builder()
+        .baseUrl(KontestsApiService.BASE_URL)
+        .addConverterFactory(MoshiConverterFactory.create(moshi))
+        .build()
+        .create(KontestsApiService::class.java)
 }

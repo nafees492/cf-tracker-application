@@ -1,4 +1,4 @@
-package com.gourav.competrace.ui.components
+package com.gourav.competrace.progress.user.presentation
 
 import android.content.Context
 import androidx.compose.animation.core.FloatTweenSpec
@@ -26,7 +26,7 @@ import android.graphics.Paint as Paint1
 
 
 @Composable
-fun BarGraphNoOfQueVsRatings(questionCount: Array<Int>) {
+fun BarGraphNoOfQueVsRatings(questionCountArray: Array<Int>) {
 
     val ratingArray = arrayListOf(
         "800 - 1199",
@@ -67,7 +67,7 @@ fun BarGraphNoOfQueVsRatings(questionCount: Array<Int>) {
     val onSurface = MaterialTheme.colorScheme.onSurface
 
     var status by remember {
-        mutableStateOf("Total Question Attempted: " + questionCount.sum())
+        mutableStateOf("Total Question Attempted: " + questionCountArray.sum())
     }
 
     var selectedOffset by remember {
@@ -95,12 +95,12 @@ fun BarGraphNoOfQueVsRatings(questionCount: Array<Int>) {
         val labelSize = size.width * 0.02f
         val headingSize = size.width * 0.05f
 
-        val maxQuestionCount = questionCount.max()
+        val maxQuestionCount = questionCountArray.max()
         val stepSizeOfGraph = (maxQuestionCount / 10 + 1)
 
         val xValueAndHeight = arrayListOf<Offset>()
         for (i in 0..8) {
-            xValueAndHeight.add(Offset((i + 1) * gap + i * barWidth, (questionCount[i] * verticalStep) / stepSizeOfGraph))
+            xValueAndHeight.add(Offset((i + 1) * gap + i * barWidth, (questionCountArray[i] * verticalStep) / stepSizeOfGraph))
         }
 
         selectedOffset.let {
@@ -112,10 +112,10 @@ fun BarGraphNoOfQueVsRatings(questionCount: Array<Int>) {
                 }
             }
             status = when (index) {
-                -1 -> "Total Question Attempted: " + questionCount.sum()
-                7 -> "Unrated: ${questionCount[index]}"
-                8 -> "Incorrect/Partial Submissions: ${questionCount[index]}"
-                else -> "For Rating (${ratingArray[index]}): ${questionCount[index]}"
+                -1 -> "Total Question Attempted: " + questionCountArray.sum()
+                7 -> "Unrated: ${questionCountArray[index]}"
+                8 -> "Incorrect/Partial Submissions: ${questionCountArray[index]}"
+                else -> "For Rating (${ratingArray[index]}): ${questionCountArray[index]}"
             }
         }
 

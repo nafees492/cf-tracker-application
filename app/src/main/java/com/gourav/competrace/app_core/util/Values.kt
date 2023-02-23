@@ -28,14 +28,13 @@ object Verdict {
     val RED = setOf(WA, FAILED, CE, CRASHED, REJECTED)
 }
 
-object ContestRated {
-    const val DIV1 = "Div. 1"
-    const val DIV2 = "Div. 2"
-    const val DIV3 = "Div. 3"
-    const val DIV4 = "Div. 4"
-    const val UNRATED = "Unrated"
 
-    val contestRatedList = arrayListOf(DIV1, DIV2, DIV3, DIV4, UNRATED)
+enum class ContestRatedCategories(val value: String) {
+    DIV1("Div. 1"),
+    DIV2("Div. 2"),
+    DIV3("Div. 3"),
+    DIV4("Div. 4"),
+    UNRATED("Unrated")
 }
 
 object FinishedContestFilter {

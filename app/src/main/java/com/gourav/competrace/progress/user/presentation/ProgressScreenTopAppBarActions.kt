@@ -1,4 +1,4 @@
-package com.gourav.competrace.ui.components
+package com.gourav.competrace.progress.user.presentation
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -14,7 +14,8 @@ import com.gourav.competrace.R
 @Composable
 fun RowScope.ProgressScreenActions(
     onClickSettings: () -> Unit,
-    onClickLogOut: () -> Unit
+    onClickLogOut: () -> Unit,
+    isLogOutButtonEnabled: Boolean
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -64,7 +65,8 @@ fun RowScope.ProgressScreenActions(
                         painter = painterResource(id = R.drawable.ic_logout_24px),
                         contentDescription = "Log Out",
                     )
-                }
+                },
+                enabled = isLogOutButtonEnabled
             )
         }
     }

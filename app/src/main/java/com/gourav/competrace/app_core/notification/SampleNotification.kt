@@ -8,7 +8,7 @@ import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.gourav.competrace.R
-import com.gourav.competrace.app_core.MainActivity
+import com.gourav.competrace.app_core.presentation.MainActivity
 
 class SampleNotification (var context: Context, var title: String, var message: String) {
 

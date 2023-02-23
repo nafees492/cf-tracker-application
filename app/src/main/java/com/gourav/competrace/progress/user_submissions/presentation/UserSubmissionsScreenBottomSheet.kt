@@ -15,20 +15,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.gourav.competrace.contests.model.Contest
-import com.gourav.competrace.problemset.model.Problem
+import com.gourav.competrace.app_core.ui.components.CompetraceClickableText
+import com.gourav.competrace.contests.model.CompetraceContest
+import com.gourav.competrace.problemset.model.CodeforcesProblem
 import com.gourav.competrace.progress.user_submissions.model.Submission
 import com.gourav.competrace.ui.components.BottomSheetDragIndicator
-import com.gourav.competrace.ui.components.CompetraceClickableText
 import com.gourav.competrace.utils.copyTextToClipBoard
 import com.gourav.competrace.utils.loadUrl
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun UserSubmissionsScreenBottomSheetContent(
-    problem: Problem?,
+    codeforcesProblem: CodeforcesProblem?,
     submissions: ArrayList<Submission>?,
-    contest: Contest?,
+    codeforcesContest: CompetraceContest?,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -45,19 +45,19 @@ fun UserSubmissionsScreenBottomSheetContent(
     ) {
         CompetraceClickableText(
             text = AnnotatedString(
-                text = "${problem?.index}. ${problem?.name}",
+                text = "${codeforcesProblem?.index}. ${codeforcesProblem?.name}",
                 spanStyle = SpanStyle(textDecoration = TextDecoration.Underline)
             ),
             style = MaterialTheme.typography.titleLarge.copy(fontSize = 18.sp),
             color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center,
             onClick = {
-                loadUrl(context = context, url = problem?.getLinkViaContest())
+                loadUrl(context = context, url = codeforcesProblem?.getLinkViaContest())
             },
             onLongClick = {
                 copyTextToClipBoard(
                     context = context,
-                    text = problem?.getLinkViaContest(),
+                    text = codeforcesProblem?.getLinkViaContest(),
                     toastMessage = "Problem Link Copied",
                     clipboardManager = clipboardManager,
                     haptic = hapticFeedback
@@ -74,19 +74,19 @@ fun UserSubmissionsScreenBottomSheetContent(
     ) {
         CompetraceClickableText(
             text = AnnotatedString(
-                text = contest?.name.toString(),
+                text = codeforcesContest?.name.toString(),
                 spanStyle = SpanStyle(textDecoration = TextDecoration.Underline)
             ),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
             textAlign = TextAlign.Center,
             onClick = {
-                loadUrl(context = context, url = contest?.getLink())
+                loadUrl(context = context, url = codeforcesContest?.websiteUrl)
             },
             onLongClick = {
                 copyTextToClipBoard(
                     context = context,
-                    text = contest?.getLink(),
+                    text = codeforcesContest?.websiteUrl,
                     toastMessage = "Contest Link Copied",
                     clipboardManager = clipboardManager,
                     haptic = hapticFeedback

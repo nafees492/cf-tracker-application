@@ -1,9 +1,8 @@
-package com.gourav.competrace.ui.screens
+package com.gourav.competrace.progress.user.presentation
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -15,14 +14,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.gourav.competrace.R
 import com.gourav.competrace.app_core.data.UserPreferences
-import com.gourav.competrace.progress.user.model.User
+import com.gourav.competrace.app_core.ui.components.CompetraceButton
+import com.gourav.competrace.app_core.ui.components.MyCircularProgressIndicator
 import com.gourav.competrace.app_core.util.ApiState
-import com.gourav.competrace.ui.components.BarGraphNoOfQueVsRatings
-import com.gourav.competrace.ui.components.CircularProgressIndicator
-import com.gourav.competrace.ui.components.CompetraceButton
+import com.gourav.competrace.progress.user.model.User
+import com.gourav.competrace.progress.user_submissions.presentation.UserSubmissionsViewModel
+import com.gourav.competrace.ui.screens.NetworkFailScreen
 import com.gourav.competrace.utils.getRatingTextColor
-import com.gourav.competrace.app_core.MainViewModel
-import com.skydoves.landscapist.animation.circular.CircularRevealPlugin
+import com.skydoves.landscapist.animation.crossfade.CrossfadePlugin
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.glide.GlideImage
 import com.skydoves.landscapist.placeholder.placeholder.PlaceholderPlugin
@@ -32,7 +31,8 @@ import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
 fun ProgressScreen(
     user: User,
     goToSubmission: () -> Unit,
-    mainViewModel: MainViewModel,
+    goToParticipatedContests: () -> Unit,
+    userSubmissionsViewModel: UserSubmissionsViewModel,
     userPreferences: UserPreferences,
 ) {
     LazyColumn(
@@ -53,7 +53,9 @@ fun ProgressScreen(
                         .size(120.dp)
                         .clip(RoundedCornerShape(4.dp)),
                     component = rememberImageComponent {
-                        +CircularRevealPlugin(duration = 300)
+                        // shows a crossFade animation when the image is loaded.
+                        +CrossfadePlugin()
+
                         // shows a shimmering effect when loading an image.
                         +ShimmerPlugin(
                             baseColor = MaterialTheme.colorScheme.surface,
@@ -79,7 +81,7 @@ fun ProgressScreen(
                         text = fullName,
                         style = MaterialTheme.typography.titleLarge,
                         modifier = Modifier.padding(vertical = 4.dp),
-                        color = getRatingTextColor(rating = user.rating),
+                        color = MaterialTheme.colorScheme.onSurface,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -87,7 +89,7 @@ fun ProgressScreen(
                         text = user.handle,
                         style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.padding(vertical = 4.dp),
-                        color = getRatingTextColor(rating = user.rating),
+                        color = MaterialTheme.colorScheme.onSurface,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -111,18 +113,23 @@ fun ProgressScreen(
         }
 
         item {
-            CompetraceButton(
-                text = "Your Submissions", onClick = goToSubmission,
+            Row(
                 modifier = Modifier
-                    .padding(horizontal = 24.dp)
-                    .fillMaxWidth(),
-                trailingIcon = {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_navigate_next_24px),
-                        contentDescription = "",
-                    )
-                }
-            )
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                CompetraceButton(
+                    text = "Participated Contests", onClick = goToParticipatedContests,
+                    modifier = Modifier.weight(1f),
+                    maxLines = 2
+                )
+                CompetraceButton(
+                    text = "Your Submissions", onClick = goToSubmission,
+                    modifier = Modifier.weight(1f),
+                    maxLines = 2
+                )
+            }
         }
 
         item {
@@ -132,53 +139,46 @@ fun ProgressScreen(
                     .padding(vertical = 8.dp),
                 contentAlignment = Alignment.Center
             ) {
-                when (val apiResultForUserSubmission = mainViewModel.responseForUserSubmissions) {
-                    is ApiState.Loading -> {
-                        CircularProgressIndicator(isDisplayed = true)
+                when (userSubmissionsViewModel.responseForUserSubmissions) {
+                    is ApiState.Empty -> {
+                        userSubmissionsViewModel.requestForUserSubmission(
+                            userPreferences = userPreferences,
+                            isForced = false
+                        )
                     }
-                    is ApiState.Success<*> -> {
-                        if (apiResultForUserSubmission.response.status == "OK") {
-
-                            val questionCount: Array<Int> = Array(9) { 0 }
-                            mainViewModel.correctProblems.forEach {
-                                when (it.first.rating) {
-                                    in 800..1199 -> questionCount[0]++
-                                    in 1200..1399 -> questionCount[1]++
-                                    in 1400..1599 -> questionCount[2]++
-                                    in 1600..1899 -> questionCount[3]++
-                                    in 1900..2099 -> questionCount[4]++
-                                    in 2100..2399 -> questionCount[5]++
-                                    in 2400..3500 -> questionCount[6]++
-                                    else -> questionCount[7]++
-                                }
-                            }
-                            questionCount[8] = mainViewModel.incorrectProblems.size
-
-                            BarGraphNoOfQueVsRatings(
-                                questionCount = questionCount
-                            )
-
-                        } else {
-                            mainViewModel.responseForUserSubmissions = ApiState.Failure(Throwable())
-                        }
+                    is ApiState.Loading -> {
+                        MyCircularProgressIndicator(isDisplayed = true)
                     }
                     is ApiState.Failure -> {
                         NetworkFailScreen(
                             onClickRetry = {
-                                mainViewModel.requestForUserSubmission(
+                                userSubmissionsViewModel.requestForUserSubmission(
                                     userPreferences = userPreferences,
                                     isForced = true
                                 )
                             }
                         )
                     }
-                    is ApiState.Empty -> {
-                        mainViewModel.requestForUserSubmission(
-                            userPreferences = userPreferences,
-                            isForced = false
+                    is ApiState.Success -> {
+                        val questionCountArray: Array<Int> = Array(9) { 0 }
+                        userSubmissionsViewModel.correctProblems.forEach {
+                            when (it.first.rating) {
+                                in 800..1199 -> questionCountArray[0]++
+                                in 1200..1399 -> questionCountArray[1]++
+                                in 1400..1599 -> questionCountArray[2]++
+                                in 1600..1899 -> questionCountArray[3]++
+                                in 1900..2099 -> questionCountArray[4]++
+                                in 2100..2399 -> questionCountArray[5]++
+                                in 2400..3500 -> questionCountArray[6]++
+                                else -> questionCountArray[7]++
+                            }
+                        }
+                        questionCountArray[8] = userSubmissionsViewModel.incorrectProblems.size
+
+                        BarGraphNoOfQueVsRatings(
+                            questionCountArray = questionCountArray
                         )
                     }
-                    else -> {}
                 }
             }
         }

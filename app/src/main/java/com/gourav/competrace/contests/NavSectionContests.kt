@@ -1,52 +1,45 @@
-package com.gourav.competrace.ui.navigation.navsections
+package com.gourav.competrace.contests
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.google.accompanist.pager.*
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import com.gourav.competrace.app_core.ApplicationViewModel
-import com.gourav.competrace.app_core.MainViewModel
 import com.gourav.competrace.app_core.data.UserPreferences
+import com.gourav.competrace.app_core.presentation.SharedViewModel
+import com.gourav.competrace.app_core.ui.components.CompetracePlatformRow
+import com.gourav.competrace.app_core.ui.components.MyCircularProgressIndicator
 import com.gourav.competrace.app_core.util.ApiState
 import com.gourav.competrace.app_core.util.Screens
-import com.gourav.competrace.contests.ContestViewModel
-import com.gourav.competrace.contests.model.Contest
-import com.gourav.competrace.contests.util.pagerTabIndicatorOffset
-import com.gourav.competrace.ui.components.CircularProgressIndicator
-import com.gourav.competrace.ui.components.ContestScreenActions
-import com.gourav.competrace.ui.components.FailureTag
+import com.gourav.competrace.contests.presentation.ContestScreenActions
+import com.gourav.competrace.contests.presentation.ContestSites
+import com.gourav.competrace.contests.presentation.ContestViewModel
+import com.gourav.competrace.contests.presentation.UpcomingContestScreen
 import com.gourav.competrace.ui.components.SettingsAlertDialog
-import com.gourav.competrace.ui.screens.FinishedContestScreen
 import com.gourav.competrace.ui.screens.NetworkFailScreen
-import com.gourav.competrace.ui.screens.UpcomingContestScreen
-import com.gourav.competrace.utils.FinishedContestFilter
-import com.gourav.competrace.utils.Phase
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.util.*
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
 @ExperimentalPagerApi // 1.
 @SuppressLint("CoroutineCreationDuringComposition")
 fun NavGraphBuilder.contests(
-    applicationViewModel: ApplicationViewModel,
-    mainViewModel: MainViewModel,
-    coroutineScope: CoroutineScope,
+    sharedViewModel: SharedViewModel,
+    contestViewModel: ContestViewModel,
     userPreferences: UserPreferences,
 ) {
-    val topAppBarController = applicationViewModel.topAppBarController
+    val topAppBarController = sharedViewModel.topAppBarController
 
     composable(route = Screens.ContestsScreen.name) {
-        val contestViewModel: ContestViewModel = viewModel()
+
+        val scope = rememberCoroutineScope()
 
         topAppBarController.apply {
             screenTitle = Screens.ContestsScreen.title
@@ -54,130 +47,108 @@ fun NavGraphBuilder.contests(
             isSearchWidgetOpen = false
         }
 
-        val isSettingsDialogueOpen by applicationViewModel.isSettingsDialogueOpen.collectAsState()
+        val isSettingsDialogueOpen by sharedViewModel.isSettingsDialogueOpen.collectAsState()
 
         SettingsAlertDialog(
             openSettingsDialog = isSettingsDialogueOpen,
-            dismissSettingsDialogue = applicationViewModel::dismissSettingsDialog,
+            dismissSettingsDialogue = sharedViewModel::dismissSettingsDialog,
             userPreferences = userPreferences
         )
 
-        val currentSelection by contestViewModel.currentSelection.collectAsState(initial = FinishedContestFilter.PARTICIPATED)
-
         topAppBarController.actions = {
-            ContestScreenActions(onClickSettings = applicationViewModel::openSettingsDialog,
-                currentSelectionForFinishedContests = currentSelection,
-                onClickAll = { contestViewModel.updateCurrentSelection(FinishedContestFilter.ALL) },
-                onClickGiven = { contestViewModel.updateCurrentSelection(FinishedContestFilter.PARTICIPATED) } )
+            ContestScreenActions(onClickSettings = sharedViewModel::openSettingsDialog)
         }
 
-        val pagerState = rememberPagerState(initialPage = 0)
-        val tabIndex = pagerState.currentPage
+        val isPlatformTabRowVisible by sharedViewModel.isPlatformsTabRowVisible.collectAsState()
+        val tabTitles = ContestSites.values().map { it.title }
 
-        val tabTitles =
-            listOf(Screens.UpcomingContestsScreen.title, Screens.FinishedContestsScreen.title)
+        val codeforcesOnGoingContests by contestViewModel.codeforcesOnGoingContests.collectAsState()
+        val codeforcesUpComingContests by contestViewModel.codeforcesUpComingContests.collectAsState()
 
-        val isRefreshing by mainViewModel.isContestListRefreshing.collectAsState()
+        val codeChefOnGoingContests by contestViewModel.codeChefOnGoingContests.collectAsState()
+        val codeChefUpComingContests by contestViewModel.codeChefUpComingContests.collectAsState()
+
+        val atCoderOnGoingContests by contestViewModel.atCoderOnGoingContests.collectAsState()
+        val atCoderUpComingContests by contestViewModel.atCoderUpComingContests.collectAsState()
+
+        val leetCodeOnGoingContests by contestViewModel.leetCodeOnGoingContests.collectAsState()
+        val leetCodeUpComingContests by contestViewModel.leetCodeUpComingContests.collectAsState()
+
+        val kickStartOnGoingContests by contestViewModel.kickStartOnGoingContests.collectAsState()
+        val kickStartUpComingContests by contestViewModel.kickStartUpComingContests.collectAsState()
+
+        val isRefreshing by contestViewModel.isKontestsContestListRefreshing.collectAsState()
         val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = isRefreshing)
 
-        SwipeRefresh(
-            state = swipeRefreshState,
-            onRefresh = mainViewModel::refreshContestList,
-        ) {
-            Column {
-                TabRow(
-                    selectedTabIndex = tabIndex,
-                    indicator = { tabPositions ->
-                        TabRowDefaults.Indicator(
-                            Modifier.pagerTabIndicatorOffset(
-                                pagerState, tabPositions
-                            )
-                        )
+        val selectedIndex by userPreferences.selectedContestSiteIndexFlow.collectAsState(initial = 0)
+
+        Column {
+            AnimatedVisibility(
+                visible = isPlatformTabRowVisible,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                CompetracePlatformRow(
+                    selectedTabIndex = selectedIndex,
+                    tabTitles = tabTitles,
+                    onClickTab = {
+                        scope.launch {
+                            userPreferences.setSelectedContestSiteIndex(it)
+                        }
                     },
-                ) {
-                    tabTitles.forEachIndexed { index, title ->
-                        Tab(
-                            selected = tabIndex == index,
-                            onClick = {
-                                coroutineScope.launch {
-                                    pagerState.animateScrollToPage(index)
-                                }
-                            },
-                            text = {
-                                Text(
-                                    text = title, maxLines = 1, overflow = TextOverflow.Ellipsis
-                                )
-                            },
-                            selectedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                            unselectedContentColor = MaterialTheme.colorScheme.onSurface
+                )
+            }
+
+            SwipeRefresh(
+                state = swipeRefreshState,
+                onRefresh = contestViewModel::refreshContestListFromKontests,
+            ) {
+                when (contestViewModel.responseForKontestsContestList) {
+                    is ApiState.Empty -> {}
+                    is ApiState.Loading -> {
+                        MyCircularProgressIndicator(
+                            isDisplayed = true, modifier = Modifier.fillMaxSize()
                         )
                     }
-                }
-                HorizontalPager(
-                    count = tabTitles.size,
-                    state = pagerState,
-                ) { index ->
-                    when (val apiResult = mainViewModel.responseForContestList) {
-                        is ApiState.Loading -> {
-                            CircularProgressIndicator(
-                                isDisplayed = true, modifier = Modifier.fillMaxSize()
-                            )
-                        }
-                        is ApiState.Success<*> -> {
-                            if (apiResult.response.status == "OK") {
-                                when (index) {
-                                    0 -> {
-                                        UpcomingContestScreen(
-                                            contestLists = mainViewModel.contestListsByPhase,
-                                            contestListBefore = mainViewModel.contestListBeforeByPhase,
-                                        )
-                                    }
-                                    1 -> {
-                                        Column {
-                                            when (val apiResultForUserRatingChanges =
-                                                mainViewModel.responseForUserRatingChanges) {
-                                                is ApiState.Loading -> {
-                                                    CircularProgressIndicator(
-                                                        isDisplayed = true,
-                                                        modifier = Modifier.fillMaxWidth()
-                                                    )
-                                                }
-                                                is ApiState.Failure -> {
-                                                    FailureTag(onClickRetry = {
-                                                        mainViewModel.requestForUserRatingChanges(
-                                                            userPreferences = userPreferences,
-                                                            isForced = true
-                                                        )
-                                                    })
-                                                }
-                                                is ApiState.Empty -> {
-                                                    mainViewModel.requestForUserRatingChanges(
-                                                        userPreferences = userPreferences,
-                                                        isForced = false
-                                                    )
-                                                }
-                                                else -> {}
-                                            }
-                                            val finishedContests: ArrayList<Contest> =
-                                                (mainViewModel.contestListsByPhase[Phase.FINISHED] as ArrayList<Contest>?)!!
-
-                                            val filteredContest =
-                                                if (currentSelection == FinishedContestFilter.ALL) finishedContests
-                                                else { finishedContests.filter { it.isAttempted } }
-
-                                            FinishedContestScreen(finishedContests = filteredContest)
-                                        }
-                                    }
-                                }
-
-                            } else {
-                                mainViewModel.responseForContestList = ApiState.Failure(Throwable())
+                    is ApiState.Failure -> {
+                        NetworkFailScreen(
+                            onClickRetry = {
+                                contestViewModel.refreshContestListFromKontests()
+                            }
+                        )
+                    }
+                    is ApiState.Success -> {
+                        when (selectedIndex) {
+                            0 -> {
+                                UpcomingContestScreen(
+                                    onGoingContest = codeforcesOnGoingContests,
+                                    upComingContests = codeforcesUpComingContests,
+                                )
+                            }
+                            1 -> {
+                                UpcomingContestScreen(
+                                    onGoingContest = codeChefOnGoingContests,
+                                    upComingContests = codeChefUpComingContests,
+                                )
+                            }
+                            2 -> {
+                                UpcomingContestScreen(
+                                    onGoingContest = atCoderOnGoingContests,
+                                    upComingContests = atCoderUpComingContests,
+                                )
+                            }
+                            3 -> {
+                                UpcomingContestScreen(
+                                    onGoingContest = leetCodeOnGoingContests,
+                                    upComingContests = leetCodeUpComingContests,
+                                )
+                            }
+                            4 -> {
+                                UpcomingContestScreen(
+                                    onGoingContest = kickStartOnGoingContests,
+                                    upComingContests = kickStartUpComingContests,
+                                )
                             }
                         }
-                        is ApiState.Failure -> {
-                            NetworkFailScreen(onClickRetry = { mainViewModel.getContestList() })
-                        }
-                        else -> {}
                     }
                 }
             }

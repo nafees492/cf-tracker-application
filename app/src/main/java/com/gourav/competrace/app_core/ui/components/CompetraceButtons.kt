@@ -1,5 +1,6 @@
-package com.gourav.competrace.ui.components
+package com.gourav.competrace.app_core.ui.components
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
@@ -15,6 +16,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.gourav.competrace.R
 
 
 @Composable
@@ -24,7 +26,8 @@ fun CompetraceButton(
     modifier: Modifier = Modifier,
     leadingIcon: @Composable () -> Unit = { },
     trailingIcon: @Composable () -> Unit = { },
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    maxLines: Int = 1
 ) {
     Button(
         onClick = onClick,
@@ -36,8 +39,9 @@ fun CompetraceButton(
         leadingIcon()
         Text(
             text = text.trim().uppercase(),
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+            maxLines = maxLines,
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Center
         )
         trailingIcon()
     }
@@ -45,7 +49,7 @@ fun CompetraceButton(
 
 @Composable
 fun CompetraceIconButton(
-    iconId: Int,
+    @DrawableRes iconId: Int,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     text: String? = null,
@@ -106,4 +110,29 @@ fun CompetraceClickableText(
             )
             .padding(vertical = 2.dp, horizontal = 4.dp)
     )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CompetraceFilterIconButton(isActive: Boolean, badgeCondition: Boolean, onClick: () -> Unit) {
+    val bgColorForFilterIcon =
+        if (isActive) MaterialTheme.colorScheme.secondaryContainer
+        else MaterialTheme.colorScheme.surface
+
+    IconButton(
+        onClick = onClick,
+        colors = IconButtonDefaults.iconButtonColors(
+            containerColor = bgColorForFilterIcon,
+        )
+    ) {
+        BadgedBox(
+            badge = { if (badgeCondition) Badge() },
+            modifier = Modifier.padding(8.dp)
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_filter_list_24px),
+                contentDescription = "Filter",
+            )
+        }
+    }
 }

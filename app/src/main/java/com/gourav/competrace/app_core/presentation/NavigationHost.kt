@@ -1,4 +1,4 @@
-package com.gourav.competrace.app_core
+package com.gourav.competrace.app_core.presentation
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.PaddingValues
@@ -6,28 +6,38 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.gourav.competrace.app_core.data.UserPreferences
 import com.gourav.competrace.app_core.util.Screens
-import com.gourav.competrace.ui.navigation.navsections.contests
-import com.gourav.competrace.ui.navigation.navsections.problemSet
-import com.gourav.competrace.ui.navigation.navsections.progress
+import com.gourav.competrace.contests.contests
+import com.gourav.competrace.contests.presentation.ContestViewModel
+import com.gourav.competrace.problemset.presentation.ProblemSetViewModel
+import com.gourav.competrace.problemset.problemSet
+import com.gourav.competrace.progress.participated_contests.presentation.ParticipatedContestViewModel
+import com.gourav.competrace.progress.progress
+import com.gourav.competrace.progress.user.presentation.UserViewModel
+import com.gourav.competrace.progress.user_submissions.presentation.UserSubmissionsViewModel
 
 @OptIn(ExperimentalPagerApi::class)
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun NavigationHost(
-    applicationViewModel: ApplicationViewModel,
-    mainViewModel: MainViewModel,
+    sharedViewModel: SharedViewModel,
     navController: NavHostController,
     paddingValues: PaddingValues,
+    userPreferences: UserPreferences = UserPreferences(LocalContext.current)
 ) {
+    val topAppBarController = sharedViewModel.topAppBarController
+    val scope = rememberCoroutineScope()
 
-    val coroutineScope = rememberCoroutineScope()
-    val userPreferences = UserPreferences(LocalContext.current.applicationContext)
-    val topAppBarController = applicationViewModel.topAppBarController
+    val contestViewModel: ContestViewModel = hiltViewModel()
+    val problemSetViewModel: ProblemSetViewModel = hiltViewModel()
+    val userSubmissionsViewModel: UserSubmissionsViewModel = hiltViewModel()
+    val userViewModel: UserViewModel = hiltViewModel()
+    val participatedContestViewModel: ParticipatedContestViewModel = hiltViewModel()
 
     NavHost(
         navController = navController, startDestination = Screens.ContestsScreen.name,
@@ -41,26 +51,25 @@ fun NavigationHost(
         topAppBarController.onClickNavUp =
             { if (!homeScreens.contains(topAppBarController.screenTitle)) navController.navigateUp() }
 
-
         contests(
-            applicationViewModel = applicationViewModel,
-            mainViewModel = mainViewModel,
-            coroutineScope = coroutineScope,
+            sharedViewModel = sharedViewModel,
+            contestViewModel = contestViewModel,
             userPreferences = userPreferences,
         )
 
         problemSet(
-            applicationViewModel = applicationViewModel,
-            mainViewModel = mainViewModel,
+            sharedViewModel = sharedViewModel,
+            problemSetViewModel = problemSetViewModel,
             userPreferences = userPreferences
         )
 
         progress(
-            applicationViewModel = applicationViewModel,
-            mainViewModel = mainViewModel,
+            sharedViewModel = sharedViewModel,
+            userViewModel = userViewModel,
+            userSubmissionsViewModel = userSubmissionsViewModel,
+            participatedContestViewModel = participatedContestViewModel,
             userPreferences = userPreferences,
             navController = navController
         )
-
     }
 }

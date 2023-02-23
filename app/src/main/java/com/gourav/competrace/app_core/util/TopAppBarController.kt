@@ -1,4 +1,4 @@
-package com.gourav.competrace.ui.controllers
+package com.gourav.competrace.app_core.util
 
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable

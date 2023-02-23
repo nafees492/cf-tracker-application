@@ -11,7 +11,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import com.gourav.competrace.R
-import com.gourav.competrace.ui.components.CompetraceIconButton
+import com.gourav.competrace.app_core.ui.components.CompetraceFilterIconButton
+import com.gourav.competrace.app_core.ui.components.CompetraceIconButton
 import com.gourav.competrace.utils.UserSubmissionFilter
 
 @ExperimentalAnimationApi
@@ -36,7 +37,11 @@ fun RowScope.UserSubmissionsScreenActions(
 
     CompetraceIconButton(iconId = R.drawable.ic_search_24px, onClick = onClickSearch)
 
-    CompetraceIconButton(iconId = R.drawable.ic_filter_list_24px, onClick = { expanded = true })
+    CompetraceFilterIconButton(
+        isActive = expanded,
+        badgeCondition = currentSelectionForUserSubmissions != UserSubmissionFilter.ALL,
+        onClick = { expanded = true }
+    )
 
     AnimatedVisibility(visible = expanded) {
         DropdownMenu(

@@ -1,4 +1,4 @@
-package com.gourav.competrace.ui.screens
+package com.gourav.competrace.problemset.presentation
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -16,16 +16,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.gourav.competrace.R
-import com.gourav.competrace.contests.model.Contest
-import com.gourav.competrace.problemset.model.Problem
-import com.gourav.competrace.ui.components.FilterChipScrollableRow
-import com.gourav.competrace.ui.components.ProblemCard
+import com.gourav.competrace.app_core.ui.components.FilterChipScrollableRow
+import com.gourav.competrace.contests.model.CompetraceContest
+import com.gourav.competrace.problemset.model.CodeforcesProblem
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ProblemSetScreen(
-    listOfProblem: List<Problem>,
-    contestListById: MutableMap<Int, Contest>,
+    listOfCodeforcesProblem: List<CodeforcesProblem>,
+    codeforcesContestListById: Map<Any, CompetraceContest>,
     tagList: ArrayList<String>,
     showTags: Boolean
 ) {
@@ -34,10 +33,10 @@ fun ProblemSetScreen(
     val isSelected: (String) -> Boolean = { selectedChips.contains(it) }
 
     val filteredList = if (selectedChips.isEmpty()) {
-        listOfProblem
+        listOfCodeforcesProblem
     } else {
-        val resultList = ArrayList<Problem>()
-        listOfProblem.forEach { problem ->
+        val resultList = ArrayList<CodeforcesProblem>()
+        listOfCodeforcesProblem.forEach { problem ->
             problem.tags?.let { tags ->
                 if (tags.containsAll(selectedChips)) resultList.add(problem)
             }
@@ -52,9 +51,7 @@ fun ProblemSetScreen(
     LazyColumn {
         if (showTags) item {
             Row(
-                modifier = Modifier
-                    .background(color = MaterialTheme.colorScheme.surface)
-                    .padding(horizontal = 4.dp)
+                modifier = Modifier.background(color = MaterialTheme.colorScheme.surface)
             ) {
                 AnimatedVisibility(visible = selectedChips.isNotEmpty()) {
                     IconButton(onClick = { selectedChips = setOf() }) {
@@ -71,8 +68,6 @@ fun ProblemSetScreen(
                     onClickFilterChip = onClickFilterChip,
                 )
             }
-
-            Divider()
         }
 
         item {
@@ -97,8 +92,8 @@ fun ProblemSetScreen(
 
         items(count = filteredList.size) {
             ProblemCard(
-                problem = filteredList[it],
-                contestListById = contestListById,
+                codeforcesProblem = filteredList[it],
+                codeforcesContestListById = codeforcesContestListById,
                 modifier = Modifier.animateItemPlacement(),
                 selectedChips = selectedChips,
                 onClickFilterChip = onClickFilterChip,

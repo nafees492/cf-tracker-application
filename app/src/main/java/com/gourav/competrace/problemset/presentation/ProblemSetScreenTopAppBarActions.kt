@@ -1,11 +1,11 @@
-package com.gourav.competrace.ui.components
+package com.gourav.competrace.problemset.presentation
 
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.painterResource
 import com.gourav.competrace.R
+import com.gourav.competrace.app_core.ui.components.CompetraceFilterIconButton
+import com.gourav.competrace.app_core.ui.components.CompetraceIconButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @ExperimentalAnimationApi
@@ -24,27 +24,17 @@ fun ProblemSetScreenActions(
         contentDescription = "Search in Problem set"
     )
 
-    IconButton(onClick = onClickSettings) {
-        Icon(
-            painter = painterResource(id = R.drawable.ic_baseline_settings_24px),
-            contentDescription = "Settings",
-        )
-    }
+    CompetraceIconButton(
+        iconId = R.drawable.ic_baseline_settings_24px,
+        onClick = onClickSettings,
+        contentDescription = "Settings"
+    )
 
-    IconButton(onClick = onClickFilterIcon) {
-        BadgedBox(badge = { if (ratingRange != 800..3500) Badge() }) {
-            AnimatedContent(
-                targetState = isToolbarExpanded,
-            ) {
-                val iconId =
-                    if (it) R.drawable.ic_expand_less_24px else R.drawable.ic_filter_list_24px
-                Icon(
-                    painter = painterResource(id = iconId),
-                    contentDescription = "Filter",
-                )
-            }
-        }
-    }
+    CompetraceFilterIconButton(
+        isActive = isToolbarExpanded,
+        badgeCondition = ratingRange != 800..3500,
+        onClick = onClickFilterIcon
+    )
 }
 
 

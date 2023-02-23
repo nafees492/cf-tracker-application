@@ -8,6 +8,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.gourav.competrace.app_core.data.UserPreferences
+import com.gourav.competrace.app_core.ui.theme.DarkModePref
+import com.gourav.competrace.app_core.ui.theme.MontserratTypography
 
 private val LightColorScheme = lightColorScheme(
     primary = md_theme_light_primary,
@@ -76,7 +78,7 @@ private val DarkColorScheme = darkColorScheme(
 
 @Composable
 fun CompetraceTheme(
-    currentTheme: String = CompetraceTheme.DEFAULT,
+    currentTheme: String = com.gourav.competrace.app_core.ui.theme.CompetraceThemeNames.DEFAULT,
     darkModePref: String = DarkModePref.SYSTEM_DEFAULT,
     isSysInDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
@@ -84,7 +86,7 @@ fun CompetraceTheme(
     val context = LocalContext.current
 
     val myColorScheme = when(currentTheme){
-        CompetraceTheme.DYNAMIC -> {
+        com.gourav.competrace.app_core.ui.theme.CompetraceThemeNames.DYNAMIC -> {
             when(darkModePref){
                 DarkModePref.DARK -> dynamicDarkColorScheme(context)
                 DarkModePref.LIGHT -> dynamicLightColorScheme(context)

@@ -108,6 +108,8 @@ val IncorrectRed = Color(0xffc00000)
 val light_IncorrectRedContainer = Color(0xffF08787)
 val dark_IncorrectRedContainer = Color(0xffCE7171)
 
+val RegistrationRed = Color(0xffcc0000)
+
 
 
 

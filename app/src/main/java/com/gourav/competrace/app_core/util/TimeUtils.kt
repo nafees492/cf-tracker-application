@@ -1,13 +1,21 @@
-package com.gourav.competrace.utils
+package com.gourav.competrace.app_core.util
 
 import android.annotation.SuppressLint
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import java.text.SimpleDateFormat
 import java.util.*
 
-fun getTodaysDate() = Date()
+fun getCurrentTimeInMillis() = Date().time
+
+@SuppressLint("SimpleDateFormat")
+fun getTodaysDate(): String = SimpleDateFormat("EEE, d-MMM").format(Date())
 
 @SuppressLint("DefaultLocale")
-fun convertMillisToDHMS(timeInMilliSec: Long): Array<Long> {
+private fun convertMillisToDHMS(timeInMilliSec: Long): Array<Long> {
     val (MsID, MsIH, MsIM, MsIS) = listOf(86400000, 3600000, 60000, 1000)
     var millis = timeInMilliSec
     val days = millis / MsID
@@ -20,28 +28,52 @@ fun convertMillisToDHMS(timeInMilliSec: Long): Array<Long> {
     return arrayOf(days, h, m, s)
 }
 
-fun formatLength(days: Long, h: Long, m: Long, s: Long) =
-    if (h + m + s != 0L) when (days) {
-        0L -> String.format("%02d:%02d:%02d", h, m, s) + " hrs"
-        1L -> "$days day and " + String.format("%02d:%02d:%02d", h, m, s) + " hrs"
-        else -> "$days days and " + String.format("%02d:%02d:%02d", h, m, s) + " hrs"
-    } else when (days) {
-        1L -> "$days day"
-        else -> "$days days"
+fun getFormattedTime(timeInMillis: Long, format: String = "%02d:%02d:%02d"): AnnotatedString {
+    return buildAnnotatedString {
+        val (days, h, m, s) = convertMillisToDHMS(timeInMillis)
+        val startPhrase = if (h + m + s != 0L) when (days) {
+            0L -> ""
+            1L -> "$days day, "
+            else -> "$days days, "
+        } else when (days) {
+            1L -> "$days day"
+            else -> "$days days"
+        }
+        append(startPhrase)
+        if (h + m + s != 0L) {
+            val timeStamp = String.format(format, h, m, s)
+            withStyle(style = SpanStyle(fontFeatureSettings = "tnum")) {
+                append(timeStamp)
+            }
+            append(" hrs")
+        }
     }
-
+}
 
 @SuppressLint("SimpleDateFormat")
-fun unixToDateAndTime(timeStampInMillis: Long): String {
+fun unixToDMYETZ(timeStampInMillis: Long): String {
     val format = SimpleDateFormat("d-MMM-yyyy, EEEE hh:mm a z")
     return format.format(Date(timeStampInMillis))
 }
 
 @SuppressLint("SimpleDateFormat")
-fun unixToDateDayTime(timeStampInMillis: Long): String {
-    val format = SimpleDateFormat("d-MMM-yyyy, EEEE hh:mm a z")
-    return format.format(Date(timeStampInMillis))
+fun unixToDMET(timeStampInMillis: Long): AnnotatedString {
+    val date = Date(timeStampInMillis)
+    return buildAnnotatedString {
+        withStyle(
+            style = SpanStyle(fontWeight = FontWeight.SemiBold)
+        ){
+            append(SimpleDateFormat("d-MMM").format(date))
+        }
+        append(SimpleDateFormat(", EEEE ").format(date))
+        withStyle(
+            style = SpanStyle(fontWeight = FontWeight.SemiBold)
+        ){
+            append(SimpleDateFormat("hh:mm a").format(date))
+        }
+    }
 }
+
 
 @SuppressLint("SimpleDateFormat")
 fun unixToTime(timeStampInMillis: Long): String {
@@ -50,7 +82,32 @@ fun unixToTime(timeStampInMillis: Long): String {
 }
 
 @SuppressLint("SimpleDateFormat")
-fun unixToDateDay(timeStampInMillis: Long): String {
+fun unixToDMYE(timeStampInMillis: Long): String {
     val format = SimpleDateFormat("d-MMM-yyyy, EEE")
     return format.format(Date(timeStampInMillis))
 }
+
+
+@SuppressLint("SimpleDateFormat")
+fun formattedStringToUnix(value: String): Long {
+    val format1 = SimpleDateFormat("yyyy-MM-dd HH:mm:ss z")
+    val format2 = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+
+    return when {
+        format1.isMatched(value) -> format1.parse(value)?.time ?: 0
+        format2.isMatched(value) -> format2.parse(value)?.time ?: 0
+        else -> 0
+    }
+}
+
+private fun SimpleDateFormat.isMatched(value: String): Boolean {
+    try {
+        parse(value)
+    } catch (_: Exception) {
+        return false
+    }
+    return true
+}
+
+
+

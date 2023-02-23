@@ -26,11 +26,13 @@ import androidx.compose.ui.unit.dp
 import com.gourav.competrace.BuildConfig
 import com.gourav.competrace.R
 import com.gourav.competrace.app_core.data.UserPreferences
-import com.gourav.competrace.ui.theme.CompetraceTheme
-import com.gourav.competrace.ui.theme.DarkModePref
+import com.gourav.competrace.app_core.ui.components.CompetraceClickableText
+import com.gourav.competrace.app_core.ui.components.CompetraceIconButton
+import com.gourav.competrace.app_core.ui.theme.CompetraceThemeNames
+import com.gourav.competrace.app_core.ui.theme.DarkModePref
 import com.gourav.competrace.utils.loadUrl
 import com.gourav.competrace.utils.sendEmail
-import com.gourav.competrace.utils.shareTextToOtherApp
+import com.gourav.competrace.app_core.util.shareTextToOtherApp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -48,14 +50,14 @@ fun SettingsAlertDialog(
     val coroutineScope = rememberCoroutineScope()
     val versionName = BuildConfig.VERSION_NAME
 
-    val currentTheme by userPreferences.currentThemeFlow.collectAsState(initial = CompetraceTheme.DEFAULT)
+    val currentTheme by userPreferences.currentThemeFlow.collectAsState(initial = CompetraceThemeNames.DEFAULT)
     val darkModePref by userPreferences.darkModePrefFlow.collectAsState(initial = DarkModePref.SYSTEM_DEFAULT)
     val showTagsInProblemSet by userPreferences.showTagsFlow.collectAsState(initial = true)
 
     val context = LocalContext.current
 
-    val themeOptions = arrayListOf(CompetraceTheme.DEFAULT)
-    if (isAbove12) themeOptions.add(CompetraceTheme.DYNAMIC)
+    val themeOptions = arrayListOf(CompetraceThemeNames.DEFAULT)
+    if (isAbove12) themeOptions.add(CompetraceThemeNames.DYNAMIC)
 
     val darkModePrefOptions =
         arrayListOf(DarkModePref.SYSTEM_DEFAULT, DarkModePref.LIGHT, DarkModePref.DARK)
@@ -74,7 +76,7 @@ fun SettingsAlertDialog(
 
     val setShowTagsInProblemSet: (Boolean) -> Unit = {
         coroutineScope.launch(Dispatchers.IO) {
-            userPreferences.setShowTagsFlow(it)
+            userPreferences.setShowTags(it)
         }
     }
 

@@ -1,88 +1,35 @@
-package com.gourav.competrace.ui.components
+package com.gourav.competrace.contests.presentation
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Done
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
 import com.gourav.competrace.R
-import com.gourav.competrace.utils.FinishedContestFilter
+import com.gourav.competrace.app_core.util.getTodaysDate
 
 @ExperimentalAnimationApi
 @Composable
-fun RowScope.ContestScreenActions(
+fun ContestScreenActions(
     onClickSettings: () -> Unit,
-    currentSelectionForFinishedContests: String,
-    onClickAll: () -> Unit,
-    onClickGiven: () -> Unit
 ) {
-    var expanded by remember { mutableStateOf(false) }
-
-    val trailingIcon: @Composable ((visible: Boolean) -> Unit) = {
-        AnimatedVisibility(visible = it) {
-            Icon(
-                imageVector = Icons.Rounded.Done,
-                contentDescription = ""
-            )
-        }
+    val todaysDate by remember {
+        mutableStateOf(getTodaysDate())
     }
+
+    Text(
+        text = todaysDate
+    )
 
     IconButton(onClick = onClickSettings) {
         Icon(
             painter = painterResource(id = R.drawable.ic_baseline_settings_24px),
             contentDescription = "Settings",
         )
-    }
-
-    IconButton(onClick = {
-        expanded = true
-    }) {
-        Icon(
-            painter = painterResource(id = R.drawable.ic_filter_list_24px),
-            contentDescription = "",
-        )
-    }
-    AnimatedVisibility(
-        visible = expanded,
-    ) {
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-        ) {
-            Text(
-                text = "Finished Contests",
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                modifier = Modifier.padding(8.dp)
-            )
-            Divider()
-            DropdownMenuItem(
-                text = { Text(FinishedContestFilter.PARTICIPATED) },
-                onClick = {
-                    onClickGiven()
-                    expanded = false
-                },
-                trailingIcon = {
-                    trailingIcon(currentSelectionForFinishedContests == FinishedContestFilter.PARTICIPATED)
-                }
-            )
-            DropdownMenuItem(
-                text = { Text(FinishedContestFilter.ALL) },
-                onClick = {
-                    onClickAll()
-                    expanded = false
-                },
-                trailingIcon = {
-                    trailingIcon(currentSelectionForFinishedContests == FinishedContestFilter.ALL)
-                }
-            )
-        }
     }
 }
 

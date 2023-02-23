@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.gourav.competrace.app_core.util.unixToDMYETZ
 import com.gourav.competrace.progress.user_submissions.model.Submission
 import com.gourav.competrace.utils.*
 
@@ -83,7 +84,7 @@ fun IndividualSubmissionCard(
             modifier = Modifier.padding(start = 8.dp, end = 8.dp, bottom = 4.dp)
         )
         Text(
-            text = unixToDateDayTime(submission.creationTimeInMillis()),
+            text = unixToDMYETZ(submission.creationTimeInMillis()),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
             modifier = Modifier.padding(start = 8.dp, end = 8.dp, bottom = 8.dp),

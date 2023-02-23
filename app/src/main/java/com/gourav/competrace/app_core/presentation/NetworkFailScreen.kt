@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.gourav.competrace.R
-import com.gourav.competrace.ui.components.CompetraceButton
+import com.gourav.competrace.app_core.ui.components.CompetraceButton
 
 @Composable
 fun NetworkFailScreen(onClickRetry: () -> Unit) {

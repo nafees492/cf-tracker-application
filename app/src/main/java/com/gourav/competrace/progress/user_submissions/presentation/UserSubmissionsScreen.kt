@@ -1,4 +1,4 @@
-package com.gourav.competrace.ui.screens
+package com.gourav.competrace.progress.user_submissions.presentation
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -15,11 +15,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.gourav.competrace.contests.model.Contest
-import com.gourav.competrace.problemset.model.Problem
+import com.gourav.competrace.contests.model.CompetraceContest
+import com.gourav.competrace.problemset.model.CodeforcesProblem
 import com.gourav.competrace.progress.user_submissions.model.Submission
-import com.gourav.competrace.progress.user_submissions.presentation.UserSubmissionsScreenBottomSheetContent
-import com.gourav.competrace.ui.components.ProblemSubmissionCard
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -29,8 +27,8 @@ import kotlinx.coroutines.launch
 )
 @Composable
 fun UserSubmissionsScreen(
-    submittedProblemsWithSubmissions: List<Pair<Problem, ArrayList<Submission>>>,
-    contestListById: MutableMap<Int, Contest>,
+    submittedProblemsWithSubmissions: List<Pair<CodeforcesProblem, ArrayList<Submission>>>,
+    codeforcesContestListById: Map<Any, CompetraceContest>,
     showTags: Boolean
 ) {
 
@@ -58,12 +56,12 @@ fun UserSubmissionsScreen(
         skipHalfExpanded = true,
     )
 
-    var selectedProblem by rememberSaveable {
-        mutableStateOf<Pair<Problem, ArrayList<Submission>>?>(null)
+    var selectedCodeforcesProblem by remember {
+        mutableStateOf<Pair<CodeforcesProblem, ArrayList<Submission>>?>(null)
     }
 
-    val onClickSubmissionCard: (Pair<Problem, ArrayList<Submission>>?) -> Unit = {
-        selectedProblem = it
+    val onClickSubmissionCard: (Pair<CodeforcesProblem, ArrayList<Submission>>?) -> Unit = {
+        selectedCodeforcesProblem = it
         coroutineScope.launch {
             delay(100)
             modalSheetState.show()
@@ -82,9 +80,9 @@ fun UserSubmissionsScreen(
         scrimColor = MaterialTheme.colorScheme.scrim.copy(alpha = 0.6f),
         sheetContent = {
             UserSubmissionsScreenBottomSheetContent(
-                problem = selectedProblem?.first,
-                submissions = selectedProblem?.second,
-                contest = contestListById[selectedProblem?.first?.contestId]
+                codeforcesProblem = selectedCodeforcesProblem?.first,
+                submissions = selectedCodeforcesProblem?.second,
+                codeforcesContest = codeforcesContestListById[selectedCodeforcesProblem?.first?.contestId ?: 0]
             )
         }
     ) {
@@ -125,9 +123,9 @@ fun UserSubmissionsScreen(
 
             items(filteredList.size) {
                 ProblemSubmissionCard(
-                    problem = filteredList[it].first,
+                    codeforcesProblem = filteredList[it].first,
                     submissions = filteredList[it].second,
-                    contestListById = contestListById,
+                    codeforcesContestListById = codeforcesContestListById,
                     showTags = showTags,
                     selectedChips = selectedChips,
                     onClickFilterChip = onClickFilterChip,

@@ -1,6 +1,6 @@
-package com.gourav.competrace.ui.theme
+package com.gourav.competrace.app_core.ui.theme
 
-object CompetraceTheme {
+object CompetraceThemeNames {
     const val DEFAULT = "Default"
     const val DYNAMIC = "Dynamic"
 }

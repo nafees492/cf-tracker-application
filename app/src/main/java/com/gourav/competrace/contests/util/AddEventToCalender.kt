@@ -1,4 +1,4 @@
-package com.gourav.competrace.utils
+package com.gourav.competrace.contests.util
 
 import android.content.Context
 import android.content.Intent

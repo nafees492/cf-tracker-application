@@ -1,4 +1,4 @@
-package com.gourav.competrace.ui.components
+package com.gourav.competrace.app_core.ui.components
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -7,20 +7,27 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.TransformOrigin
 import com.gourav.competrace.R
-import com.gourav.competrace.ui.controllers.TopAppBarController
-import com.gourav.competrace.ui.controllers.TopAppBarStyles
+import com.gourav.competrace.app_core.presentation.SharedViewModel
 import com.gourav.competrace.app_core.util.Screens
+import com.gourav.competrace.app_core.util.TopAppBarStyles
 
 @OptIn(ExperimentalAnimationApi::class)
 @ExperimentalMaterial3Api
 @Composable
 fun CompetraceTopAppBar(
-    topAppBarController: TopAppBarController
+    sharedViewModel: SharedViewModel,
 ) {
+    val topAppBarController = sharedViewModel.topAppBarController
+    val isPlatformTabRowVisible by sharedViewModel.isPlatformsTabRowVisible.collectAsState()
+    val scope = rememberCoroutineScope()
+
     val homeScreens = listOf(
         Screens.ContestsScreen.title,
         Screens.ProblemSetScreen.title,
@@ -28,12 +35,18 @@ fun CompetraceTopAppBar(
     )
 
     val navigationIcon: @Composable (() -> Unit) = {
-        AnimatedVisibility(visible = !homeScreens.contains(topAppBarController.screenTitle)) {
-            CompetraceIconButton(
-                iconId = R.drawable.ic_arrow_back_24px,
-                onClick = topAppBarController.onClickNavUp,
-                contentDescription = "Back Button"
-            )
+        AnimatedContent(targetState = homeScreens.contains(topAppBarController.screenTitle)) {
+            if (it){
+                IconButton(onClick = { sharedViewModel.setIsPlatformsTabRowVisible(!isPlatformTabRowVisible) }) {
+                    ExpandArrow(expanded = isPlatformTabRowVisible)
+                }
+            } else {
+                CompetraceIconButton(
+                    iconId = R.drawable.ic_arrow_back_24px,
+                    onClick = topAppBarController.onClickNavUp,
+                    contentDescription = "Back Button"
+                )
+            }
         }
     }
 

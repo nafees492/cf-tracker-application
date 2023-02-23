@@ -1,4 +1,4 @@
-package com.gourav.competrace.ui.theme
+package com.gourav.competrace.app_core.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
@@ -8,9 +8,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.gourav.competrace.R
 
-val CompetraceTypography = Typography()
-
-private val Montserrat = FontFamily(
+val Montserrat = FontFamily(
     Font(R.font.montserrat_light, FontWeight.Light),
     Font(R.font.montserrat_regular, FontWeight.Normal),
     Font(R.font.montserrat_medium, FontWeight.Medium),
