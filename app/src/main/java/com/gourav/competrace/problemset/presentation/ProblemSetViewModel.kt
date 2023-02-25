@@ -26,8 +26,17 @@ class ProblemSetViewModel @Inject constructor(
     private var codeforcesDatabase: CodeforcesDatabase = CodeforcesDatabase.instance as CodeforcesDatabase
 
     init {
-        getProblemSet()
+        getProblemSetFromCodeforces()
         getContestListFromCodeforces()
+    }
+
+    fun refreshProblemSetAndContests() {
+        viewModelScope.launch {
+            _isProblemSetRefreshing.update { true }
+            // Simulate API call
+            getProblemSetFromCodeforces()
+            getContestListFromCodeforces()
+        }
     }
 
     fun addContestToContestListById(codeforcesContest: CompetraceContest) {
@@ -98,13 +107,7 @@ class ProblemSetViewModel @Inject constructor(
     private val _isProblemSetRefreshing = MutableStateFlow(false)
     val isProblemSetRefreshing = _isProblemSetRefreshing.asStateFlow()
 
-    fun refreshProblemSet() = viewModelScope.launch {
-        _isProblemSetRefreshing.update { true }
-        // Simulate API call
-        getProblemSet()
-    }
-
-    fun getProblemSet() {
+    private fun getProblemSetFromCodeforces() {
         viewModelScope.launch {
             delay(100)
             codeforcesRepository.getProblemSet()
@@ -165,7 +168,7 @@ class ProblemSetViewModel @Inject constructor(
         }
         .stateIn(
             viewModelScope,
-            SharingStarted.WhileSubscribed(5_000),
+            SharingStarted.WhileSubscribed(),
             allProblems.value
         )
 

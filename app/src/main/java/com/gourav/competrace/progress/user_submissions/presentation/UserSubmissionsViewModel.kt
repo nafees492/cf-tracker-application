@@ -124,7 +124,7 @@ class UserSubmissionsViewModel @Inject constructor(
         }
         .stateIn(
             viewModelScope,
-            SharingStarted.WhileSubscribed(5_000),
+            SharingStarted.WhileSubscribed(),
             submittedProblemsFlow.value
         )
 

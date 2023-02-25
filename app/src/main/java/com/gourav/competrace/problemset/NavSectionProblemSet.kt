@@ -134,7 +134,7 @@ fun NavGraphBuilder.problemSet(
             }
             SwipeRefresh(
                 state = swipeRefreshState,
-                onRefresh = problemSetViewModel::refreshProblemSet,
+                onRefresh = problemSetViewModel::refreshProblemSetAndContests,
             ) {
                 when (problemSetViewModel.responseForProblemSet) {
                     is ApiState.Empty -> {}
@@ -145,7 +145,7 @@ fun NavGraphBuilder.problemSet(
                         )
                     }
                     is ApiState.Failure -> {
-                        NetworkFailScreen(onClickRetry = { problemSetViewModel.getProblemSet() })
+                        NetworkFailScreen(onClickRetry = problemSetViewModel::refreshProblemSetAndContests )
                     }
                     is ApiState.Success -> {
                         val filteredProblems by problemSetViewModel.filteredProblems.collectAsState()
