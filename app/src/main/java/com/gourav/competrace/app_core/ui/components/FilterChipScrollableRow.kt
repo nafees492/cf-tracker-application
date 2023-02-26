@@ -2,6 +2,7 @@ package com.gourav.competrace.app_core.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.Icons
@@ -21,19 +22,11 @@ fun FilterChipScrollableRow(
     modifier: Modifier = Modifier,
     labelStyle: TextStyle = MaterialTheme.typography.labelSmall
 ) {
-    val isSelected: (String) -> Boolean = { selectedChips.contains(it) }
-
-    val leadingIcon: @Composable ((visible: Boolean) -> Unit) = {
-        AnimatedVisibility(visible = it) {
-            Icon(
-                imageVector = Icons.Rounded.Done,
-                contentDescription = ""
-            )
-        }
-    }
+    fun isSelected(it: String) = selectedChips.contains(it)
 
     LazyRow(
-        modifier = modifier.padding(horizontal = 4.dp)
+        modifier = modifier,
+        contentPadding = PaddingValues(4.dp)
     ) {
         items(chipList.size) {
             ElevatedFilterChip(
@@ -45,7 +38,14 @@ fun FilterChipScrollableRow(
                         style = labelStyle
                     )
                 },
-                leadingIcon = { leadingIcon(isSelected(chipList[it])) },
+                leadingIcon = {
+                    AnimatedVisibility(visible = isSelected(chipList[it])) {
+                        Icon(
+                            imageVector = Icons.Rounded.Done,
+                            contentDescription = ""
+                        )
+                    }
+                },
                 modifier = Modifier
                     .padding(horizontal = 4.dp)
                     .animateItemPlacement(),

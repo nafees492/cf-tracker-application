@@ -17,8 +17,9 @@ import androidx.navigation.compose.composable
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.gourav.competrace.app_core.data.UserPreferences
-import com.gourav.competrace.app_core.presentation.SharedViewModel
+import com.gourav.competrace.app_core.ui.SharedViewModel
 import com.gourav.competrace.app_core.ui.components.CompetracePlatformRow
+import com.gourav.competrace.app_core.ui.components.CompetraceSwipeRefreshIndicator
 import com.gourav.competrace.app_core.util.ApiState
 import com.gourav.competrace.app_core.util.Screens
 import com.gourav.competrace.progress.user.presentation.*
@@ -51,6 +52,9 @@ fun NavGraphBuilder.user(
         val userHandle by userPreferences.handleNameFlow.collectAsState(null)
 
         val isSettingsDialogueOpen by sharedViewModel.isSettingsDialogueOpen.collectAsState()
+        val isPlatformTabRowVisible by sharedViewModel.isPlatformsTabRowVisible.collectAsState()
+
+        val isRefreshing by userViewModel.isUserRefreshing.collectAsState()
 
         SettingsAlertDialog(
             openSettingsDialog = isSettingsDialogueOpen,
@@ -73,16 +77,11 @@ fun NavGraphBuilder.user(
             )
         }
 
-        val isRefreshing by userViewModel.isUserRefreshing.collectAsState()
+
         val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = isRefreshing)
 
-        var selectedTabIndex by rememberSaveable {
-            mutableStateOf(0)
-        }
-
+        var selectedTabIndex by rememberSaveable { mutableStateOf(0) }
         val tabTitles = listOf("CodeForces")
-
-        val isPlatformTabRowVisible by sharedViewModel.isPlatformsTabRowVisible.collectAsState()
 
         Column {
             AnimatedVisibility(visible = isPlatformTabRowVisible, modifier = Modifier.fillMaxWidth()) {
@@ -106,7 +105,8 @@ fun NavGraphBuilder.user(
                                     userPreferences = userPreferences,
                                     isForced = true
                                 )
-                            }
+                            },
+                            indicator = CompetraceSwipeRefreshIndicator
                         ) {
                             when (userViewModel.responseForUserInfo) {
                                 is ApiState.Empty -> {
@@ -128,7 +128,7 @@ fun NavGraphBuilder.user(
                                         }
                                     )
                                 }
-                                else /* ApiState.Success */ -> {
+                                is ApiState.Success -> {
                                     val user by userViewModel.currentUser.collectAsState()
 
                                     ProgressScreen(

@@ -51,7 +51,7 @@ class UserViewModel @Inject constructor(
     }
 
     private fun getUserInfo(handle: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             codeforcesRepository.getUserInfo(handle = handle)
                 .onStart {
                     responseForUserInfo = ApiState.Loading

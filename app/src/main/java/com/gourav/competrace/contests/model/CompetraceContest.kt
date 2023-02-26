@@ -11,8 +11,8 @@ data class CompetraceContest(
     val websiteUrl: String,
     val startTimeInMillis: Long,
     val durationInMillis: Long,
-    val within7Days: Boolean,
-    val registrationOpen: Boolean? = null,
+    val within7Days: Boolean = false,
+    val registrationOpen: Boolean = false,
     val registrationUrl: String? = null,
     val site: String? = null,
 ) {

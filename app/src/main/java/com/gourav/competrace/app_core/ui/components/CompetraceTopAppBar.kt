@@ -14,7 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.TransformOrigin
 import com.gourav.competrace.R
-import com.gourav.competrace.app_core.presentation.SharedViewModel
+import com.gourav.competrace.app_core.ui.SharedViewModel
 import com.gourav.competrace.app_core.util.Screens
 import com.gourav.competrace.app_core.util.TopAppBarStyles
 

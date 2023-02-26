@@ -69,7 +69,7 @@ class UserSubmissionsViewModel @Inject constructor(
     }
 
     private fun getUserSubmission(handle: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             codeforcesRepository.getUserSubmissions(handle = handle)
                 .onStart {
                     responseForUserSubmissions = ApiState.Loading

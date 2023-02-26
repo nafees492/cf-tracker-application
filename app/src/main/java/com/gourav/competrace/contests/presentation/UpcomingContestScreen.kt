@@ -1,6 +1,9 @@
 package com.gourav.competrace.contests.presentation
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,88 +18,123 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.gourav.competrace.app_core.ui.components.ExpandArrow
 import com.gourav.competrace.contests.model.CompetraceContest
+import com.gourav.competrace.utils.Phase
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun UpcomingContestScreen(
-    onGoingContest: List<CompetraceContest>?,
-    upComingContests: List<CompetraceContest>?
+    contests: List<CompetraceContest>,
+    selectedIndex: Int
 ) {
+    val onGoingContest = contests.filter { it.phase == Phase.CODING }
+    val within7Days = contests.filter { it.phase == Phase.BEFORE && it.within7Days }
+    val after7Days = contests.filter { it.phase == Phase.BEFORE && !it.within7Days }
+
     var expanded by rememberSaveable {
         mutableStateOf(false)
     }
 
-    var hasNoItemInNext7Days by remember{
-        mutableStateOf(true)
-    }
-
-    var hasNoItemAfterNext7Days  by remember{
-        mutableStateOf(true)
-    }
+    fun generateKey(it: Int) = "s${selectedIndex}-i{$it}"
 
     LazyColumn(
         modifier = Modifier.animateContentSize()
     ) {
-        item {
+        item(key = generateKey(1)) {
             Text(
                 text = "Ongoing Contests",
                 style = MaterialTheme.typography.labelLarge,
-                modifier = Modifier.padding(8.dp),
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f)
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f),
+                modifier = Modifier
+                    .padding(8.dp)
+                    .animateItemPlacement(
+                        animationSpec = tween()
+                    )
+
             )
         }
 
-        onGoingContest?.let { list ->
-            items(count = list.size) {
-                ContestCard(contest = list[it])
-            }
-
-            item {
-                NoContestTag(isDisplayed = list.isEmpty())
-            }
-
-        }
-
-        item {
-            Text(
-                text = "Upcoming Contests",
-                style = MaterialTheme.typography.labelLarge,
-                modifier = Modifier.padding(8.dp),
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f)
-            )
-        }
-
-        upComingContests?.let { list ->
-            item {
-                Text(
-                    text = "Next 7 Days",
-                    style = MaterialTheme.typography.labelLarge,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+        onGoingContest.let { list ->
+            items(count = list.size, key = { list[it].hashCode() }) {
+                ContestCard(
+                    contest = list[it],
+                    modifier = Modifier.animateItemPlacement(
+                        animationSpec = tween()
+                    )
                 )
             }
 
-            items(count = list.size) {
-                val contest = list[it]
-                if(contest.within7Days) {
-                    ContestCard(contest = contest)
-                    hasNoItemInNext7Days = false
+            item(key = generateKey(2)) {
+                NoContestTag(
+                    isDisplayed = list.isEmpty(),
+                    modifier = Modifier.animateItemPlacement(
+                        animationSpec = tween()
+                    )
+                )
+            }
+
+        }
+
+        item(key = generateKey(3))  {
+            Text(
+                text = "Upcoming Contests",
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f),
+                modifier = Modifier.padding(8.dp)
+                    .animateItemPlacement(
+                        animationSpec = tween()
+                    )
+            )
+        }
+
+        within7Days.let { list ->
+            item(key = generateKey(4)) {
+                Text(
+                    text = "Next 7 Days",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp, vertical = 4.dp)
+                        .animateItemPlacement(
+                            animationSpec = tween()
+                        )
+                )
+            }
+
+            items(count = list.size, key = { list[it].hashCode() }) {
+                if (list[it].within7Days) {
+                    ContestCard(
+                        contest = list[it],
+                        modifier = Modifier.animateItemPlacement(
+                            animationSpec = tween()
+                        )
+                    )
                 }
             }
 
-            item {
-                NoContestTag(isDisplayed = hasNoItemInNext7Days)
+            item(key = generateKey(5)) {
+                NoContestTag(
+                    isDisplayed = list.isEmpty(),
+                    modifier = Modifier.animateItemPlacement(
+                        animationSpec = tween()
+                    )
+                )
             }
+        }
 
-            item {
+        after7Days.let {  list ->
+            item(key = generateKey(6)) {
                 Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(MaterialTheme.shapes.medium)
                         .clickable {
                             expanded = !expanded
-                        },
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                        }
+                        .animateItemPlacement(
+                            animationSpec = tween()
+                        )
                 ) {
                     Text(
                         text = "After 7 Days",
@@ -112,16 +150,24 @@ fun UpcomingContestScreen(
             }
 
             if (expanded) {
-                items(count = list.size) {
-                    val contest = list[it]
-                    if (!contest.within7Days){
-                        ContestCard(contest = contest)
-                        hasNoItemAfterNext7Days = false
+                items(count = list.size, key = { list[it].hashCode() }) {
+                    if (!list[it].within7Days) {
+                        ContestCard(
+                            contest = list[it],
+                            modifier = Modifier.animateItemPlacement(
+                                animationSpec = tween()
+                            )
+                        )
                     }
                 }
 
-                item {
-                    NoContestTag(isDisplayed = hasNoItemAfterNext7Days)
+                item(key = generateKey(7)) {
+                    NoContestTag(
+                        isDisplayed = list.isEmpty(),
+                        modifier = Modifier.animateItemPlacement(
+                            animationSpec = tween()
+                        )
+                    )
                 }
             }
         }
@@ -132,13 +178,13 @@ fun UpcomingContestScreen(
 }
 
 @Composable
-fun NoContestTag(isDisplayed: Boolean) {
+fun NoContestTag(isDisplayed: Boolean, modifier: Modifier = Modifier) {
     if (isDisplayed) {
         Text(
             text = "No Contest",
             style = MaterialTheme.typography.titleLarge,
             textAlign = TextAlign.Center,
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
                 .padding(16.dp),
         )

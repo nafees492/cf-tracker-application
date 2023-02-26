@@ -21,7 +21,7 @@ fun CompetracePlatformRow(
 ) {
 
     LaunchedEffect(key1 = selectedTabIndex){
-        scrollState.animateScrollToItem(selectedTabIndex)
+        scrollState.animateScrollToItem(selectedTabIndex, -140)
     }
 
     LazyRow(
@@ -41,21 +41,4 @@ fun CompetracePlatformRow(
             )
         }
     }
-    /*ScrollableTabRow(
-        selectedTabIndex = selectedTabIndex,
-        edgePadding = 8.dp,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        tabTitles.forEachIndexed { index, title ->
-            Tab(
-                selected = selectedTabIndex == index,
-                onClick = { onClickTab(index) },
-                text = {
-                    Text(text = title)
-                },
-                selectedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                unselectedContentColor = MaterialTheme.colorScheme.onSurface,
-            )
-        }
-    }*/
 }

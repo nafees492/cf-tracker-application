@@ -1,8 +1,8 @@
 package com.gourav.competrace.app_core.data.network
 
 import com.gourav.competrace.app_core.model.CodeforcesApiResult
-import com.gourav.competrace.contests.model.CodeforcesContest
-import com.gourav.competrace.problemset.model.CodeforcesApiResultProblemSet
+import com.gourav.competrace.problemset.model.CodeforcesContest
+import com.gourav.competrace.app_core.model.CodeforcesProblemSetApiResult
 import com.gourav.competrace.progress.participated_contests.model.UserRatingChanges
 import com.gourav.competrace.progress.user.model.User
 import com.gourav.competrace.progress.user_submissions.model.Submission
@@ -26,7 +26,7 @@ interface CodeforcesApiService {
     suspend fun getUserSubmissions(@Query("handle") handle: String): CodeforcesApiResult<Submission>
 
     @GET("problemset.problems")
-    suspend fun getProblemSet(): CodeforcesApiResultProblemSet
+    suspend fun getProblemSet(): CodeforcesProblemSetApiResult
 
     @GET("user.rating")
     suspend fun getUserRatingChanges(@Query("handle") handle: String): CodeforcesApiResult<UserRatingChanges>

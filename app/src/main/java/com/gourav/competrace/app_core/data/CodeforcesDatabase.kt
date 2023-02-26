@@ -2,9 +2,10 @@ package com.gourav.competrace.app_core.data
 
 import com.gourav.competrace.app_core.util.tempUser
 import com.gourav.competrace.contests.model.CompetraceContest
-import com.gourav.competrace.problemset.model.CodeforcesProblem
+import com.gourav.competrace.problemset.model.CompetraceProblem
 import com.gourav.competrace.progress.user.model.User
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 
 internal class CodeforcesDatabase private constructor() {
@@ -14,20 +15,22 @@ internal class CodeforcesDatabase private constructor() {
         currentUserFlow.update { user }
     }
 
-    val codeforcesContestListByIdFlow = MutableStateFlow (mutableMapOf<Any, CompetraceContest>())
-    fun addContestToContestListById(codeforcesContest: CompetraceContest){
-        codeforcesContestListByIdFlow.value[codeforcesContest.id] = codeforcesContest
+    val codeforcesContestListByIdFlow = MutableStateFlow (mapOf<Any, CompetraceContest>())
+    fun addContestToContestListById(contest: CompetraceContest){
+        codeforcesContestListByIdFlow.update {
+            it + (contest.id to contest)
+        }
     }
 
-    val allProblemsFlow = MutableStateFlow(arrayListOf<CodeforcesProblem>())
-    fun addProblem(codeforcesProblem: CodeforcesProblem){
-        allProblemsFlow.value.add(codeforcesProblem)
+    val allProblemsFlow = MutableStateFlow(listOf<CompetraceProblem>())
+    fun addProblem(problem: CompetraceProblem){
+        allProblemsFlow.update { it + problem }
     }
-    fun addAllProblems(codeforcesProblems: List<CodeforcesProblem>){
-        allProblemsFlow.value.addAll(codeforcesProblems)
+    fun addAllProblems(problems: List<CompetraceProblem>){
+        allProblemsFlow.update { it + problems }
     }
     fun clearProblems(){
-        allProblemsFlow.value.clear()
+        allProblemsFlow.update { emptyList() }
     }
 
     companion object {

@@ -43,7 +43,8 @@ fun ContestCard(
     val clipboardManager: ClipboardManager = LocalClipboardManager.current
     val haptic = LocalHapticFeedback.current
 
-    val ratedCategoriesRow: @Composable (Modifier) -> Unit = { modifier1 ->
+    @Composable
+    fun ratedCategoriesRow(modifier1: Modifier) {
         LazyRow(
             modifier = modifier1,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -58,27 +59,25 @@ fun ContestCard(
             }
 
             item {
-                contest.registrationOpen?.let {
-                    if (it) {
-                        ElevatedAssistChip(
-                            onClick = {
-                                loadUrl(
-                                    context = context,
-                                    url = contest.registrationUrl
-                                )
-                            },
-                            label = {
-                                Text(
-                                    text = "Register Now!",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                )
-                            },
-                            colors = AssistChipDefaults.elevatedAssistChipColors(
-                                containerColor = RegistrationRed,
-                                labelColor = Color.White
+                if (contest.registrationOpen) {
+                    ElevatedAssistChip(
+                        onClick = {
+                            loadUrl(
+                                context = context,
+                                url = contest.registrationUrl
                             )
+                        },
+                        label = {
+                            Text(
+                                text = "Register Now!",
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
+                        },
+                        colors = AssistChipDefaults.elevatedAssistChipColors(
+                            containerColor = RegistrationRed,
+                            labelColor = Color.White
                         )
-                    }
+                    )
                 }
             }
         }
@@ -147,22 +146,6 @@ fun ContestCard(
                 )
             }
 
-            val totalTimeInMillis =
-                if (contest.phase == Phase.BEFORE)
-                    contest.startTimeInMillis - getCurrentTimeInMillis()
-                else
-                    contest.endTimeInMillis - getCurrentTimeInMillis()
-
-            var timeLeftInMillis by remember { mutableStateOf(totalTimeInMillis) }
-
-            var isStarted by remember { mutableStateOf(false) }
-            if (!isStarted) {
-                MyCountDownTimer(
-                    totalTimeInMillis,
-                    onTik = { timeLeftInMillis = it }).start()
-                isStarted = true
-            }
-
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -170,23 +153,42 @@ fun ContestCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                if (contest.within7Days) AssistChip(
-                    onClick = { /*TODO*/ },
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_timer_24px),
-                            contentDescription = "Timer icon",
-                            modifier = Modifier.padding(end = 4.dp)
-                        )
-                    },
-                    label = {
-                        Text(
-                            text = getFormattedTime(timeLeftInMillis),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    },
-                ) else ratedCategoriesRow(Modifier)
+                if (contest.within7Days) {
+                    val totalTimeInMillis =
+                        if (contest.phase == Phase.BEFORE)
+                            contest.startTimeInMillis - getCurrentTimeInMillis()
+                        else
+                            contest.endTimeInMillis - getCurrentTimeInMillis()
+
+                    var timeLeftInMillis by remember { mutableStateOf(totalTimeInMillis) }
+
+                    var isStarted by remember { mutableStateOf(false) }
+                    if (!isStarted) {
+                        MyCountDownTimer(
+                            totalTimeInMillis = totalTimeInMillis,
+                            onTik = { timeLeftInMillis = it }
+                        ).start()
+                        isStarted = true
+                    }
+
+                    AssistChip(
+                        onClick = { /*TODO*/ },
+                        leadingIcon = {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_timer_24px),
+                                contentDescription = "Timer icon",
+                                modifier = Modifier.padding(end = 4.dp)
+                            )
+                        },
+                        label = {
+                            Text(
+                                text = getFormattedTime(timeLeftInMillis),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        },
+                    )
+                } else ratedCategoriesRow(Modifier)
 
                 if (contest.phase == Phase.BEFORE) CompetraceIconButton(
                     iconId = R.drawable.ic_calendar_add_on_24px,

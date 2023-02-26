@@ -13,7 +13,8 @@ import androidx.navigation.compose.composable
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.gourav.competrace.app_core.data.UserPreferences
-import com.gourav.competrace.app_core.presentation.SharedViewModel
+import com.gourav.competrace.app_core.ui.SharedViewModel
+import com.gourav.competrace.app_core.ui.components.CompetraceSwipeRefreshIndicator
 import com.gourav.competrace.app_core.util.ApiState
 import com.gourav.competrace.app_core.util.Screens
 import com.gourav.competrace.progress.user_submissions.presentation.UserSubmissionsScreen
@@ -106,8 +107,9 @@ fun NavGraphBuilder.userSubmission(
                     isForced = true
                 )
             },
+            indicator = CompetraceSwipeRefreshIndicator
         ) {
-            when (val apiState = userSubmissionsViewModel.responseForUserSubmissions) {
+            when (userSubmissionsViewModel.responseForUserSubmissions) {
                 is ApiState.Empty -> {
                     userSubmissionsViewModel.requestForUserSubmission(
                         userPreferences = userPreferences,

@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.gourav.competrace.app_core.data.repository.CodeforcesRepository
 import com.gourav.competrace.app_core.util.ApiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -21,7 +22,7 @@ class LoginViewModel@Inject constructor (
     var responseForCheckUsernameAvailable by mutableStateOf<ApiState>(ApiState.Empty)
 
     fun checkUsernameAvailable(handle: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             codeforcesRepository.getUserInfo(handle = handle)
                 .onStart {
                     responseForCheckUsernameAvailable = ApiState.Loading

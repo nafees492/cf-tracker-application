@@ -3,6 +3,7 @@ package com.gourav.competrace.problemset
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,9 +18,9 @@ import androidx.navigation.compose.composable
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.gourav.competrace.app_core.data.UserPreferences
-import com.gourav.competrace.app_core.presentation.SharedViewModel
+import com.gourav.competrace.app_core.ui.SharedViewModel
 import com.gourav.competrace.app_core.ui.components.CompetracePlatformRow
-import com.gourav.competrace.app_core.ui.components.MyCircularProgressIndicator
+import com.gourav.competrace.app_core.ui.components.CompetraceSwipeRefreshIndicator
 import com.gourav.competrace.app_core.util.ApiState
 import com.gourav.competrace.app_core.util.Screens
 import com.gourav.competrace.problemset.presentation.ProblemSetScreen
@@ -32,7 +33,7 @@ import com.gourav.competrace.ui.screens.NetworkFailScreen
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.problemSet(
     sharedViewModel: SharedViewModel,
     problemSetViewModel: ProblemSetViewModel,
@@ -45,12 +46,21 @@ fun NavGraphBuilder.problemSet(
             screenTitle = Screens.ProblemSetScreen.title
         }
 
-        val coroutineScope = rememberCoroutineScope()
+        val scope = rememberCoroutineScope()
 
-        val contestListById by problemSetViewModel.contestListById.collectAsState()
+        val showTagsInProblemSet by userPreferences.showTagsFlow.collectAsState(initial = true)
 
         val isSettingsDialogueOpen by sharedViewModel.isSettingsDialogueOpen.collectAsState()
+        val isPlatformTabRowVisible by sharedViewModel.isPlatformsTabRowVisible.collectAsState()
+
+        val filteredProblems by problemSetViewModel.filteredProblems.collectAsState()
+        val codeforcesContestListById by problemSetViewModel.codeforcesContestListById.collectAsState()
         val ratingRangeValue by problemSetViewModel.ratingRangeValue.collectAsState()
+        val searchQuery by problemSetViewModel.searchQuery.collectAsState()
+        val selectedChips by problemSetViewModel.selectedChips.collectAsState()
+
+        val responseForProblemSet by problemSetViewModel.responseForProblemSet.collectAsState()
+        val isRefreshing by problemSetViewModel.isProblemSetRefreshing.collectAsState()
 
         SettingsAlertDialog(
             openSettingsDialog = isSettingsDialogueOpen,
@@ -64,8 +74,6 @@ fun NavGraphBuilder.problemSet(
                 updateStartAndEnd = problemSetViewModel::updateRatingRange
             )
         }
-
-        val searchQuery by problemSetViewModel.searchQuery.collectAsState()
 
         val searchBarFocusRequester = remember { FocusRequester() }
 
@@ -91,7 +99,7 @@ fun NavGraphBuilder.problemSet(
 
         val onClickSearch: () -> Unit = {
             topAppBarController.isSearchWidgetOpen = true
-            coroutineScope.launch {
+            scope.launch {
                 delay(100)
                 searchBarFocusRequester.requestFocus()
             }
@@ -111,18 +119,10 @@ fun NavGraphBuilder.problemSet(
             )
         }
 
-        val isRefreshing by problemSetViewModel.isProblemSetRefreshing.collectAsState()
         val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = isRefreshing)
 
-        val showTagsInProblemSet by userPreferences.showTagsFlow.collectAsState(initial = true)
-
-        var selectedTabIndex by rememberSaveable {
-            mutableStateOf(0)
-        }
-
+        var selectedTabIndex by rememberSaveable { mutableStateOf(0) }
         val tabTitles = listOf("CodeForces")
-
-        val isPlatformTabRowVisible by sharedViewModel.isPlatformsTabRowVisible.collectAsState()
 
         Column {
             AnimatedVisibility(visible = isPlatformTabRowVisible, modifier = Modifier.fillMaxWidth()) {
@@ -135,25 +135,24 @@ fun NavGraphBuilder.problemSet(
             SwipeRefresh(
                 state = swipeRefreshState,
                 onRefresh = problemSetViewModel::refreshProblemSetAndContests,
+                indicator = CompetraceSwipeRefreshIndicator
             ) {
-                when (problemSetViewModel.responseForProblemSet) {
+                when (responseForProblemSet) {
                     is ApiState.Empty -> {}
                     is ApiState.Loading -> {
-                        MyCircularProgressIndicator(
-                            isDisplayed = true,
-                            modifier = Modifier.fillMaxSize()
-                        )
+                        Box(modifier = Modifier.fillMaxSize())
                     }
                     is ApiState.Failure -> {
                         NetworkFailScreen(onClickRetry = problemSetViewModel::refreshProblemSetAndContests )
                     }
                     is ApiState.Success -> {
-                        val filteredProblems by problemSetViewModel.filteredProblems.collectAsState()
-
                         ProblemSetScreen(
-                            listOfCodeforcesProblem = filteredProblems,
-                            codeforcesContestListById = contestListById,
+                            problems = filteredProblems,
+                            codeforcesContestListById = codeforcesContestListById,
                             tagList = problemSetViewModel.tagList,
+                            selectedChips = selectedChips,
+                            updateSelectedChips = problemSetViewModel::updateSelectedChips,
+                            clearSelectedChips = problemSetViewModel::clearSelectedChips,
                             showTags = showTagsInProblemSet
                         )
                     }

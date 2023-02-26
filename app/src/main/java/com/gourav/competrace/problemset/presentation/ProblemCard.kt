@@ -19,37 +19,37 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gourav.competrace.app_core.ui.components.FilterChipScrollableRow
 import com.gourav.competrace.contests.model.CompetraceContest
-import com.gourav.competrace.problemset.model.CodeforcesProblem
+import com.gourav.competrace.problemset.model.CompetraceProblem
 import com.gourav.competrace.ui.components.BackgroundDesignArrow
 import com.gourav.competrace.utils.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProblemCard(
-    codeforcesProblem: CodeforcesProblem,
-    codeforcesContestListById: Map<Any, CompetraceContest>,
+    problem: CompetraceProblem,
+    contestName: String?,
     showTags: Boolean,
+    selectedChips: Set<String>,
+    onClickFilterChip: (String) -> Unit,
     modifier: Modifier = Modifier,
-    selectedChips: Set<String> = emptySet(),
-    onClickFilterChip: (String) -> Unit = {},
 ) {
 
     val context = LocalContext.current
     val clipboardManager = LocalClipboardManager.current
     val haptic = LocalHapticFeedback.current
 
-    val ratingContainerColor = getRatingContainerColor(rating = codeforcesProblem.rating)
+    val ratingContainerColor = getRatingContainerColor(rating = problem.rating)
 
     ProblemCardDesign(
-        rating = codeforcesProblem.rating,
+        rating = problem.rating,
         color = ratingContainerColor,
         onClick = {
-            loadUrl(context = context, url = codeforcesProblem.getLinkViaProblemSet())
+            loadUrl(context = context, url = problem.websiteUrl)
         },
         onLongClick = {
-            Log.d("Copy URL", codeforcesProblem.toString())
+            Log.d("Copy URL", problem.toString())
             copyTextToClipBoard(
-                text = codeforcesProblem.getLinkViaProblemSet(),
+                text = problem.websiteUrl,
                 toastMessage = "Problem Link Copied",
                 context = context,
                 clipboardManager = clipboardManager,
@@ -59,7 +59,7 @@ fun ProblemCard(
         modifier = modifier
     ) {
         Text(
-            text = "${codeforcesProblem.index}. ${codeforcesProblem.name}",
+            text = "${problem.index}. ${problem.name}",
             style = MaterialTheme.typography.titleLarge.copy(fontSize = 18.sp),
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 8.dp, bottom = 4.dp),
@@ -67,18 +67,16 @@ fun ProblemCard(
             overflow = TextOverflow.Ellipsis
         )
 
-        codeforcesProblem.contestId?.let {
-            Text(
-                text = "${codeforcesContestListById[it]?.name}",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                modifier = Modifier.padding(horizontal = 8.dp),
-                maxLines = if(showTags) 1 else 2,
-                overflow = TextOverflow.Ellipsis
-            )
-        }
+        Text(
+            text = contestName.toString(),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+            modifier = Modifier.padding(horizontal = 8.dp),
+            maxLines = if(showTags) 1 else 2,
+            overflow = TextOverflow.Ellipsis
+        )
 
-        codeforcesProblem.tags?.let { tags ->
+        problem.tags?.let { tags ->
             if(showTags) FilterChipScrollableRow(
                 chipList = tags,
                 selectedChips = selectedChips,

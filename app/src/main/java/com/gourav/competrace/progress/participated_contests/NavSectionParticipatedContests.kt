@@ -10,7 +10,8 @@ import androidx.navigation.compose.composable
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.gourav.competrace.app_core.data.UserPreferences
-import com.gourav.competrace.app_core.presentation.SharedViewModel
+import com.gourav.competrace.app_core.ui.SharedViewModel
+import com.gourav.competrace.app_core.ui.components.CompetraceSwipeRefreshIndicator
 import com.gourav.competrace.app_core.util.ApiState
 import com.gourav.competrace.app_core.util.Screens
 import com.gourav.competrace.progress.participated_contests.presentation.ParticipatedContestViewModel
@@ -44,6 +45,7 @@ fun NavGraphBuilder.participatedContests(
                     isForced = true
                 )
             },
+            indicator = CompetraceSwipeRefreshIndicator
         ) {
             when (participatedContestViewModel.responseForUserRatingChanges) {
                 is ApiState.Empty -> {

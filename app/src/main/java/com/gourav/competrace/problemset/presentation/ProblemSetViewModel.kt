@@ -1,19 +1,18 @@
 package com.gourav.competrace.problemset.presentation
 
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gourav.competrace.app_core.data.CodeforcesDatabase
 import com.gourav.competrace.app_core.data.repository.CodeforcesRepository
 import com.gourav.competrace.app_core.util.ApiState
 import com.gourav.competrace.contests.model.CompetraceContest
-import com.gourav.competrace.contests.util.processCodeforcesContestFromAPIResult
-import com.gourav.competrace.problemset.model.CodeforcesProblem
+import com.gourav.competrace.problemset.util.processCodeforcesContestFromAPIResult
+import com.gourav.competrace.problemset.model.CompetraceProblem
 import com.gourav.competrace.problemset.util.processCodeforcesProblemSetFromAPIResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -25,30 +24,25 @@ class ProblemSetViewModel @Inject constructor(
 ) : ViewModel() {
     private var codeforcesDatabase: CodeforcesDatabase = CodeforcesDatabase.instance as CodeforcesDatabase
 
-    init {
-        getProblemSetFromCodeforces()
-        getContestListFromCodeforces()
-    }
+    private var fetchContestJob: Job? = null
+    private var fetchProblemsetJob: Job? = null
 
     fun refreshProblemSetAndContests() {
-        viewModelScope.launch {
-            _isProblemSetRefreshing.update { true }
-            // Simulate API call
-            getProblemSetFromCodeforces()
-            getContestListFromCodeforces()
-        }
+        _isProblemSetRefreshing.update { true }
+        getContestListFromCodeforces()
+        getProblemSetFromCodeforces()
     }
 
     fun addContestToContestListById(codeforcesContest: CompetraceContest) {
-        codeforcesDatabase.addContestToContestListById(codeforcesContest = codeforcesContest)
+        codeforcesDatabase.addContestToContestListById(contest = codeforcesContest)
     }
 
     private fun getContestListFromCodeforces() {
-        viewModelScope.launch {
+        fetchContestJob?.cancel()
+        fetchContestJob = viewModelScope.launch(Dispatchers.IO) {
             // Load Normal Contests.
             codeforcesRepository.getContestList(gym = false)
-                .onStart {
-                }.catch {
+                .catch {
                     Log.e(TAG, "getContestListFromCodeforces: ${it.cause}")
                 }.collect {
                     if (it.status == "OK") {
@@ -69,17 +63,9 @@ class ProblemSetViewModel @Inject constructor(
                 .collect { apiResult ->
                     if (apiResult.status == "OK") {
                         apiResult.result?.map {
-                            CompetraceContest(
-                                id = it.id,
-                                name = it.name,
-                                phase = it.phase,
-                                websiteUrl = it.getLink(),
-                                startTimeInMillis = it.startTimeInMillis(),
-                                durationInMillis = it.durationInMillis(),
-                                within7Days = it.within7Days(),
-                            )
+                            it.mapToCompetraceContest()
                         }?.forEach { contest ->
-                            codeforcesDatabase.addContestToContestListById(codeforcesContest = contest)
+                            codeforcesDatabase.addContestToContestListById(contest = contest)
                         }
 
                         Log.d(TAG, "Codeforces - Got - Gym Contest List")
@@ -90,42 +76,45 @@ class ProblemSetViewModel @Inject constructor(
         }
     }
 
-    val contestListById = codeforcesDatabase.codeforcesContestListByIdFlow.asStateFlow()
+    val codeforcesContestListById = codeforcesDatabase.codeforcesContestListByIdFlow.asStateFlow()
     private val allProblems = codeforcesDatabase.allProblemsFlow.asStateFlow()
 
     fun clearProblemsFromCodeforcesDatabase(){
         codeforcesDatabase.clearProblems()
     }
 
-    fun addAllProblemsToCodeforcesDatabase(codeforcesProblems: List<CodeforcesProblem>){
-        codeforcesDatabase.addAllProblems(codeforcesProblems = codeforcesProblems)
+    fun addAllProblemsToCodeforcesDatabase(problem: List<CompetraceProblem>){
+        codeforcesDatabase.addAllProblems(problems = problem)
     }
 
-    var responseForProblemSet by mutableStateOf<ApiState>(ApiState.Empty)
+    private val _responseForProblemSet = MutableStateFlow<ApiState>(ApiState.Loading)
+    val responseForProblemSet = _responseForProblemSet.asStateFlow()
+
     val tagList = arrayListOf<String>()
 
     private val _isProblemSetRefreshing = MutableStateFlow(false)
     val isProblemSetRefreshing = _isProblemSetRefreshing.asStateFlow()
 
     private fun getProblemSetFromCodeforces() {
-        viewModelScope.launch {
+        fetchProblemsetJob?.cancel()
+        fetchProblemsetJob = viewModelScope.launch(Dispatchers.IO) {
             delay(100)
             codeforcesRepository.getProblemSet()
                 .onStart {
-                    responseForProblemSet = ApiState.Loading
+                    _responseForProblemSet.update { ApiState.Loading }
                 }.catch {
-                    responseForProblemSet = ApiState.Failure
+                    _responseForProblemSet.update { ApiState.Failure }
                     _isProblemSetRefreshing.update { false }
-                    Log.e(TAG, "getProblemSet: $it")
+                    Log.e(TAG, "getProblemSet: ${it.cause}")
                 }.collect {
                     if(it.status == "OK"){
 
                         processCodeforcesProblemSetFromAPIResult(apiResult = it)
 
-                        responseForProblemSet = ApiState.Success
+                        _responseForProblemSet.update { ApiState.Success }
                         Log.d(TAG, "Got - Problem Set")
                     } else {
-                        responseForProblemSet = ApiState.Failure
+                        _responseForProblemSet.update { ApiState.Failure }
                         Log.e(TAG, "getProblemSet: " + it.comment.toString())
                     }
                     _isProblemSetRefreshing.update { false }
@@ -147,13 +136,27 @@ class ProblemSetViewModel @Inject constructor(
         _searchQuery.update { value }
     }
 
+    private val _selectedChips = MutableStateFlow(setOf<String>())
+    val selectedChips = _selectedChips.asStateFlow()
+
+    private fun isChipSelected(value: String) = selectedChips.value.contains(value)
+
+    fun updateSelectedChips(value: String){
+        if(isChipSelected(value)) _selectedChips.update { it - value }
+        else _selectedChips.update { it + value }
+    }
+
+    fun clearSelectedChips(){
+        _selectedChips.update { emptySet() }
+    }
+
     val filteredProblems = allProblems
         .combine(searchQuery){ problems, searchQuery ->
             if(searchQuery.isBlank()) problems
             else {
                 problems.filter {
                     val isProblemMatched = it.name.contains(searchQuery, ignoreCase = true)
-                    val isContestMatched = contestListById.value[it.contestId ?: 0]?.name
+                    val isContestMatched = codeforcesContestListById.value[it.contestId ?: 0]?.name
                         .toString().contains(searchQuery, ignoreCase = true)
                     searchQuery.isBlank() || isProblemMatched || isContestMatched
                 }
@@ -166,11 +169,20 @@ class ProblemSetViewModel @Inject constructor(
                 isDefault || (it.rating in ratingRange)
             }
         }
+        .combine(selectedChips){ problems, selectedChips ->
+            problems.filter {
+                selectedChips.isEmpty() || it.tags?.containsAll(selectedChips) ?: false
+            }
+        }
         .stateIn(
             viewModelScope,
-            SharingStarted.WhileSubscribed(),
+            SharingStarted.Eagerly,
             allProblems.value
         )
+
+    init {
+        refreshProblemSetAndContests()
+    }
 
     companion object {
         private const val TAG = "Problem Set ViewModel"

@@ -3,8 +3,8 @@ package com.gourav.competrace.app_core.data.repository
 
 import com.gourav.competrace.app_core.data.network.CodeforcesApiService
 import com.gourav.competrace.app_core.model.CodeforcesApiResult
-import com.gourav.competrace.contests.model.CodeforcesContest
-import com.gourav.competrace.problemset.model.CodeforcesApiResultProblemSet
+import com.gourav.competrace.problemset.model.CodeforcesContest
+import com.gourav.competrace.app_core.model.CodeforcesProblemSetApiResult
 import com.gourav.competrace.progress.participated_contests.model.UserRatingChanges
 import com.gourav.competrace.progress.user.model.User
 import com.gourav.competrace.progress.user_submissions.model.Submission
@@ -28,7 +28,7 @@ class CodeforcesRepository @Inject constructor(private val codeforcesApiService:
         emit(codeforcesApiService.getUserSubmissions(handle = handle))
     }.flowOn(Dispatchers.IO)
 
-    fun getProblemSet(): Flow<CodeforcesApiResultProblemSet> = flow {
+    fun getProblemSet(): Flow<CodeforcesProblemSetApiResult> = flow {
         emit(codeforcesApiService.getProblemSet())
     }.flowOn(Dispatchers.IO)
 

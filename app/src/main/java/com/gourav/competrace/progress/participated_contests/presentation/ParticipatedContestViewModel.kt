@@ -38,9 +38,9 @@ class ParticipatedContestViewModel @Inject constructor(
     fun requestForUserRatingChanges(userPreferences: UserPreferences, isForced: Boolean) {
         if (isForced || !requestedForUserRatingChanges.value) {
             _requestedForUserRatingChanges.update { true }
-            viewModelScope.launch(Dispatchers.IO) {
+            viewModelScope.launch {
                 userPreferences.handleNameFlow.collect { handle ->
-                    getUserRatingChanges(handle!!)
+                    getUserRatingChanges(handle)
                 }
             }
         }
@@ -48,7 +48,7 @@ class ParticipatedContestViewModel @Inject constructor(
 
     var responseForUserRatingChanges by mutableStateOf<ApiState>(ApiState.Empty)
     private fun getUserRatingChanges(handle: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             codeforcesRepository.getUserRatingChanges(handle = handle)
                 .onStart {
                     responseForUserRatingChanges = ApiState.Loading
