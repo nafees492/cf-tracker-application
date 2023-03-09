@@ -25,7 +25,7 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -105,9 +105,6 @@ dependencies {
     // Hilt For local unit tests
     testImplementation 'com.google.dagger:hilt-android-testing:2.44.2'
     kaptTest 'com.google.dagger:hilt-compiler:2.44.2'
-
-    //Livedata
-    implementation "androidx.compose.runtime:runtime-livedata:$compose_version"
 
     // Preferences DataStore
     implementation "androidx.datastore:datastore-preferences:1.0.0"

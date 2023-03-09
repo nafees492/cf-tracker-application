@@ -16,7 +16,6 @@ fun NavGraphBuilder.progress(
     userViewModel: UserViewModel,
     userSubmissionsViewModel: UserSubmissionsViewModel,
     participatedContestViewModel: ParticipatedContestViewModel,
-    userPreferences: UserPreferences,
     navController: NavController
 ) {
 
@@ -24,19 +23,14 @@ fun NavGraphBuilder.progress(
         sharedViewModel = sharedViewModel,
         userViewModel = userViewModel,
         userSubmissionsViewModel = userSubmissionsViewModel,
-        userPreferences = userPreferences,
         navController = navController
     )
 
     userSubmission(
-        sharedViewModel = sharedViewModel,
         userSubmissionsViewModel = userSubmissionsViewModel,
-        userPreferences = userPreferences
     )
 
     participatedContests(
-        sharedViewModel = sharedViewModel,
         participatedContestViewModel = participatedContestViewModel,
-        userPreferences = userPreferences
     )
 }

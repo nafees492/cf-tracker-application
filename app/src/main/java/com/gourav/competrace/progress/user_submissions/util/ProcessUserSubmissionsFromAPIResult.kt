@@ -4,7 +4,7 @@ import com.gourav.competrace.app_core.model.CodeforcesApiResult
 import com.gourav.competrace.problemset.model.CodeforcesProblem
 import com.gourav.competrace.progress.user_submissions.model.Submission
 import com.gourav.competrace.progress.user_submissions.presentation.UserSubmissionsViewModel
-import com.gourav.competrace.utils.Verdict
+import com.gourav.competrace.app_core.util.Verdict
 
 fun UserSubmissionsViewModel.processUserSubmissionsFromAPIResult(codeforcesApiResult: CodeforcesApiResult<Submission>){
     submittedProblemsFlow.value.clear()

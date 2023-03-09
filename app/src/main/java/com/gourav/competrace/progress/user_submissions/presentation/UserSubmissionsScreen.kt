@@ -14,7 +14,9 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.gourav.competrace.R
 import com.gourav.competrace.contests.model.CompetraceContest
 import com.gourav.competrace.problemset.model.CodeforcesProblem
 import com.gourav.competrace.progress.user_submissions.model.Submission
@@ -22,7 +24,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(
-    ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class,
+    ExperimentalMaterial3Api::class,
+    ExperimentalFoundationApi::class,
     ExperimentalMaterialApi::class
 )
 @Composable
@@ -31,6 +34,7 @@ fun UserSubmissionsScreen(
     codeforcesContestListById: Map<Any, CompetraceContest>,
     showTags: Boolean
 ) {
+    val scope = rememberCoroutineScope()
 
     var selectedChips by rememberSaveable { mutableStateOf(emptySet<String>()) }
 
@@ -48,8 +52,6 @@ fun UserSubmissionsScreen(
         selectedChips = if (isSelected(it)) selectedChips.minus(it) else selectedChips.plus(it)
     }
 
-    val coroutineScope = rememberCoroutineScope()
-
     val modalSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
         confirmStateChange = { it != ModalBottomSheetValue.HalfExpanded },
@@ -60,16 +62,16 @@ fun UserSubmissionsScreen(
         mutableStateOf<Pair<CodeforcesProblem, ArrayList<Submission>>?>(null)
     }
 
-    val onClickSubmissionCard: (Pair<CodeforcesProblem, ArrayList<Submission>>?) -> Unit = {
+    fun onClickSubmissionCard(it: Pair<CodeforcesProblem, ArrayList<Submission>>?) {
         selectedCodeforcesProblem = it
-        coroutineScope.launch {
+        scope.launch {
             delay(100)
             modalSheetState.show()
         }
     }
 
     BackHandler(modalSheetState.isVisible) {
-        coroutineScope.launch { modalSheetState.hide() }
+        scope.launch { modalSheetState.hide() }
     }
 
     ModalBottomSheetLayout(
@@ -82,12 +84,13 @@ fun UserSubmissionsScreen(
             UserSubmissionsScreenBottomSheetContent(
                 codeforcesProblem = selectedCodeforcesProblem?.first,
                 submissions = selectedCodeforcesProblem?.second,
-                codeforcesContest = codeforcesContestListById[selectedCodeforcesProblem?.first?.contestId ?: 0]
+                codeforcesContest = codeforcesContestListById[selectedCodeforcesProblem?.first?.contestId
+                    ?: 0]
             )
         }
     ) {
         LazyColumn {
-            item {
+            item(key = "no-problem-tag") {
                 if (filteredList.isEmpty()) {
                     Column(
                         modifier = Modifier
@@ -108,11 +111,16 @@ fun UserSubmissionsScreen(
                 }
             }
 
-            item {
+            item(key = "clear-all-chip") {
                 if (selectedChips.isNotEmpty()) {
                     ElevatedAssistChip(
                         onClick = { selectedChips = emptySet() },
-                        label = { Text("Clear All", style = MaterialTheme.typography.labelMedium) },
+                        label = {
+                            Text(
+                                stringResource(R.string.clear_all),
+                                style = MaterialTheme.typography.labelMedium
+                            )
+                        },
                         enabled = true,
                         modifier = Modifier
                             .padding(8.dp)
@@ -121,7 +129,7 @@ fun UserSubmissionsScreen(
                 }
             }
 
-            items(filteredList.size) {
+            items(filteredList.size, key = { filteredList[it].hashCode() }) {
                 ProblemSubmissionCard(
                     codeforcesProblem = filteredList[it].first,
                     submissions = filteredList[it].second,

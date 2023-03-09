@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gourav.competrace.app_core.data.CodeforcesDatabase
+import com.gourav.competrace.app_core.data.UserPreferences
 import com.gourav.competrace.app_core.data.repository.CodeforcesRepository
 import com.gourav.competrace.app_core.util.ApiState
 import com.gourav.competrace.contests.model.CompetraceContest
@@ -20,15 +21,18 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProblemSetViewModel @Inject constructor(
-    private val codeforcesRepository: CodeforcesRepository
+    private val codeforcesRepository: CodeforcesRepository,
+    private val userPreferences: UserPreferences
 ) : ViewModel() {
-    private var codeforcesDatabase: CodeforcesDatabase = CodeforcesDatabase.instance as CodeforcesDatabase
+
+    private val codeforcesDatabase = CodeforcesDatabase.instance as CodeforcesDatabase
+
+    val showTags = userPreferences.showTagsFlow
 
     private var fetchContestJob: Job? = null
     private var fetchProblemsetJob: Job? = null
 
     fun refreshProblemSetAndContests() {
-        _isProblemSetRefreshing.update { true }
         getContestListFromCodeforces()
         getProblemSetFromCodeforces()
     }
@@ -90,7 +94,12 @@ class ProblemSetViewModel @Inject constructor(
     private val _responseForProblemSet = MutableStateFlow<ApiState>(ApiState.Loading)
     val responseForProblemSet = _responseForProblemSet.asStateFlow()
 
-    val tagList = arrayListOf<String>()
+    private val _allTags = MutableStateFlow(emptyList<String>())
+    val allTags = _allTags.asStateFlow()
+
+    fun updateAllTags(value: List<String>){
+        _allTags.update { value }
+    }
 
     private val _isProblemSetRefreshing = MutableStateFlow(false)
     val isProblemSetRefreshing = _isProblemSetRefreshing.asStateFlow()
@@ -98,9 +107,9 @@ class ProblemSetViewModel @Inject constructor(
     private fun getProblemSetFromCodeforces() {
         fetchProblemsetJob?.cancel()
         fetchProblemsetJob = viewModelScope.launch(Dispatchers.IO) {
-            delay(100)
             codeforcesRepository.getProblemSet()
                 .onStart {
+                    _isProblemSetRefreshing.update { true }
                     _responseForProblemSet.update { ApiState.Loading }
                 }.catch {
                     _responseForProblemSet.update { ApiState.Failure }

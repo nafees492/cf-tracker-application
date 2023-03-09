@@ -1,43 +1,32 @@
 package com.gourav.competrace.app_core.ui
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.navigation.compose.rememberNavController
 import com.gourav.competrace.app_core.ui.components.CompetraceBottomNavigationBar
 import com.gourav.competrace.app_core.ui.components.CompetraceTopAppBar
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Application(
     sharedViewModel: SharedViewModel
 ) {
-    val navController = rememberNavController()
-    val snackbarHostState = remember{
-        SnackbarHostState()
-    }
+    val appState = rememberCompetraceAppState()
 
     Surface {
         Scaffold(
             topBar = {
-                CompetraceTopAppBar(sharedViewModel = sharedViewModel)
+                CompetraceTopAppBar(sharedViewModel = sharedViewModel, appState = appState)
             },
             bottomBar = {
-                CompetraceBottomNavigationBar(
-                    navController = navController,
-                    currentScreen = sharedViewModel.topAppBarController.screenTitle
-                )
+                CompetraceBottomNavigationBar(appState = appState)
             },
-            snackbarHost = { SnackbarHost(snackbarHostState) }
+            snackbarHost = { SnackbarHost(hostState = appState.snackbarHostState) }
         ) {
-            NavigationHost(
+            CompetraceNavHost(
                 sharedViewModel = sharedViewModel,
-                navController = navController,
-                snackbarHostState = snackbarHostState,
-                paddingValues = it,
+                appState = appState,
+                paddingValues = it
             )
         }
     }

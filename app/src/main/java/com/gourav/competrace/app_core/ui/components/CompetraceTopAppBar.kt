@@ -13,29 +13,24 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.res.stringResource
 import com.gourav.competrace.R
+import com.gourav.competrace.app_core.ui.CompetraceAppState
 import com.gourav.competrace.app_core.ui.SharedViewModel
-import com.gourav.competrace.app_core.util.Screens
-import com.gourav.competrace.app_core.util.TopAppBarStyles
+import com.gourav.competrace.app_core.util.TopAppBarManager
 
 @OptIn(ExperimentalAnimationApi::class)
 @ExperimentalMaterial3Api
 @Composable
 fun CompetraceTopAppBar(
     sharedViewModel: SharedViewModel,
+    appState: CompetraceAppState
 ) {
-    val topAppBarController = sharedViewModel.topAppBarController
     val isPlatformTabRowVisible by sharedViewModel.isPlatformsTabRowVisible.collectAsState()
-    val scope = rememberCoroutineScope()
+    val topAppBarValues by TopAppBarManager.topAppBarValues.collectAsState()
 
-    val homeScreens = listOf(
-        Screens.ContestsScreen.title,
-        Screens.ProblemSetScreen.title,
-        Screens.ProgressScreen.title
-    )
-
-    val navigationIcon: @Composable (() -> Unit) = {
-        AnimatedContent(targetState = homeScreens.contains(topAppBarController.screenTitle)) {
+    val navigationIcon: @Composable (() -> Unit) =  {
+        AnimatedContent(targetState = appState.shouldShowBottomBar) {
             if (it){
                 IconButton(onClick = { sharedViewModel.setIsPlatformsTabRowVisible(!isPlatformTabRowVisible) }) {
                     ExpandArrow(expanded = isPlatformTabRowVisible)
@@ -43,8 +38,8 @@ fun CompetraceTopAppBar(
             } else {
                 CompetraceIconButton(
                     iconId = R.drawable.ic_arrow_back_24px,
-                    onClick = topAppBarController.onClickNavUp,
-                    contentDescription = "Back Button"
+                    onClick = appState::upPress,
+                    contentDescription = stringResource(R.string.cd_go_back)
                 )
             }
         }
@@ -54,44 +49,19 @@ fun CompetraceTopAppBar(
         modifier = Modifier.animateContentSize()
     ) {
         Box {
-            when (topAppBarController.topAppBarStyle) {
-                is TopAppBarStyles.Small ->
-                    TopAppBar(
-                        navigationIcon = navigationIcon,
-                        title = {
-                            Text(
-                                text = topAppBarController.screenTitle,
-                                style = MaterialTheme.typography.titleLarge,
-                                modifier = Modifier.animateContentSize()
-                            )
-                        },
-                        actions = topAppBarController.actions,
+            TopAppBar(
+                navigationIcon = navigationIcon,
+                title = {
+                    Text(
+                        text = stringResource(id = topAppBarValues.currentScreen.titleId),
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.animateContentSize()
                     )
-                is TopAppBarStyles.Medium ->
-                    MediumTopAppBar(
-                        navigationIcon = navigationIcon,
-                        title = {
-                            Text(
-                                text = topAppBarController.screenTitle,
-                                style = MaterialTheme.typography.titleLarge
-                            )
-                        },
-                        actions = topAppBarController.actions,
-                    )
-                is TopAppBarStyles.Large ->
-                    LargeTopAppBar(
-                        navigationIcon = navigationIcon,
-                        title = {
-                            Text(
-                                text = topAppBarController.screenTitle,
-                                style = MaterialTheme.typography.titleLarge
-                            )
-                        },
-                        actions = topAppBarController.actions,
-                    )
-            }
+                },
+                actions = topAppBarValues.actions,
+            )
             this@Column.AnimatedVisibility(
-                visible = topAppBarController.isSearchWidgetOpen,
+                visible = topAppBarValues.isSearchWidgetOpen,
                 enter = scaleIn(
                     animationSpec = tween(easing = FastOutSlowInEasing),
                     transformOrigin = TransformOrigin(0.8f, 0.5f)
@@ -101,16 +71,16 @@ fun CompetraceTopAppBar(
                     transformOrigin = TransformOrigin(0.8f, 0.5f)
                 ) + fadeOut(animationSpec = tween(easing = FastOutSlowInEasing))
             ) {
-                topAppBarController.searchWidgetContent()
+                topAppBarValues.searchWidget()
             }
         }
 
         AnimatedVisibility(
-            visible = topAppBarController.isTopAppBarExpanded && !topAppBarController.isSearchWidgetOpen,
+            visible = topAppBarValues.isTopAppBarExpanded && !topAppBarValues.isSearchWidgetOpen,
             enter = expandVertically(expandFrom = Alignment.Top),
             exit = shrinkVertically(shrinkTowards = Alignment.Top),
         ) {
-            topAppBarController.expandedTopAppBarContent()
+            topAppBarValues.expandedTopAppBarContent()
         }
     }
 }

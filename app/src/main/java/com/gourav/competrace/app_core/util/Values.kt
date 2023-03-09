@@ -1,4 +1,6 @@
-package com.gourav.competrace.utils
+package com.gourav.competrace.app_core.util
+
+import com.gourav.competrace.R
 
 object Phase {
     const val CODING = "CODING"
@@ -6,8 +8,6 @@ object Phase {
     const val PENDING_SYSTEM_TEST = "PENDING_SYSTEM_TEST"
     const val SYSTEM_TEST = "SYSTEM_TEST"
     const val FINISHED = "FINISHED"
-    const val WITHIN_7DAYS = "WITHIN_7DAYS"
-    const val AFTER_7DAYS = "AFTER_7DAYS"
 }
 
 object Verdict {
@@ -43,9 +43,9 @@ object FinishedContestFilter {
 }
 
 object UserSubmissionFilter {
-    const val ALL = "All Submissions"
-    const val CORRECT = "Correct Submissions"
-    const val INCORRECT = "Incorrect Submissions"
+    val ALL = UiText.StringResource(R.string.all_submissions)
+    val CORRECT = UiText.StringResource(R.string.correct_submissions)
+    val INCORRECT = UiText.StringResource(R.string.incorrect_submissions)
 }
 
 object CardValues {

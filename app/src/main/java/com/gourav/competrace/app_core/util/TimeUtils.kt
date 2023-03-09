@@ -14,7 +14,6 @@ fun getCurrentTimeInMillis() = Date().time
 @SuppressLint("SimpleDateFormat")
 fun getTodaysDate(): String = SimpleDateFormat("EEE, d-MMM").format(Date())
 
-@SuppressLint("DefaultLocale")
 private fun convertMillisToDHMS(timeInMilliSec: Long): Array<Long> {
     val (MsID, MsIH, MsIM, MsIS) = listOf(86400000, 3600000, 60000, 1000)
     var millis = timeInMilliSec

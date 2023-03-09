@@ -3,11 +3,11 @@ package com.gourav.competrace.contests.presentation
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.gourav.competrace.app_core.data.UserPreferences
 import com.gourav.competrace.app_core.data.repository.KontestsRepository
 import com.gourav.competrace.app_core.util.ApiState
 import com.gourav.competrace.contests.model.CompetraceContest
-import com.gourav.competrace.utils.ContestRatedCategories
-import com.gourav.competrace.utils.Phase
+import com.gourav.competrace.app_core.util.ContestRatedCategories
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -17,16 +17,22 @@ import javax.inject.Inject
 @HiltViewModel
 class ContestViewModel @Inject constructor(
     private val kontestsRepository: KontestsRepository,
+    private val userPreferences: UserPreferences
 ) : ViewModel() {
 
-    private val _selectedIndex = MutableStateFlow(0)
-    val selectedIndex = _selectedIndex.asStateFlow()
+    val selectedIndex = userPreferences.selectedContestSiteIndexFlow.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(),
+        0
+    )
 
     fun setSelectedIndexTo(value: Int) {
-        _selectedIndex.update { value }
+        viewModelScope.launch {
+            userPreferences.setSelectedContestSiteIndex(value)
+        }
     }
 
-    private val currentScreen = selectedIndex.map {
+    private val selectedSite = selectedIndex.map {
         ContestSites.values()[it]
     }.stateIn(
         viewModelScope,
@@ -45,31 +51,41 @@ class ContestViewModel @Inject constructor(
         getContestListFromKontests()
     }
 
-    private val kontestsContestListsBySiteFlow: Map<String, MutableStateFlow<MutableList<CompetraceContest>>> =
+    private val contestListsBySiteFlow: Map<String, MutableStateFlow<List<CompetraceContest>>> =
         mapOf(
-            ContestSites.Codeforces.title to MutableStateFlow(mutableListOf()),
-            ContestSites.CodeChef.title to MutableStateFlow(mutableListOf()),
-            ContestSites.AtCoder.title to MutableStateFlow(mutableListOf()),
-            ContestSites.LeetCode.title to MutableStateFlow(mutableListOf()),
-            ContestSites.KickStart.title to MutableStateFlow(mutableListOf()),
+            ContestSites.Codeforces.title to MutableStateFlow(emptyList()),
+            ContestSites.CodeChef.title to MutableStateFlow(emptyList()),
+            ContestSites.AtCoder.title to MutableStateFlow(emptyList()),
+            ContestSites.LeetCode.title to MutableStateFlow(emptyList()),
         )
 
-    private fun clearAllContestsFromKontestsContestListBySite() {
-        kontestsContestListsBySiteFlow.values.forEach {
-            it.value.clear()
+    private fun clearAllContestsFromContestListBySite() {
+        contestListsBySiteFlow.values.forEach {
+            it.update { emptyList() }
         }
     }
 
-    private fun addContestToKontestsContestListBySite(contest: CompetraceContest) {
-        kontestsContestListsBySiteFlow[contest.site]?.value?.add(contest)
+    private fun addContestToContestListBySite(contest: CompetraceContest) {
+        contestListsBySiteFlow[contest.site]?.update { it + contest }
     }
 
-    val currentContests = currentScreen.map { site ->
-        kontestsContestListsBySiteFlow[site.title]!!.value
+    val contests: StateFlow<List<CompetraceContest>> = combine(
+        selectedSite,
+        contestListsBySiteFlow[ContestSites.Codeforces.title]!!,
+        contestListsBySiteFlow[ContestSites.CodeChef.title]!!,
+        contestListsBySiteFlow[ContestSites.AtCoder.title]!!,
+        contestListsBySiteFlow[ContestSites.LeetCode.title]!!
+    ) { site, CodeforcesContests, CodeChefContests, AtCoderContests, LeetCodeContests ->
+        when (site) {
+            ContestSites.Codeforces -> CodeforcesContests
+            ContestSites.CodeChef -> CodeChefContests
+            ContestSites.AtCoder -> AtCoderContests
+            ContestSites.LeetCode -> LeetCodeContests
+        }
     }.stateIn(
         viewModelScope,
-        SharingStarted.WhileSubscribed(),
-        kontestsContestListsBySiteFlow[ContestSites.Codeforces.title]!!.value
+        SharingStarted.Eagerly,
+        emptyList()
     )
 
     private fun getContestListFromKontests() {
@@ -84,16 +100,16 @@ class ContestViewModel @Inject constructor(
                     Log.e(TAG, "getContestListFromKontests: ${it.cause}")
                 }
                 .collect { apiResult ->
-                    clearAllContestsFromKontestsContestListBySite()
+                    clearAllContestsFromContestListBySite()
 
                     val contests = apiResult
-                        .map {
-                            it.mapToCompetraceContest()
-                        }
                         .filter { contest ->
                             contest.site?.let { site ->
                                 ContestSites.values().any { it.title == site }
                             } ?: false
+                        }
+                        .map {
+                            it.mapToCompetraceContest()
                         }.sortedBy {
                             it.startTimeInMillis
                         }
@@ -103,7 +119,7 @@ class ContestViewModel @Inject constructor(
                         ContestRatedCategories.values().forEach {
                             if (contest.name.contains(it.value)) contest.ratedCategories.add(it)
                         }
-                        addContestToKontestsContestListBySite(contest = contest)
+                        addContestToContestListBySite(contest = contest)
                     }
 
                     _responseForKontestsContestList.update { ApiState.Success }
@@ -126,6 +142,5 @@ enum class ContestSites(val title: String) {
     Codeforces(title = "CodeForces"),
     CodeChef(title = "CodeChef"),
     AtCoder(title = "AtCoder"),
-    LeetCode(title = "LeetCode"),
-    KickStart(title = "Kick Start")
+    LeetCode(title = "LeetCode")
 }

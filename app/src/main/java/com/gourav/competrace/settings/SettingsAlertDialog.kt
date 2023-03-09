@@ -1,4 +1,4 @@
-package com.gourav.competrace.ui.components
+package com.gourav.competrace.settings
 
 import android.annotation.SuppressLint
 import android.os.Build
@@ -30,9 +30,11 @@ import com.gourav.competrace.app_core.ui.components.CompetraceClickableText
 import com.gourav.competrace.app_core.ui.components.CompetraceIconButton
 import com.gourav.competrace.app_core.ui.theme.CompetraceThemeNames
 import com.gourav.competrace.app_core.ui.theme.DarkModePref
-import com.gourav.competrace.utils.loadUrl
+import com.gourav.competrace.app_core.util.loadUrl
 import com.gourav.competrace.utils.sendEmail
 import com.gourav.competrace.app_core.util.shareTextToOtherApp
+import com.gourav.competrace.ui.components.AppDialog
+import com.gourav.competrace.ui.components.RadioButtonSelectionForDarkModePref
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -42,7 +44,7 @@ import kotlinx.coroutines.launch
 fun SettingsAlertDialog(
     openSettingsDialog: Boolean,
     dismissSettingsDialogue: () -> Unit,
-    userPreferences: UserPreferences
+    userPreferences: UserPreferences = UserPreferences(LocalContext.current)
 ) {
 
     val isAbove12 = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
@@ -60,7 +62,7 @@ fun SettingsAlertDialog(
     if (isAbove12) themeOptions.add(CompetraceThemeNames.DYNAMIC)
 
     val darkModePrefOptions =
-        arrayListOf(DarkModePref.SYSTEM_DEFAULT, DarkModePref.LIGHT, DarkModePref.DARK)
+        listOf(DarkModePref.SYSTEM_DEFAULT, DarkModePref.LIGHT, DarkModePref.DARK)
 
     val setTheme: (String) -> Unit = {
         coroutineScope.launch(Dispatchers.IO) {
@@ -82,23 +84,23 @@ fun SettingsAlertDialog(
 
     val appLink = stringResource(id = R.string.app_link_on_playstore)
     val shareAppText = stringResource(id = R.string.share_app_text)
-    val feedbackEmailAddress = stringResource(id = R.string.feedback_email_address)
+    val feedbackEmailAddress = stringResource(id = R.string.gourav_email)
     val feedbackEmailSubject = stringResource(id = R.string.feedback_email_subject)
     val feedbackEmailBody = stringResource(id = R.string.feedback_email_body)
     val privacyPolicyLink = stringResource(id = R.string.privacy_policy_link)
 
     AppDialog(
         openDialog = openSettingsDialog,
-        title = "Settings",
+        title = stringResource(id = R.string.settings),
 //        iconId = R.drawable.ic_baseline_settings_24px,
-        confirmButtonText = "OK",
+        confirmButtonText = stringResource(id = R.string.ok),
         onClickConfirmButton = dismissSettingsDialogue,
         dismissDialog = dismissSettingsDialogue
     ) {
         LazyColumn {
             item {
                 Text(
-                    text = "General",
+                    text = stringResource(id = R.string.general),
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
@@ -110,7 +112,7 @@ fun SettingsAlertDialog(
                         .fillMaxWidth()
                 ) {
                     Text(
-                        text = "Show Tags",
+                        text = stringResource(id = R.string.show_tags),
                         style = MaterialTheme.typography.labelLarge,
                     )
                     Switch(
@@ -126,7 +128,7 @@ fun SettingsAlertDialog(
                 )
                 if (isAbove12) {
                     Text(
-                        text = "Theme",
+                        text = stringResource(id = R.string.theme),
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
                         modifier = Modifier.padding(vertical = 8.dp)
                     )
@@ -138,7 +140,7 @@ fun SettingsAlertDialog(
                     )
                 }
                 Text(
-                    text = "Dark mode preference",
+                    text = stringResource(id = R.string.dark_mode_pref),
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
@@ -161,8 +163,8 @@ fun SettingsAlertDialog(
                     CompetraceIconButton(
                         iconId = R.drawable.ic_shield_24px,
                         onClick = { loadUrl(context = context, url = privacyPolicyLink) },
-                        text = "Privacy Policy",
-                        contentDescription = "Privacy Policy",
+                        text = stringResource(id = R.string.privacy_policy),
+                        contentDescription = stringResource(id = R.string.privacy_policy),
                     )
                     CompetraceIconButton(
                         iconId = R.drawable.ic_report_24px,
@@ -174,49 +176,47 @@ fun SettingsAlertDialog(
                                 emailBody = feedbackEmailBody
                             )
                         },
-                        text = "Report Issue",
-                        contentDescription = "Feedback"
+                        text = stringResource(id = R.string.report_issue),
+                        contentDescription = stringResource(id = R.string.report_issue)
                     )
                     CompetraceIconButton(
                         iconId = R.drawable.ic_star_half_24px,
                         onClick = {
                             loadUrl(context = context, url = appLink)
                         },
-                        text = "Rate and Review",
-                        contentDescription = "Rate and Review"
+                        text = stringResource(id = R.string.rate_and_review),
+                        contentDescription = stringResource(id = R.string.rate_and_review)
                     )
                     CompetraceIconButton(
                         iconId = R.drawable.ic_share_24px,
                         onClick = {
-                            shareTextToOtherApp(
-                                context = context,
-                                text = shareAppText,
-                                heading = "Share \"Competrace\" Via:"
+                            context.shareTextToOtherApp(
+                                textToShare = shareAppText,
+                                heading = context.getString(R.string.share_competrace_via)
                             )
                         },
-                        text = "Share",
-                        contentDescription = "Share with friends"
+                        text = stringResource(id = R.string.share),
+                        contentDescription = stringResource(id = R.string.share)
                     )
                 }
             }
 
             item {
-                val text1 = AnnotatedString("< Version-$versionName />")
+                val text1 = AnnotatedString(stringResource(id = R.string.version, versionName))
 
                 val text2 = buildAnnotatedString {
-                    append("Designed By: Vidhi Khosla - ")
+                    append(stringResource(id = R.string.designed_by))
                     withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
-                        append("vid2001work@gmail.com")
+                        append(stringResource(id = R.string.vidhi_email))
                     }
-                    append("\nDeveloped By: Lokesh Patidar - ")
+                    append("\n")
+                    append(stringResource(id = R.string.developed_by))
                     withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
-                        append("gourav.ranayara@gmail.com")
+                        append(stringResource(id = R.string.gourav_email))
                     }
                 }
 
-                var version by remember {
-                    mutableStateOf(text1)
-                }
+                var version by remember { mutableStateOf(text1) }
                 AnimatedContent(targetState = version) {
                     Row(
                         modifier = Modifier

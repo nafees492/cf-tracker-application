@@ -1,6 +1,7 @@
 package com.gourav.competrace.app_core.ui.components
 
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
@@ -11,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -131,7 +133,28 @@ fun CompetraceFilterIconButton(isActive: Boolean, badgeCondition: Boolean, onCli
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_filter_list_24px),
-                contentDescription = "Filter",
+                contentDescription = stringResource(id = R.string.filter),
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CompetraceBadgeIconButton(
+    badgeCondition: Boolean,
+    onClick: () -> Unit,
+    @DrawableRes iconId: Int,
+    contentDescription: String? = null
+) {
+    IconButton(onClick = onClick) {
+        BadgedBox(
+            badge = { if (badgeCondition) Badge() },
+            modifier = Modifier.padding(8.dp)
+        ) {
+            Icon(
+                painter = painterResource(id = iconId),
+                contentDescription = contentDescription,
             )
         }
     }

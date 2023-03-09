@@ -4,7 +4,7 @@ package com.gourav.competrace.problemset.util
 import com.gourav.competrace.app_core.model.CodeforcesApiResult
 import com.gourav.competrace.problemset.model.CodeforcesContest
 import com.gourav.competrace.problemset.presentation.ProblemSetViewModel
-import com.gourav.competrace.utils.ContestRatedCategories
+import com.gourav.competrace.app_core.util.ContestRatedCategories
 
 fun ProblemSetViewModel.processCodeforcesContestFromAPIResult(
     apiResult: CodeforcesApiResult<CodeforcesContest>

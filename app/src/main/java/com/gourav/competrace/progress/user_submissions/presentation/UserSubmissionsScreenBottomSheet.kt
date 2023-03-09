@@ -1,6 +1,5 @@
 package com.gourav.competrace.progress.user_submissions.presentation
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
@@ -20,21 +19,19 @@ import com.gourav.competrace.contests.model.CompetraceContest
 import com.gourav.competrace.problemset.model.CodeforcesProblem
 import com.gourav.competrace.progress.user_submissions.model.Submission
 import com.gourav.competrace.ui.components.BottomSheetDragIndicator
-import com.gourav.competrace.utils.copyTextToClipBoard
-import com.gourav.competrace.utils.loadUrl
+import com.gourav.competrace.app_core.util.copyTextToClipBoard
+import com.gourav.competrace.app_core.util.loadUrl
+import com.gourav.competrace.R
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun UserSubmissionsScreenBottomSheetContent(
     codeforcesProblem: CodeforcesProblem?,
     submissions: ArrayList<Submission>?,
     codeforcesContest: CompetraceContest?,
-    modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
     val clipboardManager = LocalClipboardManager.current
     val hapticFeedback = LocalHapticFeedback.current
-    val linkEmoji = "\uD83D\uDD17"
 
     BottomSheetDragIndicator()
     Row(
@@ -55,10 +52,9 @@ fun UserSubmissionsScreenBottomSheetContent(
                 loadUrl(context = context, url = codeforcesProblem?.getLinkViaContest())
             },
             onLongClick = {
-                copyTextToClipBoard(
-                    context = context,
-                    text = codeforcesProblem?.getLinkViaContest(),
-                    toastMessage = "Problem Link Copied",
+                context.copyTextToClipBoard(
+                    textToCopy = codeforcesProblem?.getLinkViaContest(),
+                    toastMessageId = R.string.problem_link_copied,
                     clipboardManager = clipboardManager,
                     haptic = hapticFeedback
                 )
@@ -84,10 +80,9 @@ fun UserSubmissionsScreenBottomSheetContent(
                 loadUrl(context = context, url = codeforcesContest?.websiteUrl)
             },
             onLongClick = {
-                copyTextToClipBoard(
-                    context = context,
-                    text = codeforcesContest?.websiteUrl,
-                    toastMessage = "Contest Link Copied",
+                context.copyTextToClipBoard(
+                    textToCopy = codeforcesContest?.websiteUrl,
+                    toastMessageId = R.string.contest_link_copied,
                     clipboardManager = clipboardManager,
                     haptic = hapticFeedback
                 )

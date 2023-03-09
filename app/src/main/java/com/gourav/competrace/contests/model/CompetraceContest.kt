@@ -2,7 +2,7 @@ package com.gourav.competrace.contests.model
 
 import android.content.Context
 import com.gourav.competrace.contests.util.addEventToCalendar
-import com.gourav.competrace.utils.ContestRatedCategories
+import com.gourav.competrace.app_core.util.ContestRatedCategories
 
 data class CompetraceContest(
     val id: Any,

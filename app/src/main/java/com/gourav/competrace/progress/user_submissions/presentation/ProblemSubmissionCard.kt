@@ -14,11 +14,21 @@ import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.gourav.competrace.R
 import com.gourav.competrace.app_core.ui.components.FilterChipScrollableRow
+import com.gourav.competrace.app_core.ui.theme.BlueTickColor
+import com.gourav.competrace.app_core.util.CardValues
+import com.gourav.competrace.app_core.util.Verdict
+import com.gourav.competrace.app_core.util.copyTextToClipBoard
 import com.gourav.competrace.app_core.util.unixToDMYE
 import com.gourav.competrace.contests.model.CompetraceContest
 import com.gourav.competrace.problemset.model.CodeforcesProblem
@@ -51,10 +61,9 @@ fun ProblemSubmissionCard(
         onClick = onClick,
         onLongClick = {
             Log.d("Copy URL", codeforcesProblem.toString())
-            copyTextToClipBoard(
-                text = codeforcesProblem.getLinkViaContest(),
-                toastMessage = "Problem Link Copied",
-                context = context,
+            context.copyTextToClipBoard(
+                textToCopy = codeforcesProblem.getLinkViaContest(),
+                toastMessageId = R.string.problem_link_copied,
                 clipboardManager = clipboardManager,
                 haptic = haptic
             )
@@ -73,18 +82,20 @@ fun ProblemSubmissionCard(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
-            /*submissions[0].contestId?.let { id->
+            submissions[0].contestId?.let { id ->
                 val contest = codeforcesContestListById[id]
                 contest?.let {
-                    if(submissions[0].isSubmittedDuringContest(it)){
+                    if (submissions[0].isSubmittedDuringContest(it)) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_blue_tick),
-                            contentDescription = "Submitted During Contest",
-                            modifier = Modifier.size(16.dp)
+                            contentDescription = stringResource(R.string.cd_blue_tick),
+                            modifier = Modifier
+                                .requiredSize(16.dp),
+                            tint = BlueTickColor
                         )
                     }
                 }
-            }*/
+            }
         }
 
 
@@ -115,30 +126,24 @@ fun ProblemSubmissionCard(
             hasVerdictOK = codeforcesProblem.hasVerdictOK
         )
 
-        Row(
+        val statusAndSubmissions = buildAnnotatedString {
+            withStyle(style = SpanStyle(color = statusColor)){
+                append(status)
+            }
+            append("  |  ")
+            append("${submissions.size}" + " Submission" + if (submissions.size > 1) "s" else "")
+        }
+
+        Text(
+            text = statusAndSubmissions,
+            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+            color = MaterialTheme.colorScheme.onSurface,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = status,
-                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                color = statusColor,
-            )
-            Text(
-                text = "|",
-                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                modifier = Modifier.padding(horizontal = 8.dp)
-            )
-            Text(
-                text = "${submissions.size}" + " Submission" + if (submissions.size > 1) "s" else "",
-                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                color = MaterialTheme.colorScheme.onSurface,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-        }
+                .padding(horizontal = 8.dp)
+        )
 
         codeforcesProblem.tags?.let { tags ->
             if (showTags) FilterChipScrollableRow(

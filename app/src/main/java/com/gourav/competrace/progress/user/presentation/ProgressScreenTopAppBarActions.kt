@@ -8,6 +8,7 @@ import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import com.gourav.competrace.R
 
 @ExperimentalAnimationApi
@@ -22,7 +23,7 @@ fun RowScope.ProgressScreenActions(
     IconButton(onClick = onClickSettings) {
         Icon(
             painter = painterResource(id = R.drawable.ic_baseline_settings_24px),
-            contentDescription = "Settings",
+            contentDescription = stringResource(id = R.string.settings),
         )
     }
 
@@ -31,7 +32,7 @@ fun RowScope.ProgressScreenActions(
     }) {
         Icon(
             imageVector = Icons.Rounded.MoreVert,
-            contentDescription = "",
+            contentDescription = stringResource(R.string.more),
         )
     }
     AnimatedVisibility(
@@ -41,21 +42,8 @@ fun RowScope.ProgressScreenActions(
             expanded = expanded,
             onDismissRequest = { expanded = false },
         ) {
-            /*DropdownMenuItem(
-                text = { Text("Refresh") },
-                onClick = {
-                    onClickRefresh()
-                    expanded = false
-                },
-                trailingIcon = {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_refresh_24px),
-                        contentDescription = "Refresh",
-                    )
-                }
-            )*/
             DropdownMenuItem(
-                text = { Text("Log Out") },
+                text = { Text(stringResource(id = R.string.logout)) },
                 onClick = {
                     onClickLogOut()
                     expanded = false
@@ -63,7 +51,7 @@ fun RowScope.ProgressScreenActions(
                 trailingIcon = {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_logout_24px),
-                        contentDescription = "Log Out",
+                        contentDescription = stringResource(id = R.string.logout),
                     )
                 },
                 enabled = isLogOutButtonEnabled

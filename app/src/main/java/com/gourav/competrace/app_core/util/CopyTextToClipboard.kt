@@ -1,20 +1,22 @@
-package com.gourav.competrace.utils
+package com.gourav.competrace.app_core.util
 
 import android.content.Context
-import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.text.AnnotatedString
+import com.gourav.competrace.R
 
-fun copyTextToClipBoard(
-    context: Context,
-    text: String?,
-    toastMessage: String? = null,
+fun Context.copyTextToClipBoard(
+    textToCopy: String?,
+    @StringRes toastMessageId: Int,
     clipboardManager: ClipboardManager,
     haptic: HapticFeedback
 ) {
     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-    text?.let { clipboardManager.setText(AnnotatedString(text)) }
-    toastMessage?.let {  Toast.makeText(context, it, Toast.LENGTH_SHORT).show() }
+    textToCopy?.let { clipboardManager.setText(AnnotatedString(textToCopy)) }
+    SnackbarManager.showMessageWithAction(toastMessageId, R.string.share) {
+        shareTextToOtherApp(getString(R.string.share_copied_link, textToCopy))
+    }
 }

@@ -11,55 +11,49 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import com.gourav.competrace.app_core.data.UserPreferences
 import com.gourav.competrace.app_core.ui.SharedViewModel
 import com.gourav.competrace.app_core.ui.components.CompetracePlatformRow
 import com.gourav.competrace.app_core.ui.components.CompetraceSwipeRefreshIndicator
 import com.gourav.competrace.app_core.util.ApiState
 import com.gourav.competrace.app_core.util.Screens
+import com.gourav.competrace.app_core.util.TopAppBarManager
 import com.gourav.competrace.contests.presentation.ContestScreenActions
 import com.gourav.competrace.contests.presentation.ContestSites
 import com.gourav.competrace.contests.presentation.ContestViewModel
 import com.gourav.competrace.contests.presentation.UpcomingContestScreen
-import com.gourav.competrace.ui.components.SettingsAlertDialog
+import com.gourav.competrace.settings.SettingsAlertDialog
 import com.gourav.competrace.ui.screens.NetworkFailScreen
 import java.util.*
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
-@SuppressLint("CoroutineCreationDuringComposition")
+@OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.contests(
     sharedViewModel: SharedViewModel,
-    contestViewModel: ContestViewModel,
-    userPreferences: UserPreferences,
+    contestViewModel: ContestViewModel
 ) {
-    val topAppBarController = sharedViewModel.topAppBarController
-
-    composable(route = Screens.ContestsScreen.name) {
-
-        topAppBarController.apply {
-            screenTitle = Screens.ContestsScreen.title
-            isTopAppBarExpanded = false
-            isSearchWidgetOpen = false
-        }
+    composable(route = Screens.ContestsScreen.route) {
 
         val isSettingsDialogueOpen by sharedViewModel.isSettingsDialogueOpen.collectAsState()
         val isPlatformTabRowVisible by sharedViewModel.isPlatformsTabRowVisible.collectAsState()
 
         val selectedIndex by contestViewModel.selectedIndex.collectAsState()
-        val currentContests by contestViewModel.currentContests.collectAsState()
+        val currentContests by contestViewModel.contests.collectAsState()
 
         val responseForKontestsContestList by contestViewModel.responseForKontestsContestList.collectAsState()
         val isRefreshing by contestViewModel.isKontestsContestListRefreshing.collectAsState()
 
+        LaunchedEffect(Unit){
+            TopAppBarManager.updateTopAppBar(
+                screen = Screens.ContestsScreen,
+                actions = {
+                    ContestScreenActions(onClickSettings = sharedViewModel::openSettingsDialog)
+                }
+            )
+        }
+
         SettingsAlertDialog(
             openSettingsDialog = isSettingsDialogueOpen,
-            dismissSettingsDialogue = sharedViewModel::dismissSettingsDialog,
-            userPreferences = userPreferences
+            dismissSettingsDialogue = sharedViewModel::dismissSettingsDialog
         )
-
-        topAppBarController.actions = {
-            ContestScreenActions(onClickSettings = sharedViewModel::openSettingsDialog)
-        }
 
         val tabTitles = ContestSites.values().map { it.title }
 

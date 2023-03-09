@@ -18,25 +18,22 @@ import javax.inject.Inject
 
 @HiltViewModel
 class UserViewModel @Inject constructor(
-    private val codeforcesRepository: CodeforcesRepository
+    private val codeforcesRepository: CodeforcesRepository,
+    private val userPreferences: UserPreferences
 ) : ViewModel() {
 
-    private var codeforcesDatabase: CodeforcesDatabase = CodeforcesDatabase.instance as CodeforcesDatabase
+    val userHandle = userPreferences.handleNameFlow
+    private val codeforcesDatabase: CodeforcesDatabase = CodeforcesDatabase.instance as CodeforcesDatabase
 
-    var responseForUserInfo by mutableStateOf<ApiState>(ApiState.Empty)
-
-    private val _requestedForUserInfo = MutableStateFlow(false)
-    private val requestedForUserInfo = _requestedForUserInfo.asStateFlow()
+    private val _responseForUserInfo = MutableStateFlow<ApiState>(ApiState.Empty)
+    val responseForUserInfo = _responseForUserInfo.asStateFlow()
 
     val currentUser = codeforcesDatabase.currentUserFlow.asStateFlow()
 
-    fun requestForUserInfo(userPreferences: UserPreferences, isForced: Boolean) {
-        if (isForced || !requestedForUserInfo.value) {
-            _requestedForUserInfo.update { true }
-            viewModelScope.launch(Dispatchers.IO) {
-                userPreferences.handleNameFlow.collect { handle ->
-                    refreshUser(handle!!)
-                }
+    fun refreshUserInfo() {
+        viewModelScope.launch(Dispatchers.IO) {
+            userPreferences.handleNameFlow.collect { handle ->
+                handle?.let { getUserInfo(handle) }
             }
         }
     }
@@ -44,30 +41,24 @@ class UserViewModel @Inject constructor(
     private val _isUserRefreshing = MutableStateFlow(false)
     val isUserRefreshing = _isUserRefreshing.asStateFlow()
 
-    private fun refreshUser(handle: String) = viewModelScope.launch {
-        _isUserRefreshing.update { true }
-        // Simulate API call
-        getUserInfo(handle = handle)
-    }
-
     private fun getUserInfo(handle: String) {
         viewModelScope.launch(Dispatchers.IO) {
             codeforcesRepository.getUserInfo(handle = handle)
                 .onStart {
-                    responseForUserInfo = ApiState.Loading
+                    _responseForUserInfo.update { ApiState.Loading }
+                    _isUserRefreshing.update { true }
                 }.catch {
-                    responseForUserInfo = ApiState.Failure
+                    _responseForUserInfo.update { ApiState.Failure }
                     _isUserRefreshing.update { false }
                     Log.e(TAG, "getUserInfo: $it")
                 }.collect {
                     if(it.status == "OK"){
 
                         codeforcesDatabase.setUser(user = it.result!![0])
-
-                        responseForUserInfo = ApiState.Success
+                        _responseForUserInfo.update { ApiState.Success }
                         Log.d(TAG, "Got - User Info - $handle")
                     } else {
-                        responseForUserInfo = ApiState.Failure
+                        _responseForUserInfo.update { ApiState.Failure }
                         Log.e(TAG, "getUserInfo: " + it.comment.toString())
                     }
                     _isUserRefreshing.update { false }
@@ -75,7 +66,17 @@ class UserViewModel @Inject constructor(
         }
     }
 
+    fun logoutUser(){
+        viewModelScope.launch {
+            userPreferences.setHandleName("")
+        }
+    }
+
     companion object{
         private const val TAG = "User ViewModel"
+    }
+
+    init {
+        refreshUserInfo()
     }
 }

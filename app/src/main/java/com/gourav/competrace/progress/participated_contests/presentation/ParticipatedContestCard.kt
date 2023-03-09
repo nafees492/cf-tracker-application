@@ -1,6 +1,5 @@
 package com.gourav.competrace.progress.participated_contests.presentation
 
-import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
@@ -22,11 +21,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.gourav.competrace.R
+import com.gourav.competrace.app_core.util.copyTextToClipBoard
+import com.gourav.competrace.app_core.util.loadUrl
 import com.gourav.competrace.app_core.util.unixToDMYETZ
 import com.gourav.competrace.contests.model.CompetraceContest
 import com.gourav.competrace.ui.components.BackgroundDesignArrow
 import com.gourav.competrace.utils.*
-import com.gourav.competrace.utils.CardValues.TriangularFractionOfCard
+import com.gourav.competrace.app_core.util.CardValues.TriangularFractionOfCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,11 +52,9 @@ fun ParticipatedContestCard(
     }
 
     val onLongClickContestCard: () -> Unit = {
-        Log.d("Copy URL", contest.toString())
-        copyTextToClipBoard(
-            text = contest.websiteUrl,
-            toastMessage = "Contest Link Copied",
-            context = context,
+        context.copyTextToClipBoard(
+            textToCopy = contest.websiteUrl,
+            toastMessageId = R.string.contest_link_copied,
             clipboardManager = clipboardManager,
             haptic = haptic
         )

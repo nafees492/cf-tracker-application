@@ -1,7 +1,6 @@
 package com.gourav.competrace.contests.presentation
 
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
@@ -14,11 +13,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.gourav.competrace.R
 import com.gourav.competrace.app_core.ui.components.ExpandArrow
 import com.gourav.competrace.contests.model.CompetraceContest
-import com.gourav.competrace.utils.Phase
+import com.gourav.competrace.app_core.util.Phase
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -26,22 +27,28 @@ fun UpcomingContestScreen(
     contests: List<CompetraceContest>,
     selectedIndex: Int
 ) {
-    val onGoingContest = contests.filter { it.phase == Phase.CODING }
-    val within7Days = contests.filter { it.phase == Phase.BEFORE && it.within7Days }
-    val after7Days = contests.filter { it.phase == Phase.BEFORE && !it.within7Days }
+    val onGoingContest = remember(contests) {
+        contests.filter { it.phase == Phase.CODING }
+    }
+    val within7Days = remember(contests) {
+        contests.filter { it.phase == Phase.BEFORE && it.within7Days }
+    }
+    val after7Days = remember(contests) {
+        contests.filter { it.phase == Phase.BEFORE && !it.within7Days }
+    }
 
     var expanded by rememberSaveable {
         mutableStateOf(false)
     }
 
-    fun generateKey(it: Int) = "s${selectedIndex}-i{$it}"
+    fun generateKey(id: Int) = "s${selectedIndex}-i{$id}"
 
     LazyColumn(
         modifier = Modifier.animateContentSize()
     ) {
         item(key = generateKey(1)) {
             Text(
-                text = "Ongoing Contests",
+                text = stringResource(id = R.string.ongoing_contests),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f),
                 modifier = Modifier
@@ -74,12 +81,13 @@ fun UpcomingContestScreen(
 
         }
 
-        item(key = generateKey(3))  {
+        item(key = generateKey(3)) {
             Text(
-                text = "Upcoming Contests",
+                text = stringResource(id = R.string.upcoming_contests),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f),
-                modifier = Modifier.padding(8.dp)
+                modifier = Modifier
+                    .padding(8.dp)
                     .animateItemPlacement(
                         animationSpec = tween()
                     )
@@ -89,7 +97,7 @@ fun UpcomingContestScreen(
         within7Days.let { list ->
             item(key = generateKey(4)) {
                 Text(
-                    text = "Next 7 Days",
+                    text = stringResource(id = R.string.next_7_days),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                     modifier = Modifier
@@ -121,7 +129,7 @@ fun UpcomingContestScreen(
             }
         }
 
-        after7Days.let {  list ->
+        after7Days.let { list ->
             item(key = generateKey(6)) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -137,7 +145,7 @@ fun UpcomingContestScreen(
                         )
                 ) {
                     Text(
-                        text = "After 7 Days",
+                        text = stringResource(id = R.string.after_7_days),
                         style = MaterialTheme.typography.labelLarge,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
@@ -181,7 +189,7 @@ fun UpcomingContestScreen(
 fun NoContestTag(isDisplayed: Boolean, modifier: Modifier = Modifier) {
     if (isDisplayed) {
         Text(
-            text = "No Contest",
+            text = stringResource(id = R.string.no_contest),
             style = MaterialTheme.typography.titleLarge,
             textAlign = TextAlign.Center,
             modifier = modifier

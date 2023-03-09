@@ -30,35 +30,9 @@ import com.gourav.competrace.app_core.util.ApiState
 import com.gourav.competrace.app_core.ui.components.MyCircularProgressIndicator
 
 private const val TAG = "Login Screen"
-
-@Composable
-fun LoginScreen(loginViewModel: LoginViewModel) {
-    val context = LocalContext.current
-    val userPreferences = UserPreferences(context)
-
-    val inputHandle by loginViewModel.inputHandle.collectAsState()
-
-    when (loginViewModel.responseForCheckUsernameAvailable) {
-        is ApiState.Empty -> {
-            LoginScreenPresentation(loginViewModel = loginViewModel)
-        }
-        is ApiState.Loading -> {
-            MyCircularProgressIndicator(isDisplayed = true, modifier = Modifier.fillMaxSize())
-        }
-        is ApiState.Failure -> {
-            loginViewModel.responseForCheckUsernameAvailable = ApiState.Empty
-        }
-        is ApiState.Success -> {
-            LaunchedEffect(Unit) {
-                userPreferences.setHandleName(inputHandle.trim())
-            }
-        }
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
-fun LoginScreenPresentation(loginViewModel: LoginViewModel) {
+fun LoginScreen(loginViewModel: LoginViewModel) {
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
     val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -78,7 +52,7 @@ fun LoginScreenPresentation(loginViewModel: LoginViewModel) {
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.competrace_logo_96),
-                    contentDescription = "Competrace Logo",
+                    contentDescription = stringResource(id = R.string.app_name),
                     modifier = Modifier.size(96.dp),
                 )
 
@@ -103,7 +77,7 @@ fun LoginScreenPresentation(loginViewModel: LoginViewModel) {
                     onValueChange = loginViewModel::onInputHandleChange,
                     label = {
                         Text(
-                            text = "Enter Codeforces Handle",
+                            text = stringResource(id = R.string.enter_codeforces_handle),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -118,23 +92,21 @@ fun LoginScreenPresentation(loginViewModel: LoginViewModel) {
                     leadingIcon = {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_round_leaderboard_24),
-                            contentDescription = "Codeforces Logo"
+                            contentDescription = stringResource(id = R.string.app_name)
                         )
                     },
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 CompetraceButton(
-                    text = "Login",
+                    text = stringResource(id = R.string.login),
                     onClick = {
-                        if (inputHandle.isNotBlank()) loginViewModel.checkUsernameAvailable(
-                            inputHandle.trim()
-                        )
+                        if (inputHandle.isNotBlank())
+                            loginViewModel.checkUsernameAvailable(inputHandle.trim())
                     },
                     modifier = Modifier.fillMaxWidth()
                 )
             }
-
         }
     }
 }

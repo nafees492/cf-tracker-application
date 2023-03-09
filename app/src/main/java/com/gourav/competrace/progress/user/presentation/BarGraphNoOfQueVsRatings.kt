@@ -21,8 +21,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.res.ResourcesCompat
 import com.gourav.competrace.R
-import com.gourav.competrace.ui.theme.*
+import com.gourav.competrace.app_core.ui.theme.*
 import android.graphics.Paint as Paint1
+
 
 
 @Composable
@@ -67,7 +68,7 @@ fun BarGraphNoOfQueVsRatings(questionCountArray: Array<Int>) {
     val onSurface = MaterialTheme.colorScheme.onSurface
 
     var status by remember {
-        mutableStateOf("Total Question Attempted: " + questionCountArray.sum())
+        mutableStateOf(context.getString(R.string.total_questions, questionCountArray.sum()))
     }
 
     var selectedOffset by remember {
@@ -112,10 +113,10 @@ fun BarGraphNoOfQueVsRatings(questionCountArray: Array<Int>) {
                 }
             }
             status = when (index) {
-                -1 -> "Total Question Attempted: " + questionCountArray.sum()
-                7 -> "Unrated: ${questionCountArray[index]}"
-                8 -> "Incorrect/Partial Submissions: ${questionCountArray[index]}"
-                else -> "For Rating (${ratingArray[index]}): ${questionCountArray[index]}"
+                -1 -> context.getString(R.string.total_questions, questionCountArray.sum())
+                7 -> context.getString(R.string.unrated_questions, questionCountArray[index])
+                8 -> context.getString(R.string.incorrect_questions, questionCountArray[index])
+                else -> context.getString(R.string.rating_questions, ratingArray[index], questionCountArray[index])
             }
         }
 
@@ -154,7 +155,7 @@ fun BarGraphNoOfQueVsRatings(questionCountArray: Array<Int>) {
 
         drawLabelInCanvas(
             context = context,
-            text = "Rating",
+            text = context.getString(R.string.rating),
             color = textColor,
             size = headingSize,
             position = Offset(size.width * 0.5f, size.height * 0.9f),
@@ -213,7 +214,7 @@ fun BarGraphNoOfQueVsRatings(questionCountArray: Array<Int>) {
         }
         drawLabelInCanvas(
             context = context,
-            text = "No. of Questions",
+            text = context.getString(R.string.number_of_questions),
             color = textColor,
             size = headingSize,
             position = Offset(size.width * 0.6f, size.height * 0.1f),

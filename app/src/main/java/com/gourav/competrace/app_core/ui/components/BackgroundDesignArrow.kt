@@ -10,7 +10,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.SolidColor
-import com.gourav.competrace.utils.CardValues.RectangleFractionOfTriangle
+import com.gourav.competrace.app_core.util.CardValues.RectangleFractionOfTriangle
 
 @Composable
 fun BackgroundDesignArrow(color: Color) {

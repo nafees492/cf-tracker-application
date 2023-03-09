@@ -11,18 +11,21 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import com.gourav.competrace.R
+import com.gourav.competrace.app_core.ui.components.CompetraceBadgeIconButton
 import com.gourav.competrace.app_core.ui.components.CompetraceFilterIconButton
 import com.gourav.competrace.app_core.ui.components.CompetraceIconButton
-import com.gourav.competrace.utils.UserSubmissionFilter
+import com.gourav.competrace.app_core.util.UiText
+import com.gourav.competrace.app_core.util.UserSubmissionFilter
 
 @ExperimentalAnimationApi
 @Composable
 fun RowScope.UserSubmissionsScreenActions(
-    currentSelectionForUserSubmissions: String,
+    currentSelectionForUserSubmissions: UiText,
     onClickSearch: () -> Unit,
     onClickAll: () -> Unit,
     onClickCorrect: () -> Unit,
-    onClickIncorrect: () -> Unit
+    onClickIncorrect: () -> Unit,
+    badgeConditionForSearch: Boolean
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -35,7 +38,11 @@ fun RowScope.UserSubmissionsScreenActions(
         }
     }
 
-    CompetraceIconButton(iconId = R.drawable.ic_search_24px, onClick = onClickSearch)
+    CompetraceBadgeIconButton(
+        badgeCondition = badgeConditionForSearch,
+        iconId = R.drawable.ic_search_24px,
+        onClick = onClickSearch
+    )
 
     CompetraceFilterIconButton(
         isActive = expanded,
@@ -49,7 +56,7 @@ fun RowScope.UserSubmissionsScreenActions(
             onDismissRequest = { expanded = false },
         ) {
             DropdownMenuItem(
-                text = { Text(UserSubmissionFilter.ALL) },
+                text = { Text(UserSubmissionFilter.ALL.asString()) },
                 onClick = {
                     onClickAll()
                     expanded = false
@@ -59,7 +66,7 @@ fun RowScope.UserSubmissionsScreenActions(
                 }
             )
             DropdownMenuItem(
-                text = { Text(UserSubmissionFilter.CORRECT) },
+                text = { Text(UserSubmissionFilter.CORRECT.asString()) },
                 onClick = {
                     onClickCorrect()
                     expanded = false
@@ -69,7 +76,7 @@ fun RowScope.UserSubmissionsScreenActions(
                 }
             )
             DropdownMenuItem(
-                text = { Text(UserSubmissionFilter.INCORRECT) },
+                text = { Text(UserSubmissionFilter.INCORRECT.asString()) },
                 onClick = {
                     onClickIncorrect()
                     expanded = false

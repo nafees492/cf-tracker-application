@@ -9,15 +9,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import com.gourav.competrace.app_core.data.UserPreferences
 import com.gourav.competrace.app_core.ui.SharedViewModel
 import com.gourav.competrace.app_core.ui.components.CompetracePlatformRow
 import com.gourav.competrace.app_core.ui.components.CompetraceSwipeRefreshIndicator
@@ -26,98 +25,82 @@ import com.gourav.competrace.app_core.util.Screens
 import com.gourav.competrace.problemset.presentation.ProblemSetScreen
 import com.gourav.competrace.problemset.presentation.ProblemSetScreenActions
 import com.gourav.competrace.problemset.presentation.ProblemSetViewModel
-import com.gourav.competrace.ui.components.RatingRangeSlider
+import com.gourav.competrace.problemset.presentation.RatingRangeSlider
 import com.gourav.competrace.ui.components.SearchAppBar
-import com.gourav.competrace.ui.components.SettingsAlertDialog
+import com.gourav.competrace.settings.SettingsAlertDialog
 import com.gourav.competrace.ui.screens.NetworkFailScreen
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import com.gourav.competrace.R
+import com.gourav.competrace.app_core.util.TopAppBarManager
 
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.problemSet(
     sharedViewModel: SharedViewModel,
     problemSetViewModel: ProblemSetViewModel,
-    userPreferences: UserPreferences,
 ) {
-    val topAppBarController = sharedViewModel.topAppBarController
-
-    composable(route = Screens.ProblemSetScreen.name) {
-        topAppBarController.apply {
-            screenTitle = Screens.ProblemSetScreen.title
-        }
-
+    composable(route = Screens.ProblemSetScreen.route) {
         val scope = rememberCoroutineScope()
-
-        val showTagsInProblemSet by userPreferences.showTagsFlow.collectAsState(initial = true)
 
         val isSettingsDialogueOpen by sharedViewModel.isSettingsDialogueOpen.collectAsState()
         val isPlatformTabRowVisible by sharedViewModel.isPlatformsTabRowVisible.collectAsState()
+
+        val showTagsInProblemSet by problemSetViewModel.showTags.collectAsState(initial = true)
 
         val filteredProblems by problemSetViewModel.filteredProblems.collectAsState()
         val codeforcesContestListById by problemSetViewModel.codeforcesContestListById.collectAsState()
         val ratingRangeValue by problemSetViewModel.ratingRangeValue.collectAsState()
         val searchQuery by problemSetViewModel.searchQuery.collectAsState()
+        val allTags by problemSetViewModel.allTags.collectAsState()
         val selectedChips by problemSetViewModel.selectedChips.collectAsState()
 
         val responseForProblemSet by problemSetViewModel.responseForProblemSet.collectAsState()
         val isRefreshing by problemSetViewModel.isProblemSetRefreshing.collectAsState()
 
-        SettingsAlertDialog(
-            openSettingsDialog = isSettingsDialogueOpen,
-            dismissSettingsDialogue = sharedViewModel::dismissSettingsDialog,
-            userPreferences = userPreferences
-        )
-
-        topAppBarController.expandedTopAppBarContent = {
-            RatingRangeSlider(
-                start = ratingRangeValue.first, end = ratingRangeValue.last,
-                updateStartAndEnd = problemSetViewModel::updateRatingRange
-            )
-        }
-
         val searchBarFocusRequester = remember { FocusRequester() }
 
-        BackHandler(topAppBarController.isSearchWidgetOpen) {
-            topAppBarController.isSearchWidgetOpen = false
-        }
-
-        LaunchedEffect(!topAppBarController.isSearchWidgetOpen) {
-            problemSetViewModel.updateSearchQuery("")
-        }
-
-        topAppBarController.searchWidgetContent = {
-            SearchAppBar(
-                query = searchQuery,
-                onValueChange = problemSetViewModel::updateSearchQuery,
-                onCloseClicked = {
-                    topAppBarController.isSearchWidgetOpen = false
-                },
-                modifier = Modifier.focusRequester(searchBarFocusRequester),
-                placeHolderText = "Search Problem / Contest"
-            )
-        }
-
         val onClickSearch: () -> Unit = {
-            topAppBarController.isSearchWidgetOpen = true
+            TopAppBarManager.openSearchWidget()
             scope.launch {
                 delay(100)
                 searchBarFocusRequester.requestFocus()
             }
         }
 
-        val onClickFilterIcon: () -> Unit = {
-            topAppBarController.isTopAppBarExpanded = !topAppBarController.isTopAppBarExpanded
-        }
-
-        topAppBarController.actions = {
-            ProblemSetScreenActions(
-                onClickSearch = onClickSearch,
-                onClickSettings = sharedViewModel::openSettingsDialog,
-                onClickFilterIcon = onClickFilterIcon,
-                isToolbarExpanded = topAppBarController.isTopAppBarExpanded,
-                ratingRange = ratingRangeValue
+        LaunchedEffect(Unit){
+            TopAppBarManager.updateTopAppBar(
+                screen = Screens.ProblemSetScreen,
+                expandedTopAppBarContent = {
+                    RatingRangeSlider(
+                        start = ratingRangeValue.first, end = ratingRangeValue.last,
+                        updateStartAndEnd = problemSetViewModel::updateRatingRange
+                    )
+                },
+                searchWidget = {
+                    SearchAppBar(
+                        query = searchQuery,
+                        onValueChange = problemSetViewModel::updateSearchQuery,
+                        onCloseClicked = TopAppBarManager::closeSearchWidget,
+                        modifier = Modifier.focusRequester(searchBarFocusRequester),
+                        placeHolderText = stringResource(id = R.string.search_problem_contest)
+                    )
+                },
+                actions = {
+                    ProblemSetScreenActions(
+                        onClickSearch = onClickSearch,
+                        onClickSettings = sharedViewModel::openSettingsDialog,
+                        onClickFilterIcon = TopAppBarManager::toggleExpandedState,
+                        badgeConditionForSearch = searchQuery.isNotBlank(),
+                        badgeConditionForFilter = ratingRangeValue != 800..3500
+                    )
+                }
             )
         }
+
+        SettingsAlertDialog(
+            openSettingsDialog = isSettingsDialogueOpen,
+            dismissSettingsDialogue = sharedViewModel::dismissSettingsDialog
+        )
 
         val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = isRefreshing)
 
@@ -149,7 +132,7 @@ fun NavGraphBuilder.problemSet(
                         ProblemSetScreen(
                             problems = filteredProblems,
                             codeforcesContestListById = codeforcesContestListById,
-                            tagList = problemSetViewModel.tagList,
+                            allTags = allTags,
                             selectedChips = selectedChips,
                             updateSelectedChips = problemSetViewModel::updateSelectedChips,
                             clearSelectedChips = problemSetViewModel::clearSelectedChips,

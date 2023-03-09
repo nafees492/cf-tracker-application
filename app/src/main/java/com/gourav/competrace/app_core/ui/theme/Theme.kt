@@ -8,8 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.gourav.competrace.app_core.data.UserPreferences
-import com.gourav.competrace.app_core.ui.theme.DarkModePref
-import com.gourav.competrace.app_core.ui.theme.MontserratTypography
+import com.gourav.competrace.app_core.ui.theme.*
 
 private val LightColorScheme = lightColorScheme(
     primary = md_theme_light_primary,

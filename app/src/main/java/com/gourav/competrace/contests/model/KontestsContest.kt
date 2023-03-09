@@ -11,7 +11,7 @@ data class KontestsContest(
     private val start_time: String,
     private val status: String,
     private val url: String,
-    private val site: String?
+    val site: String?
 ){
     private fun getId(): String = url.split('/').last()
 

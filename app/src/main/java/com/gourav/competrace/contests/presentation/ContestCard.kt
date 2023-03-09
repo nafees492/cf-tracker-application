@@ -1,6 +1,5 @@
 package com.gourav.competrace.contests.presentation
 
-import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
@@ -17,6 +16,7 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -28,10 +28,10 @@ import com.gourav.competrace.app_core.util.getFormattedTime
 import com.gourav.competrace.app_core.util.unixToDMET
 import com.gourav.competrace.contests.model.CompetraceContest
 import com.gourav.competrace.contests.util.MyCountDownTimer
-import com.gourav.competrace.ui.theme.RegistrationRed
-import com.gourav.competrace.utils.Phase
-import com.gourav.competrace.utils.copyTextToClipBoard
-import com.gourav.competrace.utils.loadUrl
+import com.gourav.competrace.app_core.ui.theme.RegistrationRed
+import com.gourav.competrace.app_core.util.Phase
+import com.gourav.competrace.app_core.util.copyTextToClipBoard
+import com.gourav.competrace.app_core.util.loadUrl
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -59,7 +59,7 @@ fun ContestCard(
             }
 
             item {
-                if (contest.registrationOpen) {
+                if (contest.registrationOpen && contest.phase == Phase.BEFORE) {
                     ElevatedAssistChip(
                         onClick = {
                             loadUrl(
@@ -69,7 +69,7 @@ fun ContestCard(
                         },
                         label = {
                             Text(
-                                text = "Register Now!",
+                                text = stringResource(id = R.string.register_now),
                                 style = MaterialTheme.typography.bodyMedium,
                             )
                         },
@@ -88,11 +88,9 @@ fun ContestCard(
     }
 
     val onLongClickContestCard: () -> Unit = {
-        Log.d("Copy URL", contest.toString())
-        copyTextToClipBoard(
-            text = contest.websiteUrl,
-            toastMessage = "Contest Link Copied",
-            context = context,
+        context.copyTextToClipBoard(
+            textToCopy = contest.websiteUrl,
+            toastMessageId = R.string.contest_link_copied,
             clipboardManager = clipboardManager,
             haptic = haptic
         )

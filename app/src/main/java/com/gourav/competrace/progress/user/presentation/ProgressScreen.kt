@@ -6,10 +6,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.gourav.competrace.R
@@ -33,7 +36,6 @@ fun ProgressScreen(
     goToSubmission: () -> Unit,
     goToParticipatedContests: () -> Unit,
     userSubmissionsViewModel: UserSubmissionsViewModel,
-    userPreferences: UserPreferences,
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -120,12 +122,14 @@ fun ProgressScreen(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 CompetraceButton(
-                    text = "Participated Contests", onClick = goToParticipatedContests,
+                    text = stringResource(id = R.string.participated_contests),
+                    onClick = goToParticipatedContests,
                     modifier = Modifier.weight(1f),
                     maxLines = 2
                 )
                 CompetraceButton(
-                    text = "Your Submissions", onClick = goToSubmission,
+                    text = stringResource(id = R.string.your_submissions),
+                    onClick = goToSubmission,
                     modifier = Modifier.weight(1f),
                     maxLines = 2
                 )
@@ -139,24 +143,15 @@ fun ProgressScreen(
                     .padding(vertical = 8.dp),
                 contentAlignment = Alignment.Center
             ) {
-                when (userSubmissionsViewModel.responseForUserSubmissions) {
-                    is ApiState.Empty -> {
-                        userSubmissionsViewModel.requestForUserSubmission(
-                            userPreferences = userPreferences,
-                            isForced = false
-                        )
-                    }
+                val responseForUserSubmissions by userSubmissionsViewModel.responseForUserSubmissions.collectAsState()
+                when (responseForUserSubmissions) {
+                    is ApiState.Empty -> {}
                     is ApiState.Loading -> {
                         MyCircularProgressIndicator(isDisplayed = true)
                     }
                     is ApiState.Failure -> {
                         NetworkFailScreen(
-                            onClickRetry = {
-                                userSubmissionsViewModel.requestForUserSubmission(
-                                    userPreferences = userPreferences,
-                                    isForced = true
-                                )
-                            }
+                            onClickRetry = userSubmissionsViewModel::refreshUserSubmission
                         )
                     }
                     is ApiState.Success -> {

@@ -1,4 +1,4 @@
-package com.gourav.competrace.ui.components
+package com.gourav.competrace.problemset.presentation
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,11 +10,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
+import com.gourav.competrace.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -24,14 +26,18 @@ fun RatingRangeSlider(
     updateStartAndEnd: (Int, Int) -> Unit
 ) {
     var sliderPosition by remember {
-        mutableStateOf(start*1f..end*1f)
+        mutableStateOf(start * 1f..end * 1f)
     }
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Rating Range: ${sliderPosition.start.roundToInt()} - ${sliderPosition.endInclusive.roundToInt()}",
+            text = stringResource(
+                id = R.string.rating_range,
+                sliderPosition.start.roundToInt(),
+                sliderPosition.endInclusive.roundToInt()
+            ),
             style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
         )
         RangeSlider(
@@ -44,7 +50,10 @@ fun RatingRangeSlider(
             },
             valueRange = 800f..3500f,
             onValueChangeFinished = {
-                updateStartAndEnd(sliderPosition.start.roundToInt(), sliderPosition.endInclusive.roundToInt())
+                updateStartAndEnd(
+                    sliderPosition.start.roundToInt(),
+                    sliderPosition.endInclusive.roundToInt()
+                )
             },
             steps = 26,
         )

@@ -1,6 +1,5 @@
 package com.gourav.competrace.problemset.presentation
 
-import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
@@ -18,12 +17,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gourav.competrace.app_core.ui.components.FilterChipScrollableRow
-import com.gourav.competrace.contests.model.CompetraceContest
+import com.gourav.competrace.app_core.util.copyTextToClipBoard
+import com.gourav.competrace.app_core.util.loadUrl
 import com.gourav.competrace.problemset.model.CompetraceProblem
 import com.gourav.competrace.ui.components.BackgroundDesignArrow
 import com.gourav.competrace.utils.*
+import com.gourav.competrace.R
+import com.gourav.competrace.app_core.util.CardValues
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProblemCard(
     problem: CompetraceProblem,
@@ -47,11 +48,9 @@ fun ProblemCard(
             loadUrl(context = context, url = problem.websiteUrl)
         },
         onLongClick = {
-            Log.d("Copy URL", problem.toString())
-            copyTextToClipBoard(
-                text = problem.websiteUrl,
-                toastMessage = "Problem Link Copied",
-                context = context,
+            context.copyTextToClipBoard(
+                textToCopy = problem.websiteUrl,
+                toastMessageId = R.string.problem_link_copied,
                 clipboardManager = clipboardManager,
                 haptic = haptic
             )

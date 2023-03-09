@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.gourav.competrace.R
 import com.gourav.competrace.app_core.ui.components.FilterChipScrollableRow
@@ -21,7 +22,7 @@ import com.gourav.competrace.problemset.model.CompetraceProblem
 fun ProblemSetScreen(
     problems: List<CompetraceProblem>,
     codeforcesContestListById: Map<Any, CompetraceContest>,
-    tagList: ArrayList<String>,
+    allTags: List<String>,
     selectedChips: Set<String>,
     updateSelectedChips: (String) -> Unit,
     clearSelectedChips: () -> Unit,
@@ -42,14 +43,14 @@ fun ProblemSetScreen(
                 }
 
                 FilterChipScrollableRow(
-                    chipList = tagList,
+                    chipList = allTags,
                     selectedChips = selectedChips,
                     onClickFilterChip = updateSelectedChips,
                 )
             }
         }
 
-        item {
+        item(key = "no-problem-tag") {
             if (problems.isEmpty()) {
                 Column(
                     modifier = Modifier
@@ -60,7 +61,7 @@ fun ProblemSetScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "No Problem Found!",
+                        text = stringResource(id = R.string.no_problem_found),
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.padding(8.dp),
                         color = MaterialTheme.colorScheme.onSurface
@@ -69,7 +70,7 @@ fun ProblemSetScreen(
             }
         }
 
-        items(count = problems.size) {
+        items(count = problems.size, key = { problems[it].hashCode() }) {
             ProblemCard(
                 problem = problems[it],
                 contestName = codeforcesContestListById[problems[it].contestId ?: 0]?.name,

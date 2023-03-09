@@ -16,67 +16,51 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import com.gourav.competrace.app_core.data.UserPreferences
 import com.gourav.competrace.app_core.ui.SharedViewModel
 import com.gourav.competrace.app_core.ui.components.CompetracePlatformRow
 import com.gourav.competrace.app_core.ui.components.CompetraceSwipeRefreshIndicator
 import com.gourav.competrace.app_core.util.ApiState
 import com.gourav.competrace.app_core.util.Screens
+import com.gourav.competrace.app_core.util.TopAppBarManager
 import com.gourav.competrace.progress.user.presentation.*
 import com.gourav.competrace.progress.user_submissions.presentation.UserSubmissionsViewModel
-import com.gourav.competrace.ui.components.SettingsAlertDialog
+import com.gourav.competrace.settings.SettingsAlertDialog
 import com.gourav.competrace.ui.screens.NetworkFailScreen
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.user(
     sharedViewModel: SharedViewModel,
     userViewModel: UserViewModel,
     userSubmissionsViewModel: UserSubmissionsViewModel,
-    userPreferences: UserPreferences,
     navController: NavController
 ) {
-    val topAppBarController = sharedViewModel.topAppBarController
-
-    composable(route = Screens.ProgressScreen.name) {
+    composable(route = Screens.ProgressScreen.route) {
         val loginViewModel: LoginViewModel = hiltViewModel()
-
-        topAppBarController.apply {
-            screenTitle = Screens.ProgressScreen.title
-            isTopAppBarExpanded = false
-            isSearchWidgetOpen = false
-        }
-
-        val scope = rememberCoroutineScope()
-
-        val userHandle by userPreferences.handleNameFlow.collectAsState(null)
 
         val isSettingsDialogueOpen by sharedViewModel.isSettingsDialogueOpen.collectAsState()
         val isPlatformTabRowVisible by sharedViewModel.isPlatformsTabRowVisible.collectAsState()
 
+        val userHandle by userViewModel.userHandle.collectAsState(null)
+        val responseForUserInfo by userViewModel.responseForUserInfo.collectAsState()
         val isRefreshing by userViewModel.isUserRefreshing.collectAsState()
 
-        SettingsAlertDialog(
-            openSettingsDialog = isSettingsDialogueOpen,
-            dismissSettingsDialogue = sharedViewModel::dismissSettingsDialog,
-            userPreferences = userPreferences
-        )
-
-        val onClickLogoutBtn: () -> Unit = {
-            loginViewModel.responseForCheckUsernameAvailable = ApiState.Empty
-            scope.launch {
-                userPreferences.setHandleName("")
-            }
-        }
-
-        topAppBarController.actions = {
-            ProgressScreenActions(
-                onClickSettings = sharedViewModel::openSettingsDialog,
-                onClickLogOut = onClickLogoutBtn,
-                isLogOutButtonEnabled = !userHandle.isNullOrEmpty()
+        LaunchedEffect(Unit){
+            TopAppBarManager.updateTopAppBar(
+                screen = Screens.ProgressScreen,
+                actions = {
+                    ProgressScreenActions(
+                        onClickSettings = sharedViewModel::openSettingsDialog,
+                        onClickLogOut = userViewModel::logoutUser,
+                        isLogOutButtonEnabled = !userHandle.isNullOrEmpty()
+                    )
+                }
             )
         }
 
+        SettingsAlertDialog(
+            openSettingsDialog = isSettingsDialogueOpen,
+            dismissSettingsDialogue = sharedViewModel::dismissSettingsDialog
+        )
 
         val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = isRefreshing)
 
@@ -100,32 +84,17 @@ fun NavGraphBuilder.user(
                     } else {
                         SwipeRefresh(
                             state = swipeRefreshState,
-                            onRefresh = {
-                                userViewModel.requestForUserInfo(
-                                    userPreferences = userPreferences,
-                                    isForced = true
-                                )
-                            },
+                            onRefresh = userViewModel::refreshUserInfo,
                             indicator = CompetraceSwipeRefreshIndicator
                         ) {
-                            when (userViewModel.responseForUserInfo) {
-                                is ApiState.Empty -> {
-                                    userViewModel.requestForUserInfo(
-                                        userPreferences = userPreferences,
-                                        isForced = false
-                                    )
-                                }
+                            when (responseForUserInfo) {
+                                is ApiState.Empty -> {}
                                 is ApiState.Loading -> {
                                     Box(modifier = Modifier.fillMaxSize())
                                 }
                                 is ApiState.Failure -> {
                                     NetworkFailScreen(
-                                        onClickRetry = {
-                                            userViewModel.requestForUserInfo(
-                                                userPreferences = userPreferences,
-                                                isForced = true
-                                            )
-                                        }
+                                        onClickRetry = userViewModel::refreshUserInfo
                                     )
                                 }
                                 is ApiState.Success -> {
@@ -134,13 +103,12 @@ fun NavGraphBuilder.user(
                                     ProgressScreen(
                                         user = user,
                                         goToSubmission = {
-                                            navController.navigate(Screens.UserSubmissionsScreen.name)
+                                            navController.navigate(Screens.UserSubmissionsScreen.route)
                                         },
                                         goToParticipatedContests = {
-                                            navController.navigate(Screens.ParticipatedContestsScreen.name)
+                                            navController.navigate(Screens.ParticipatedContestsScreen.route)
                                         },
                                         userSubmissionsViewModel = userSubmissionsViewModel,
-                                        userPreferences = userPreferences
                                     )
                                 }
                             }

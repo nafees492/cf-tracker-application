@@ -1,4 +1,4 @@
-package com.gourav.competrace.ui.theme
+package com.gourav.competrace.app_core.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
@@ -94,7 +94,6 @@ val GrandmasterRed = Color(0xffff0000)
 val light_GrandmasterRedContainer = Color(0xffFA6C6C)
 val dark_GrandmasterRedContainer = Color(0xffCE7171)
 
-
 val TestingGreen = Color(0xff004C00)
 
 val PartialYellow = Color(0xfff1c232)
@@ -109,6 +108,7 @@ val light_IncorrectRedContainer = Color(0xffF08787)
 val dark_IncorrectRedContainer = Color(0xffCE7171)
 
 val RegistrationRed = Color(0xffcc0000)
+val BlueTickColor = Color(0xff1da2f5)
 
 
 

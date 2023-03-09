@@ -1,19 +1,17 @@
 package com.gourav.competrace.progress.user_submissions.presentation
 
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gourav.competrace.app_core.data.CodeforcesDatabase
 import com.gourav.competrace.app_core.data.UserPreferences
 import com.gourav.competrace.app_core.data.repository.CodeforcesRepository
 import com.gourav.competrace.app_core.util.ApiState
+import com.gourav.competrace.app_core.util.UiText
 import com.gourav.competrace.problemset.model.CodeforcesProblem
 import com.gourav.competrace.progress.user_submissions.model.Submission
 import com.gourav.competrace.progress.user_submissions.util.processUserSubmissionsFromAPIResult
-import com.gourav.competrace.utils.UserSubmissionFilter
+import com.gourav.competrace.app_core.util.UserSubmissionFilter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -22,22 +20,25 @@ import javax.inject.Inject
 
 @HiltViewModel
 class UserSubmissionsViewModel @Inject constructor(
-    private val codeforcesRepository: CodeforcesRepository
+    private val codeforcesRepository: CodeforcesRepository,
+    private val userPreferences: UserPreferences
 ) : ViewModel() {
 
-    private var codeforcesDatabase: CodeforcesDatabase =
-        CodeforcesDatabase.instance as CodeforcesDatabase
+    private val codeforcesDatabase = CodeforcesDatabase.instance as CodeforcesDatabase
+
+    val showTags = userPreferences.showTagsFlow
 
     val contestListById = codeforcesDatabase.codeforcesContestListByIdFlow.asStateFlow()
 
-    private val _currentSelection = MutableStateFlow(UserSubmissionFilter.ALL)
+    private val _currentSelection = MutableStateFlow<UiText>(UserSubmissionFilter.ALL)
     val currentSelection = _currentSelection.asStateFlow()
 
-    fun updateCurrentSelection(value: String) {
+    fun updateCurrentSelection(value: UiText) {
         _currentSelection.update { value }
     }
 
-    var responseForUserSubmissions by mutableStateOf<ApiState>(ApiState.Empty)
+    private val _responseForUserSubmission = MutableStateFlow<ApiState>(ApiState.Empty)
+    var responseForUserSubmissions = _responseForUserSubmission.asStateFlow()
 
     val submittedProblemsFlow =
         MutableStateFlow(arrayListOf<Pair<CodeforcesProblem, ArrayList<Submission>>>())
@@ -45,16 +46,10 @@ class UserSubmissionsViewModel @Inject constructor(
     val correctProblems = arrayListOf<Pair<CodeforcesProblem, ArrayList<Submission>>>()
     val incorrectProblems = arrayListOf<Pair<CodeforcesProblem, ArrayList<Submission>>>()
 
-    private val _requestedForUserSubmission = MutableStateFlow(false)
-    private val requestedForUserSubmission = _requestedForUserSubmission.asStateFlow()
-
-    fun requestForUserSubmission(userPreferences: UserPreferences, isForced: Boolean) {
-        if (isForced || !requestedForUserSubmission.value) {
-            _requestedForUserSubmission.update { true }
-            viewModelScope.launch(Dispatchers.IO) {
-                userPreferences.handleNameFlow.collect { handle ->
-                    refreshUserSubmission(handle!!)
-                }
+    fun refreshUserSubmission() {
+        viewModelScope.launch(Dispatchers.IO) {
+            userPreferences.handleNameFlow.collect { handle ->
+                getUserSubmission(handle)
             }
         }
     }
@@ -62,19 +57,14 @@ class UserSubmissionsViewModel @Inject constructor(
     private val _isUserSubmissionRefreshing = MutableStateFlow(false)
     val isUserSubmissionRefreshing = _isUserSubmissionRefreshing.asStateFlow()
 
-    private fun refreshUserSubmission(handle: String) = viewModelScope.launch {
-        _isUserSubmissionRefreshing.update { true }
-        // Simulate API call
-        getUserSubmission(handle = handle)
-    }
-
     private fun getUserSubmission(handle: String) {
         viewModelScope.launch(Dispatchers.IO) {
             codeforcesRepository.getUserSubmissions(handle = handle)
                 .onStart {
-                    responseForUserSubmissions = ApiState.Loading
+                    _isUserSubmissionRefreshing.update { true }
+                    _responseForUserSubmission.update { ApiState.Loading }
                 }.catch {
-                    responseForUserSubmissions = ApiState.Failure
+                    _responseForUserSubmission.update { ApiState.Failure }
                     _isUserSubmissionRefreshing.update { false }
                     Log.e(TAG, "getUserSubmission: $it")
                 }.collect {
@@ -82,14 +72,14 @@ class UserSubmissionsViewModel @Inject constructor(
 
                         processUserSubmissionsFromAPIResult(codeforcesApiResult = it)
 
-                        responseForUserSubmissions = ApiState.Success
+                        _responseForUserSubmission.update { ApiState.Success }
+
                         Log.d(TAG, "Got - User Submissions")
                     } else {
-                        responseForUserSubmissions = ApiState.Failure
+                        _responseForUserSubmission.update { ApiState.Failure }
                         Log.e(TAG, "getUserSubmission: " + it.comment.toString())
                     }
                     _isUserSubmissionRefreshing.update { false }
-
                 }
         }
     }
@@ -103,7 +93,7 @@ class UserSubmissionsViewModel @Inject constructor(
 
     val filteredProblemsWithSubmissions = submittedProblemsFlow
         .combine(currentSelection) { problems, currentSelection ->
-            when(currentSelection){
+            when (currentSelection) {
                 UserSubmissionFilter.CORRECT -> correctProblems
                 UserSubmissionFilter.INCORRECT -> incorrectProblems
                 else -> problems
@@ -127,6 +117,10 @@ class UserSubmissionsViewModel @Inject constructor(
             SharingStarted.WhileSubscribed(),
             submittedProblemsFlow.value
         )
+
+    init {
+        refreshUserSubmission()
+    }
 
     companion object {
         private const val TAG = "User Submission ViewModel"

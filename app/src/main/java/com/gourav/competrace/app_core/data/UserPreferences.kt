@@ -21,6 +21,7 @@ class UserPreferences(
         private val Context.handleDataStore by preferencesDataStore(
             name = USER_HANDLE_PREFERENCES_NAME
         )
+        private val IS_USER_LOGGED_IN = stringPreferencesKey("is_user_logged_in")
         private val HANDLE_NAME = stringPreferencesKey("user_name")
 
 

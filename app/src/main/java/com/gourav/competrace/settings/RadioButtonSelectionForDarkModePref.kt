@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun RadioButtonSelectionForDarkModePref(
-    darkModePrefOptions: ArrayList<String>,
+    darkModePrefOptions: List<String>,
     isOptionSelected: (String) -> Boolean,
     onClickOption: (String) -> Unit,
     modifier: Modifier = Modifier

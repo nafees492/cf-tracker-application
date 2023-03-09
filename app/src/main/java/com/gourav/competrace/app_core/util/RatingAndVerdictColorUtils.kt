@@ -2,6 +2,8 @@ package com.gourav.competrace.utils
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import com.gourav.competrace.app_core.ui.theme.*
+import com.gourav.competrace.app_core.util.Verdict
 import com.gourav.competrace.ui.theme.*
 
 @Composable

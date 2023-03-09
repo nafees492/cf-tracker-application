@@ -1,4 +1,4 @@
-package com.gourav.competrace.ui.components
+package com.gourav.competrace.settings
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun RadioButtonSelectionForAppTheme(
-    themeOptions: ArrayList<String>,
+    themeOptions: List<String>,
     isOptionSelected: (String) -> Boolean,
     onClickOption: (String) -> Unit,
     modifier: Modifier = Modifier

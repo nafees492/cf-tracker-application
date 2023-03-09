@@ -1,9 +1,91 @@
 <resources>
-    <string name="app_name">Competrace</string>
-    <string name="feedback_email_address">gourav.ranayara@gmail.com</string>
+
+    <string name="app_name" translatable="false">Competrace</string>
+
+    <!-- General -->
+    <string name="ok">OK</string>
+    <string name="filter">Filter</string>
+    <string name="more">More</string>
+    <string name="cd_go_back">Go Back</string>
+    <string name="gourav_email">gourav.ranayara@gmail.com</string>
+    <string name="vidhi_email">vid2001work@gmail.com</string>
     <string name="feedback_email_subject">Competrace - Reporting an Issue</string>
     <string name="feedback_email_body">"Android Version: \nCodeforces Handle: \n\nIssue: "</string>
     <string name="app_link_on_playstore">https://play.google.com/store/apps/details?id=com.gourav.competrace</string>
     <string name="privacy_policy_link">https://github.com/gorv02/privacy_policy/blob/master/privacy-policy.md</string>
     <string name="share_app_text">Competrace - CP Contest Tracker\n\nTrack Your Competitive Programming Progress with this App.\n\nDownload It Now: https://play.google.com/store/apps/details?id=com.gourav.competrace</string>
+    <string name="share_copied_link">%1$s\n\nShared Via: *Competrace*\nDownload it from: https://play.google.com/store/apps/details?id=com.gourav.competrace</string>
+
+    <!-- Sites Title -->
+    <string name="codeforces">CodeForces</string>
+    <string name="codechef">CodeChef</string>
+    <string name="atcoder">AtCoder</string>
+    <string name="leetcode">LeetCode</string>
+
+    <!-- Contest Screen -->
+    <string name="contests">Contests</string>
+    <string name="ongoing_contests">Ongoing Contests</string>
+    <string name="upcoming_contests">Upcoming Contests</string>
+    <string name="next_7_days">Next 7 Days</string>
+    <string name="after_7_days">After 7 Days</string>
+    <string name="no_contest">No Contest</string>
+    <string name="register_now">Register Now!</string>
+    <string name="contest_link_copied">Contest Link Copied</string>
+
+    <!-- Problem Set Screen -->
+    <string name="problem_set">Problem Set</string>
+    <string name="rating_range">Rating Range: %1$d - %2$d</string>
+    <string name="no_problem_found">No Problem Found!</string>
+    <string name="search_problem_contest">Search Problem / Contest</string>
+    <string name="problem_link_copied">Problem Link Copied</string>
+    <string name="cd_search_icon">Search in problem set</string>
+
+    <!-- Progress Screen -->
+    <string name="progress">Progress</string>
+    <string name="logout">Logout</string>
+    <string name="participated_contests">Participated Contests</string>
+    <string name="your_submissions">Your Submissions</string>
+
+    <!-- Graph -->
+    <string name="number_of_questions">Number Of Questions</string>
+    <string name="rating">Rating</string>
+    <string name="total_questions">Total Question Attempted: %1$d</string>
+    <string name="rating_questions">"For Rating (%1$s): %2$d"</string>
+    <string name="unrated_questions">Unrated: %1$d</string>
+    <string name="incorrect_questions">Incorrect/Partial Submissions: %1$d</string>
+
+    <!-- Your Submissions Screen -->
+    <string name="all_submissions">All Submissions</string>
+    <string name="correct_submissions">Correct Submissions</string>
+    <string name="incorrect_submissions">Incorrect Submissions</string>
+    <string name="submission_link_copied">Submission Link Copied</string>
+    <string name="clear_all">Clear All</string>
+    <string name="passes_test_cases">Passed Test Cases: %1$d</string>
+    <string name="cd_blue_tick">Submitted During Contest</string>
+
+
+    <!-- Login Screen -->
+    <string name="login">Login</string>
+    <string name="enter_codeforces_handle">Enter Codeforces Handle</string>
+
+    <!-- Settings -->
+    <string name="settings">Settings</string>
+    <string name="general">General</string>
+    <string name="show_tags">Show Tags</string>
+    <string name="theme">Theme</string>
+    <string name="default_theme">Default</string>
+    <string name="dynamic_theme">Dynamic</string>
+    <string name="dark_mode_pref">Dark mode preference</string>
+    <string name="system_default">System default</string>
+    <string name="light">Light</string>
+    <string name="dark">Dark</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="report_issue">Report Issue</string>
+    <string name="rate_and_review">Rate and Review</string>
+    <string name="share">Share</string>
+    <string name="version">&lt; Version-%1$s /&gt;</string>
+    <string name="share_competrace_via">Share "Competrace" Via:</string>
+    <string name="designed_by">Designed By: Vidhi Khosla - </string>
+    <string name="developed_by">Developed By: Lokesh Patidar - </string>
+
 </resources>
