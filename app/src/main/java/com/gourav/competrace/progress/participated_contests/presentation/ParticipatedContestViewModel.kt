@@ -51,12 +51,12 @@ class ParticipatedContestViewModel @Inject constructor(
     fun refreshUserRatingChanges() {
         viewModelScope.launch {
             userPreferences.handleNameFlow.collect {
-                getUserRatingChanges(it)
+                if(it.isNotBlank()) getUserRatingChanges(it)
             }
         }
     }
 
-    private val _responseForUserRatingChanges = MutableStateFlow<ApiState>(ApiState.Empty)
+    private val _responseForUserRatingChanges = MutableStateFlow<ApiState>(ApiState.Loading)
     val responseForUserRatingChanges = _responseForUserRatingChanges.asStateFlow()
 
     private fun getUserRatingChanges(handle: String) {

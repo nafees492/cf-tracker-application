@@ -10,14 +10,13 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import com.gourav.competrace.app_core.ui.SharedViewModel
 import com.gourav.competrace.app_core.ui.components.CompetraceSwipeRefreshIndicator
 import com.gourav.competrace.app_core.util.ApiState
 import com.gourav.competrace.app_core.util.Screens
 import com.gourav.competrace.app_core.util.TopAppBarManager
 import com.gourav.competrace.progress.participated_contests.presentation.ParticipatedContestViewModel
 import com.gourav.competrace.progress.participated_contests.presentation.ParticipatedContestsScreen
-import com.gourav.competrace.ui.screens.NetworkFailScreen
+import com.gourav.competrace.app_core.ui.NetworkFailScreen
 
 fun NavGraphBuilder.participatedContests(
     participatedContestViewModel: ParticipatedContestViewModel,
@@ -40,7 +39,6 @@ fun NavGraphBuilder.participatedContests(
             indicator = CompetraceSwipeRefreshIndicator
         ) {
             when (responseForUserRatingChanges) {
-                is ApiState.Empty -> {}
                 is ApiState.Loading -> {
                     Box(modifier = Modifier.fillMaxSize())
                 }

@@ -16,7 +16,10 @@ fun Context.copyTextToClipBoard(
 ) {
     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
     textToCopy?.let { clipboardManager.setText(AnnotatedString(textToCopy)) }
-    SnackbarManager.showMessageWithAction(toastMessageId, R.string.share) {
+    SnackbarManager.showMessageWithAction(
+        toastMessageId,
+        R.string.share
+    ) {
         shareTextToOtherApp(getString(R.string.share_copied_link, textToCopy))
     }
 }

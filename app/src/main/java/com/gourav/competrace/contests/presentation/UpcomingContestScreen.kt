@@ -17,6 +17,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.gourav.competrace.R
+import com.gourav.competrace.app_core.AlarmItem
 import com.gourav.competrace.app_core.ui.components.ExpandArrow
 import com.gourav.competrace.contests.model.CompetraceContest
 import com.gourav.competrace.app_core.util.Phase
@@ -25,7 +26,9 @@ import com.gourav.competrace.app_core.util.Phase
 @Composable
 fun UpcomingContestScreen(
     contests: List<CompetraceContest>,
-    selectedIndex: Int
+    selectedIndex: Int,
+    onClickNotificationIcon: (CompetraceContest) -> Unit,
+    notificationContestIdList: Set<String>
 ) {
     val onGoingContest = remember(contests) {
         contests.filter { it.phase == Phase.CODING }
@@ -66,7 +69,9 @@ fun UpcomingContestScreen(
                     contest = list[it],
                     modifier = Modifier.animateItemPlacement(
                         animationSpec = tween()
-                    )
+                    ),
+                    onClickNotificationIcon = onClickNotificationIcon,
+                    notificationContestIdList = notificationContestIdList
                 )
             }
 
@@ -114,7 +119,9 @@ fun UpcomingContestScreen(
                         contest = list[it],
                         modifier = Modifier.animateItemPlacement(
                             animationSpec = tween()
-                        )
+                        ),
+                        onClickNotificationIcon = onClickNotificationIcon,
+                        notificationContestIdList = notificationContestIdList
                     )
                 }
             }
@@ -164,7 +171,9 @@ fun UpcomingContestScreen(
                             contest = list[it],
                             modifier = Modifier.animateItemPlacement(
                                 animationSpec = tween()
-                            )
+                            ),
+                            onClickNotificationIcon = onClickNotificationIcon,
+                            notificationContestIdList = notificationContestIdList
                         )
                     }
                 }

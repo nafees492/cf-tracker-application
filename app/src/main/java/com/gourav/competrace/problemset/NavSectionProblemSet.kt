@@ -1,6 +1,5 @@
 package com.gourav.competrace.problemset
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Box
@@ -28,7 +27,7 @@ import com.gourav.competrace.problemset.presentation.ProblemSetViewModel
 import com.gourav.competrace.problemset.presentation.RatingRangeSlider
 import com.gourav.competrace.ui.components.SearchAppBar
 import com.gourav.competrace.settings.SettingsAlertDialog
-import com.gourav.competrace.ui.screens.NetworkFailScreen
+import com.gourav.competrace.app_core.ui.NetworkFailScreen
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.gourav.competrace.R
@@ -121,7 +120,6 @@ fun NavGraphBuilder.problemSet(
                 indicator = CompetraceSwipeRefreshIndicator
             ) {
                 when (responseForProblemSet) {
-                    is ApiState.Empty -> {}
                     is ApiState.Loading -> {
                         Box(modifier = Modifier.fillMaxSize())
                     }

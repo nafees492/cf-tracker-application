@@ -12,7 +12,6 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import com.gourav.competrace.app_core.ui.SharedViewModel
 import com.gourav.competrace.app_core.ui.components.CompetraceSwipeRefreshIndicator
 import com.gourav.competrace.app_core.util.ApiState
 import com.gourav.competrace.app_core.util.Screens
@@ -21,7 +20,7 @@ import com.gourav.competrace.progress.user_submissions.presentation.UserSubmissi
 import com.gourav.competrace.progress.user_submissions.presentation.UserSubmissionsScreenActions
 import com.gourav.competrace.progress.user_submissions.presentation.UserSubmissionsViewModel
 import com.gourav.competrace.ui.components.SearchAppBar
-import com.gourav.competrace.ui.screens.NetworkFailScreen
+import com.gourav.competrace.app_core.ui.NetworkFailScreen
 import com.gourav.competrace.app_core.util.UserSubmissionFilter
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -90,7 +89,6 @@ fun NavGraphBuilder.userSubmission(
             indicator = CompetraceSwipeRefreshIndicator
         ) {
             when (responseForUserSubmissions) {
-                is ApiState.Empty -> {}
                 is ApiState.Loading -> {
                     Box(modifier = Modifier.fillMaxSize())
                 }

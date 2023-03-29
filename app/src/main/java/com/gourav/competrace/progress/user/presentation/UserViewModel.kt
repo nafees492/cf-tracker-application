@@ -25,15 +25,15 @@ class UserViewModel @Inject constructor(
     val userHandle = userPreferences.handleNameFlow
     private val codeforcesDatabase: CodeforcesDatabase = CodeforcesDatabase.instance as CodeforcesDatabase
 
-    private val _responseForUserInfo = MutableStateFlow<ApiState>(ApiState.Empty)
+    private val _responseForUserInfo = MutableStateFlow<ApiState>(ApiState.Loading)
     val responseForUserInfo = _responseForUserInfo.asStateFlow()
 
     val currentUser = codeforcesDatabase.currentUserFlow.asStateFlow()
 
     fun refreshUserInfo() {
         viewModelScope.launch(Dispatchers.IO) {
-            userPreferences.handleNameFlow.collect { handle ->
-                handle?.let { getUserInfo(handle) }
+            userPreferences.handleNameFlow.collect {
+                if(it.isNotBlank()) getUserInfo(it)
             }
         }
     }
@@ -53,7 +53,6 @@ class UserViewModel @Inject constructor(
                     Log.e(TAG, "getUserInfo: $it")
                 }.collect {
                     if(it.status == "OK"){
-
                         codeforcesDatabase.setUser(user = it.result!![0])
                         _responseForUserInfo.update { ApiState.Success }
                         Log.d(TAG, "Got - User Info - $handle")

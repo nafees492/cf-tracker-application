@@ -37,7 +37,7 @@ class UserSubmissionsViewModel @Inject constructor(
         _currentSelection.update { value }
     }
 
-    private val _responseForUserSubmission = MutableStateFlow<ApiState>(ApiState.Empty)
+    private val _responseForUserSubmission = MutableStateFlow<ApiState>(ApiState.Loading)
     var responseForUserSubmissions = _responseForUserSubmission.asStateFlow()
 
     val submittedProblemsFlow =
@@ -48,8 +48,8 @@ class UserSubmissionsViewModel @Inject constructor(
 
     fun refreshUserSubmission() {
         viewModelScope.launch(Dispatchers.IO) {
-            userPreferences.handleNameFlow.collect { handle ->
-                getUserSubmission(handle)
+            userPreferences.handleNameFlow.collect {
+                if(it.isNotBlank()) getUserSubmission(it)
             }
         }
     }

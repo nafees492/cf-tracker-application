@@ -1,6 +1,5 @@
 package com.gourav.competrace.contests
 
-import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
@@ -22,7 +21,7 @@ import com.gourav.competrace.contests.presentation.ContestSites
 import com.gourav.competrace.contests.presentation.ContestViewModel
 import com.gourav.competrace.contests.presentation.UpcomingContestScreen
 import com.gourav.competrace.settings.SettingsAlertDialog
-import com.gourav.competrace.ui.screens.NetworkFailScreen
+import com.gourav.competrace.app_core.ui.NetworkFailScreen
 import java.util.*
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -37,6 +36,7 @@ fun NavGraphBuilder.contests(
 
         val selectedIndex by contestViewModel.selectedIndex.collectAsState()
         val currentContests by contestViewModel.contests.collectAsState()
+        val notificationContestIdList by contestViewModel.notificationContestIdList.collectAsState()
 
         val responseForKontestsContestList by contestViewModel.responseForKontestsContestList.collectAsState()
         val isRefreshing by contestViewModel.isKontestsContestListRefreshing.collectAsState()
@@ -45,7 +45,10 @@ fun NavGraphBuilder.contests(
             TopAppBarManager.updateTopAppBar(
                 screen = Screens.ContestsScreen,
                 actions = {
-                    ContestScreenActions(onClickSettings = sharedViewModel::openSettingsDialog)
+                    ContestScreenActions(
+                        onClickSettings = sharedViewModel::openSettingsDialog,
+                        clearAllNotifications = contestViewModel::clearAllNotifications
+                    )
                 }
             )
         }
@@ -73,23 +76,24 @@ fun NavGraphBuilder.contests(
 
             SwipeRefresh(
                 state = swipeRefreshState,
-                onRefresh = contestViewModel::refreshContestListFromKontests,
+                onRefresh = contestViewModel::getContestListFromKontests,
                 indicator = CompetraceSwipeRefreshIndicator
             ) {
                 when (responseForKontestsContestList) {
-                    is ApiState.Empty -> {}
                     is ApiState.Loading -> {
                         Box(modifier = Modifier.fillMaxSize())
                     }
                     is ApiState.Failure -> {
                         NetworkFailScreen(
-                            onClickRetry = contestViewModel::refreshContestListFromKontests
+                            onClickRetry = contestViewModel::getContestListFromKontests
                         )
                     }
                     is ApiState.Success -> {
                        UpcomingContestScreen(
                            contests = currentContests,
-                           selectedIndex = selectedIndex
+                           selectedIndex = selectedIndex,
+                           onClickNotificationIcon = contestViewModel::toggleContestNotification,
+                           notificationContestIdList = notificationContestIdList
                        )
                     }
                 }

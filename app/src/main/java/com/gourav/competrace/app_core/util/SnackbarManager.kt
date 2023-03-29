@@ -6,12 +6,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import androidx.compose.material3.SnackbarDuration
 
 data class SnackbarMessage(
     val id: Long,
     @StringRes val messageId: Int,
     @StringRes val actionLabelId: Int? = null,
-    val action: () -> Unit = {}
+    val action: () -> Unit = {},
+    val duration: SnackbarDuration = SnackbarDuration.Short
 )
 
 /**
@@ -19,14 +21,18 @@ data class SnackbarMessage(
  */
 object SnackbarManager {
 
-    private val _messages: MutableStateFlow<List<SnackbarMessage>> = MutableStateFlow(emptyList())
-    val messages: StateFlow<List<SnackbarMessage>> get() = _messages.asStateFlow()
+    private val messagesFlow: MutableStateFlow<List<SnackbarMessage>> = MutableStateFlow(emptyList())
+    val messages: StateFlow<List<SnackbarMessage>> get() = messagesFlow.asStateFlow()
 
-    fun showMessage(@StringRes messageId: Int) {
-        _messages.update { currentMessages ->
+    fun showMessage(
+        @StringRes messageTextId: Int,
+        duration: SnackbarDuration = SnackbarDuration.Short
+    ) {
+        messagesFlow.update { currentMessages ->
             currentMessages + SnackbarMessage(
                 id = UUID.randomUUID().mostSignificantBits,
-                messageId = messageId
+                messageId = messageTextId,
+                duration = duration
             )
         }
     }
@@ -34,20 +40,22 @@ object SnackbarManager {
     fun showMessageWithAction(
         @StringRes messageTextId: Int,
         @StringRes actionLabelId: Int,
+        duration: SnackbarDuration = SnackbarDuration.Short,
         action: () -> Unit
     ) {
-        _messages.update { currentMessages ->
+        messagesFlow.update { currentMessages ->
             currentMessages + SnackbarMessage(
                 id = UUID.randomUUID().mostSignificantBits,
                 messageId = messageTextId,
                 actionLabelId = actionLabelId,
-                action = action
+                action = action,
+                duration = duration
             )
         }
     }
 
     fun setMessageShown(messageId: Long) {
-        _messages.update { currentMessages ->
+        messagesFlow.update { currentMessages ->
             currentMessages.filterNot { it.id == messageId }
         }
     }

@@ -1,9 +1,12 @@
 package com.gourav.competrace.app_core.data.di
 
 import android.content.Context
+import com.gourav.competrace.app_core.AlarmScheduler
+import com.gourav.competrace.app_core.AndroidAlarmScheduler
 import com.gourav.competrace.app_core.data.UserPreferences
 import com.gourav.competrace.app_core.data.network.CodeforcesApiService
 import com.gourav.competrace.app_core.data.network.KontestsApiService
+import com.gourav.competrace.app_core.room_database.AlarmRepository
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
@@ -23,6 +26,16 @@ object AppModule {
     @Singleton
     fun provideUserPreferences(@ApplicationContext context: Context): UserPreferences =
         UserPreferences(context)
+
+    @Provides
+    @Singleton
+    fun provideAlarmRepository(@ApplicationContext context: Context): AlarmRepository =
+        AlarmRepository(context)
+
+    @Provides
+    @Singleton
+    fun provideAlarmScheduler(@ApplicationContext context: Context): AlarmScheduler =
+        AndroidAlarmScheduler(context)
 
     @Provides
     @Singleton

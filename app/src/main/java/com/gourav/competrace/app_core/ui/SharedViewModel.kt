@@ -34,7 +34,7 @@ class SharedViewModel : ViewModel() {
     private val _isPlatformsTabRowVisible = MutableStateFlow(true)
     val isPlatformsTabRowVisible = _isPlatformsTabRowVisible.asStateFlow()
 
-    fun setIsPlatformsTabRowVisible(value: Boolean) {
+    fun toggleIsPlatformsTabRowVisibleTo(value: Boolean) {
         _isPlatformsTabRowVisible.update { value }
     }
 

@@ -1,4 +1,4 @@
-package com.gourav.competrace.ui.screens
+package com.gourav.competrace.app_core.ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Icon

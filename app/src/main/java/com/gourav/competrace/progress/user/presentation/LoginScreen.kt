@@ -7,14 +7,12 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -24,12 +22,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gourav.competrace.R
-import com.gourav.competrace.app_core.data.UserPreferences
 import com.gourav.competrace.app_core.ui.components.CompetraceButton
-import com.gourav.competrace.app_core.util.ApiState
-import com.gourav.competrace.app_core.ui.components.MyCircularProgressIndicator
 
 private const val TAG = "Login Screen"
+
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun LoginScreen(loginViewModel: LoginViewModel) {
@@ -37,6 +33,7 @@ fun LoginScreen(loginViewModel: LoginViewModel) {
     val keyboardController = LocalSoftwareKeyboardController.current
 
     val inputHandle by loginViewModel.inputHandle.collectAsState()
+    val isValidHandle by loginViewModel.isValidHandle.collectAsState()
 
     LazyColumn(
         modifier = Modifier.padding(horizontal = 8.dp),
@@ -69,7 +66,9 @@ fun LoginScreen(loginViewModel: LoginViewModel) {
 
         item {
             Column(
-                modifier = Modifier.fillMaxWidth(0.8f),
+                modifier = Modifier
+                    .fillMaxWidth(0.8f)
+                    .imePadding(),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 OutlinedTextField(
@@ -101,9 +100,9 @@ fun LoginScreen(loginViewModel: LoginViewModel) {
                 CompetraceButton(
                     text = stringResource(id = R.string.login),
                     onClick = {
-                        if (inputHandle.isNotBlank())
-                            loginViewModel.checkUsernameAvailable(inputHandle.trim())
+                        loginViewModel.checkUsernameAvailable(inputHandle.trim())
                     },
+                    enabled = isValidHandle,
                     modifier = Modifier.fillMaxWidth()
                 )
             }

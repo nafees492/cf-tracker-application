@@ -15,6 +15,7 @@
     <string name="privacy_policy_link">https://github.com/gorv02/privacy_policy/blob/master/privacy-policy.md</string>
     <string name="share_app_text">Competrace - CP Contest Tracker\n\nTrack Your Competitive Programming Progress with this App.\n\nDownload It Now: https://play.google.com/store/apps/details?id=com.gourav.competrace</string>
     <string name="share_copied_link">%1$s\n\nShared Via: *Competrace*\nDownload it from: https://play.google.com/store/apps/details?id=com.gourav.competrace</string>
+    <string name="network_unavailable">Network Unavailable!</string>
 
     <!-- Sites Title -->
     <string name="codeforces">CodeForces</string>
@@ -31,6 +32,11 @@
     <string name="no_contest">No Contest</string>
     <string name="register_now">Register Now!</string>
     <string name="contest_link_copied">Contest Link Copied</string>
+    <string name="all_notification_cleared">All Notification Cleared</string>
+    <string name="contest_channel_name">Contest Notifications</string>
+    <string name="cd_add_to_calender">Add to calender</string>
+    <string name="cd_toggle_notification">Toggle Notification</string>
+    <string name="notification_set_confirmation">You will be notified within 60 minutes before the contest starts</string>
 
     <!-- Problem Set Screen -->
     <string name="problem_set">Problem Set</string>
@@ -67,6 +73,7 @@
     <!-- Login Screen -->
     <string name="login">Login</string>
     <string name="enter_codeforces_handle">Enter Codeforces Handle</string>
+    <string name="user_not_found">User Not Found</string>
 
     <!-- Settings -->
     <string name="settings">Settings</string>
@@ -87,5 +94,8 @@
     <string name="share_competrace_via">Share "Competrace" Via:</string>
     <string name="designed_by">Designed By: Vidhi Khosla - </string>
     <string name="developed_by">Developed By: Lokesh Patidar - </string>
+
+
+    <string name="searching">Searching...</string>
 
 </resources>

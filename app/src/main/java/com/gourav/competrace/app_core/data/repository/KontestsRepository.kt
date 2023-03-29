@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
 class KontestsRepository @Inject constructor(private val kontestsApiService: KontestsApiService) {
-
     fun getAllContests(): Flow<List<KontestsContest>> = flow {
         emit(kontestsApiService.getAllContests())
     }.flowOn(Dispatchers.IO)

@@ -90,7 +90,7 @@ fun UserSubmissionsScreen(
         }
     ) {
         LazyColumn {
-            item(key = "no-problem-tag") {
+            item {
                 if (filteredList.isEmpty()) {
                     Column(
                         modifier = Modifier
@@ -111,7 +111,7 @@ fun UserSubmissionsScreen(
                 }
             }
 
-            item(key = "clear-all-chip") {
+            item {
                 if (selectedChips.isNotEmpty()) {
                     ElevatedAssistChip(
                         onClick = { selectedChips = emptySet() },
@@ -129,7 +129,7 @@ fun UserSubmissionsScreen(
                 }
             }
 
-            items(filteredList.size, key = { filteredList[it].hashCode() }) {
+            items(filteredList.size) {
                 ProblemSubmissionCard(
                     codeforcesProblem = filteredList[it].first,
                     submissions = filteredList[it].second,

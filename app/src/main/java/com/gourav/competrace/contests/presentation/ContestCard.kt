@@ -22,6 +22,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gourav.competrace.R
+import com.gourav.competrace.app_core.AlarmItem
+import com.gourav.competrace.app_core.AndroidAlarmScheduler
 import com.gourav.competrace.app_core.ui.components.CompetraceIconButton
 import com.gourav.competrace.app_core.util.getCurrentTimeInMillis
 import com.gourav.competrace.app_core.util.getFormattedTime
@@ -38,6 +40,8 @@ import com.gourav.competrace.app_core.util.loadUrl
 fun ContestCard(
     contest: CompetraceContest,
     modifier: Modifier = Modifier,
+    notificationContestIdList: Set<String>,
+    onClickNotificationIcon: (CompetraceContest) -> Unit
 ) {
     val context = LocalContext.current
     val clipboardManager: ClipboardManager = LocalClipboardManager.current
@@ -188,11 +192,22 @@ fun ContestCard(
                     )
                 } else ratedCategoriesRow(Modifier)
 
-                if (contest.phase == Phase.BEFORE) CompetraceIconButton(
-                    iconId = R.drawable.ic_calendar_add_on_24px,
-                    onClick = { contest.addToCalender(context = context) },
-                    contentDescription = "Add to calender",
-                )
+                if (contest.phase == Phase.BEFORE) Row {
+                    CompetraceIconButton(
+                        iconId = R.drawable.ic_calendar_add_on_24px,
+                        onClick = { contest.addToCalender(context = context) },
+                        contentDescription = stringResource(R.string.cd_add_to_calender),
+                    )
+
+                    val notificationIcon = if (contest.id.toString() in notificationContestIdList) R.drawable.ic_notifications_active_24px
+                    else R.drawable.ic_notifications_24px
+
+                    CompetraceIconButton(
+                        iconId = notificationIcon,
+                        onClick = { onClickNotificationIcon(contest) },
+                        contentDescription = stringResource(R.string.cd_toggle_notification),
+                    )
+                }
             }
             if (contest.within7Days) ratedCategoriesRow(Modifier.padding(horizontal = 8.dp))
         }

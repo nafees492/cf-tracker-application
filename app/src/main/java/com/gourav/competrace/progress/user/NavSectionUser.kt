@@ -25,7 +25,7 @@ import com.gourav.competrace.app_core.util.TopAppBarManager
 import com.gourav.competrace.progress.user.presentation.*
 import com.gourav.competrace.progress.user_submissions.presentation.UserSubmissionsViewModel
 import com.gourav.competrace.settings.SettingsAlertDialog
-import com.gourav.competrace.ui.screens.NetworkFailScreen
+import com.gourav.competrace.app_core.ui.NetworkFailScreen
 
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.user(
@@ -43,6 +43,7 @@ fun NavGraphBuilder.user(
         val userHandle by userViewModel.userHandle.collectAsState(null)
         val responseForUserInfo by userViewModel.responseForUserInfo.collectAsState()
         val isRefreshing by userViewModel.isUserRefreshing.collectAsState()
+        val user by userViewModel.currentUser.collectAsState()
 
         LaunchedEffect(Unit){
             TopAppBarManager.updateTopAppBar(
@@ -88,7 +89,6 @@ fun NavGraphBuilder.user(
                             indicator = CompetraceSwipeRefreshIndicator
                         ) {
                             when (responseForUserInfo) {
-                                is ApiState.Empty -> {}
                                 is ApiState.Loading -> {
                                     Box(modifier = Modifier.fillMaxSize())
                                 }
@@ -98,8 +98,6 @@ fun NavGraphBuilder.user(
                                     )
                                 }
                                 is ApiState.Success -> {
-                                    val user by userViewModel.currentUser.collectAsState()
-
                                     ProgressScreen(
                                         user = user,
                                         goToSubmission = {

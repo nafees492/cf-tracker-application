@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -16,13 +17,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.gourav.competrace.R
-import com.gourav.competrace.app_core.data.UserPreferences
 import com.gourav.competrace.app_core.ui.components.CompetraceButton
 import com.gourav.competrace.app_core.ui.components.MyCircularProgressIndicator
 import com.gourav.competrace.app_core.util.ApiState
 import com.gourav.competrace.progress.user.model.User
 import com.gourav.competrace.progress.user_submissions.presentation.UserSubmissionsViewModel
-import com.gourav.competrace.ui.screens.NetworkFailScreen
+import com.gourav.competrace.app_core.ui.NetworkFailScreen
 import com.gourav.competrace.utils.getRatingTextColor
 import com.skydoves.landscapist.animation.crossfade.CrossfadePlugin
 import com.skydoves.landscapist.components.rememberImageComponent
@@ -145,7 +145,6 @@ fun ProgressScreen(
             ) {
                 val responseForUserSubmissions by userSubmissionsViewModel.responseForUserSubmissions.collectAsState()
                 when (responseForUserSubmissions) {
-                    is ApiState.Empty -> {}
                     is ApiState.Loading -> {
                         MyCircularProgressIndicator(isDisplayed = true)
                     }

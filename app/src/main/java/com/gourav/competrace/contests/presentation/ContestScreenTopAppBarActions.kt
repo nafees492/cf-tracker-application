@@ -11,12 +11,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.gourav.competrace.R
+import com.gourav.competrace.app_core.ui.components.CompetraceIconButton
 import com.gourav.competrace.app_core.util.getTodaysDate
 
 @ExperimentalAnimationApi
 @Composable
 fun ContestScreenActions(
     onClickSettings: () -> Unit,
+    clearAllNotifications: () -> Unit
 ) {
     val todaysDate by remember {
         mutableStateOf(getTodaysDate())
@@ -32,6 +34,11 @@ fun ContestScreenActions(
             contentDescription = stringResource(id = R.string.settings),
         )
     }
+    CompetraceIconButton(
+        iconId = R.drawable.ic_notifications_off_24px,
+        onClick = clearAllNotifications,
+        contentDescription = stringResource(id = R.string.clear_all)
+    )
 }
 
 

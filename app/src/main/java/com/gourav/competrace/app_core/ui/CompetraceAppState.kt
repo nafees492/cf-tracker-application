@@ -1,24 +1,19 @@
 package com.gourav.competrace.app_core.ui
 
+import android.content.Context
 import android.content.res.Resources
-import androidx.compose.material3.SnackbarDefaults
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.Lifecycle
-import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDestination
 import androidx.navigation.NavGraph
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.gourav.competrace.app_core.util.Screens
-import com.gourav.competrace.app_core.util.SnackbarManager
+import com.gourav.competrace.app_core.util.*
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 @Composable
@@ -27,10 +22,26 @@ fun rememberCompetraceAppState(
     navController: NavHostController = rememberNavController(),
     snackbarManager: SnackbarManager = SnackbarManager,
     resources: Resources = resources(),
-    coroutineScope: CoroutineScope = rememberCoroutineScope()
-) = remember(snackbarHostState, navController, snackbarManager, resources, coroutineScope) {
-    CompetraceAppState(snackbarHostState, navController, snackbarManager, resources, coroutineScope)
+    coroutineScope: CoroutineScope = rememberCoroutineScope(),
+    context: Context = LocalContext.current
+) = remember(
+    snackbarHostState,
+    navController,
+    snackbarManager,
+    resources,
+    coroutineScope,
+    context
+) {
+    CompetraceAppState(
+        snackbarHostState,
+        navController,
+        snackbarManager,
+        resources,
+        coroutineScope,
+        context
+    )
 }
+
 
 
 @Stable
@@ -39,7 +50,8 @@ class CompetraceAppState(
     val navController: NavHostController,
     private val snackbarManager: SnackbarManager,
     private val resources: Resources,
-    coroutineScope: CoroutineScope
+    coroutineScope: CoroutineScope,
+    context: Context
 ) {
     // Process snackbars coming from SnackbarManager
     init {
@@ -49,14 +61,15 @@ class CompetraceAppState(
                     val message = currentMessages[0]
                     val text = resources.getString(message.messageId)
                     val actionLabel = message.actionLabelId?.let { resources.getString(it) }
+                    val duration = message.duration
 
                     val action = snackbarHostState.showSnackbar(
                         message = text,
                         actionLabel = actionLabel,
-                        duration = SnackbarDuration.Short
+                        duration = duration
                     )
 
-                    if(action == SnackbarResult.ActionPerformed) message.action()
+                    if (action == SnackbarResult.ActionPerformed) message.action()
 
                     snackbarManager.setMessageShown(message.id)
                 }
