@@ -8,9 +8,6 @@ import android.util.Log
 fun loadUrl(context: Context, url: String?) {
     Log.e("Main Activity", "URL is $url")
     if(url.isNullOrBlank()) return
-    val urlIntent = Intent(
-        Intent.ACTION_VIEW,
-        Uri.parse(url)
-    )
+    val urlIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
     context.startActivity(urlIntent)
 }

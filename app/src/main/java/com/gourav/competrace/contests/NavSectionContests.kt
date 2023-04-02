@@ -1,37 +1,48 @@
 package com.gourav.competrace.contests
 
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
+import android.provider.Settings
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.gourav.competrace.R
+import com.gourav.competrace.app_core.ui.CompetraceAppState
 import com.gourav.competrace.app_core.ui.SharedViewModel
 import com.gourav.competrace.app_core.ui.components.CompetracePlatformRow
 import com.gourav.competrace.app_core.ui.components.CompetraceSwipeRefreshIndicator
-import com.gourav.competrace.app_core.util.ApiState
-import com.gourav.competrace.app_core.util.Screens
-import com.gourav.competrace.app_core.util.TopAppBarManager
 import com.gourav.competrace.contests.presentation.ContestScreenActions
-import com.gourav.competrace.contests.presentation.ContestSites
 import com.gourav.competrace.contests.presentation.ContestViewModel
 import com.gourav.competrace.contests.presentation.UpcomingContestScreen
-import com.gourav.competrace.settings.SettingsAlertDialog
 import com.gourav.competrace.app_core.ui.NetworkFailScreen
+import com.gourav.competrace.app_core.util.*
 import java.util.*
 
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.contests(
     sharedViewModel: SharedViewModel,
-    contestViewModel: ContestViewModel
+    contestViewModel: ContestViewModel,
+    appState: CompetraceAppState
 ) {
     composable(route = Screens.ContestsScreen.route) {
 
-        val isSettingsDialogueOpen by sharedViewModel.isSettingsDialogueOpen.collectAsState()
+        val context = LocalContext.current
+
         val isPlatformTabRowVisible by sharedViewModel.isPlatformsTabRowVisible.collectAsState()
 
         val selectedIndex by contestViewModel.selectedIndex.collectAsState()
@@ -41,24 +52,33 @@ fun NavGraphBuilder.contests(
         val responseForKontestsContestList by contestViewModel.responseForKontestsContestList.collectAsState()
         val isRefreshing by contestViewModel.isKontestsContestListRefreshing.collectAsState()
 
-        LaunchedEffect(Unit){
+        var hasNotificationPermission by remember {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                mutableStateOf(
+                    ContextCompat.checkSelfPermission(
+                        context, Manifest.permission.POST_NOTIFICATIONS
+                    ) == PackageManager.PERMISSION_GRANTED
+                )
+            } else mutableStateOf(true)
+        }
+
+        val permissionLauncher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission(),
+            onResult = { isGranted ->
+                hasNotificationPermission = isGranted
+            }
+        )
+
+        LaunchedEffect(Unit) {
             TopAppBarManager.updateTopAppBar(
                 screen = Screens.ContestsScreen,
                 actions = {
                     ContestScreenActions(
-                        onClickSettings = sharedViewModel::openSettingsDialog,
-                        clearAllNotifications = contestViewModel::clearAllNotifications
+                        onClickSettings = appState::navigateToSettings
                     )
                 }
             )
         }
-
-        SettingsAlertDialog(
-            openSettingsDialog = isSettingsDialogueOpen,
-            dismissSettingsDialogue = sharedViewModel::dismissSettingsDialog
-        )
-
-        val tabTitles = ContestSites.values().map { it.title }
 
         val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = isRefreshing)
 
@@ -69,7 +89,7 @@ fun NavGraphBuilder.contests(
             ) {
                 CompetracePlatformRow(
                     selectedTabIndex = selectedIndex,
-                    tabTitles = tabTitles,
+                    platforms = contestViewModel.contestSites,
                     onClickTab = contestViewModel::setSelectedIndexTo
                 )
             }
@@ -85,16 +105,36 @@ fun NavGraphBuilder.contests(
                     }
                     is ApiState.Failure -> {
                         NetworkFailScreen(
-                            onClickRetry = contestViewModel::getContestListFromKontests
+                            onClickRetry = contestViewModel::getContestListFromKontests,
                         )
                     }
                     is ApiState.Success -> {
-                       UpcomingContestScreen(
-                           contests = currentContests,
-                           selectedIndex = selectedIndex,
-                           onClickNotificationIcon = contestViewModel::toggleContestNotification,
-                           notificationContestIdList = notificationContestIdList
-                       )
+                        UpcomingContestScreen(
+                            contests = currentContests,
+                            selectedIndex = selectedIndex,
+                            onClickNotificationIcon = {
+                                if(hasNotificationPermission)
+                                    contestViewModel.toggleContestNotification(it)
+                                else {
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                                    }
+                                    SnackbarManager.showMessageWithAction(
+                                        messageTextId = UiText.StringResource(R.string.grant_permission_to_continue),
+                                        actionLabelId = UiText.StringResource(R.string.go_to_settings),
+                                        action = {
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                                Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                                                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                                                    putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+                                                }.also(context::startActivity)
+                                            }
+                                        }
+                                    )
+                                }
+                            },
+                            notificationContestIdList = notificationContestIdList
+                        )
                     }
                 }
             }

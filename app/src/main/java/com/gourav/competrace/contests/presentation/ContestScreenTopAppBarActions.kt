@@ -1,8 +1,10 @@
 package com.gourav.competrace.contests.presentation
 
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -12,20 +14,22 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.gourav.competrace.R
 import com.gourav.competrace.app_core.ui.components.CompetraceIconButton
+import com.gourav.competrace.app_core.util.SnackbarManager
+import com.gourav.competrace.app_core.util.UiText
 import com.gourav.competrace.app_core.util.getTodaysDate
 
 @ExperimentalAnimationApi
 @Composable
 fun ContestScreenActions(
-    onClickSettings: () -> Unit,
-    clearAllNotifications: () -> Unit
+    onClickSettings: () -> Unit
 ) {
     val todaysDate by remember {
         mutableStateOf(getTodaysDate())
     }
 
     Text(
-        text = todaysDate
+        text = todaysDate,
+        style = MaterialTheme.typography.labelLarge
     )
 
     IconButton(onClick = onClickSettings) {
@@ -34,11 +38,11 @@ fun ContestScreenActions(
             contentDescription = stringResource(id = R.string.settings),
         )
     }
-    CompetraceIconButton(
-        iconId = R.drawable.ic_notifications_off_24px,
-        onClick = clearAllNotifications,
-        contentDescription = stringResource(id = R.string.clear_all)
-    )
+
+    CompetraceIconButton(iconId = R.drawable.ic_help_24px, onClick = {
+        SnackbarManager.showMessage(UiText.StringResource(R.string.todo))
+    })
+
 }
 
 

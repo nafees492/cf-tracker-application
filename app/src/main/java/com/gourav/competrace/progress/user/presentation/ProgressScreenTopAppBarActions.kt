@@ -27,15 +27,13 @@ fun RowScope.ProgressScreenActions(
         )
     }
 
-    IconButton(onClick = {
-        expanded = true
-    }) {
+    IconButton(onClick = onClickLogOut, enabled = isLogOutButtonEnabled) {
         Icon(
-            imageVector = Icons.Rounded.MoreVert,
-            contentDescription = stringResource(R.string.more),
+            painter = painterResource(id = R.drawable.ic_logout_24px),
+            contentDescription = stringResource(R.string.switch_user),
         )
     }
-    AnimatedVisibility(
+    /*AnimatedVisibility(
         visible = expanded,
     ) {
         DropdownMenu(
@@ -43,7 +41,7 @@ fun RowScope.ProgressScreenActions(
             onDismissRequest = { expanded = false },
         ) {
             DropdownMenuItem(
-                text = { Text(stringResource(id = R.string.logout)) },
+                text = { Text(stringResource(id = R.string.switch_user)) },
                 onClick = {
                     onClickLogOut()
                     expanded = false
@@ -51,13 +49,13 @@ fun RowScope.ProgressScreenActions(
                 trailingIcon = {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_logout_24px),
-                        contentDescription = stringResource(id = R.string.logout),
+                        contentDescription = stringResource(id = R.string.switch_user),
                     )
                 },
                 enabled = isLogOutButtonEnabled
             )
         }
-    }
+    }*/
 }
 
 

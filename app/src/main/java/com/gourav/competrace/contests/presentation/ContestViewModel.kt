@@ -4,16 +4,14 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gourav.competrace.R
-import com.gourav.competrace.app_core.AlarmItem
-import com.gourav.competrace.app_core.AlarmScheduler
+import com.gourav.competrace.contests.data.AlarmScheduler
 import com.gourav.competrace.app_core.data.UserPreferences
-import com.gourav.competrace.app_core.data.repository.KontestsRepository
-import com.gourav.competrace.app_core.room_database.AlarmRepository
-import com.gourav.competrace.app_core.util.ApiState
+import com.gourav.competrace.app_core.data.repository.remote.KontestsRepository
+import com.gourav.competrace.contests.data.repository.AlarmRepository
+import com.gourav.competrace.app_core.util.*
+import com.gourav.competrace.contests.model.AlarmItem
 import com.gourav.competrace.contests.model.CompetraceContest
-import com.gourav.competrace.app_core.util.ContestRatedCategories
-import com.gourav.competrace.app_core.util.SnackbarManager
-import com.gourav.competrace.app_core.util.getCurrentTimeInMillis
+import com.gourav.competrace.settings.ScheduleNotifBeforeOptions
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -27,6 +25,7 @@ class ContestViewModel @Inject constructor(
     private val alarmRepository: AlarmRepository,
     private val alarmScheduler: AlarmScheduler,
 ) : ViewModel() {
+    val contestSites = Sites.values().filter { it.isContestSite }
 
     val selectedIndex = userPreferences.selectedContestSiteIndexFlow.stateIn(
         viewModelScope,
@@ -41,15 +40,23 @@ class ContestViewModel @Inject constructor(
     }
 
     private val selectedSite = selectedIndex.map {
-        ContestSites.values()[it]
+        contestSites[it]
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(),
-        ContestSites.Codeforces
+        Sites.Codeforces
     )
 
     private val _notificationContestIdList = MutableStateFlow(setOf<String>())
     val notificationContestIdList = _notificationContestIdList.asStateFlow()
+
+    private val scheduleNotifBefore = userPreferences.scheduleNotifBeforeFlow.map {
+        it
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.Eagerly,
+        60
+    )
 
     private val _responseForKontestsContestList = MutableStateFlow<ApiState>(ApiState.Loading)
     val responseForKontestsContestList = _responseForKontestsContestList.asStateFlow()
@@ -92,7 +99,7 @@ class ContestViewModel @Inject constructor(
                     val contests = apiResult
                         .filter { contest ->
                             contest.site?.let { site ->
-                                ContestSites.values().any { it.title == site }
+                                contestSites.any { it.title == site }
                             } ?: false
                         }.map {
                             it.mapToCompetraceContest()
@@ -107,15 +114,11 @@ class ContestViewModel @Inject constructor(
                         }
                         addContestToAllContests(contest = contest)
 
-                        alarmRepository.updateAlarm(
-                            AlarmItem(
-                                id = contest.uniqueId(),
-                                contestId = contest.id.toString(),
-                                timeInMillis = contest.startTimeInMillis - 60 * 60 * 1000,
-                                title = contest.site ?: "Competrace",
-                                message = "${contest.name} is going to start in 60 minutes. Hurry Up!!"
+                        if (contest.startTimeInMillis - getCurrentTimeInMillis() > minutesToMillis(
+                                scheduleNotifBefore.value
                             )
                         )
+                            alarmRepository.updateAlarm(contest.getAlarmItem(scheduleNotifBefore.value))
                     }
 
                     _responseForKontestsContestList.update { ApiState.Success }
@@ -127,27 +130,50 @@ class ContestViewModel @Inject constructor(
 
 
     fun toggleContestNotification(contest: CompetraceContest) {
-        val item = AlarmItem(
-            id = contest.uniqueId(),
-            contestId = contest.id.toString(),
-            timeInMillis = contest.startTimeInMillis - 60 * 60 * 1000,
-            title = contest.site ?: "Competrace",
-            message = "${contest.name} is going to start within 60 minutes. Hurry Up!!"
-        )
+        val contestTimeRemInMillis = contest.startTimeInMillis - getCurrentTimeInMillis()
 
         if (contest.id.toString() in notificationContestIdList.value) {
+            val item = contest.getAlarmItem(scheduleNotifBefore.value)
+
             viewModelScope.launch {
                 alarmRepository.deleteAlarm(item)
                 item.let(alarmScheduler::cancel)
             }
             _notificationContestIdList.update { it - contest.id.toString() }
         } else {
-            viewModelScope.launch {
-                alarmRepository.addAlarm(item)
-                item.let(alarmScheduler::schedule)
+
+            if (contestTimeRemInMillis > minutesToMillis(scheduleNotifBefore.value)) {
+                val item = contest.getAlarmItem(scheduleNotifBefore.value)
+
+                viewModelScope.launch {
+                    alarmRepository.addAlarm(item)
+                    item.let(alarmScheduler::schedule)
+                }
+                _notificationContestIdList.update { it + contest.id.toString() }
+
+                SnackbarManager.showMessage(
+                    message = UiText.StringResource(
+                        R.string.notif_set_confirmation,
+                        ScheduleNotifBeforeOptions.getOption(scheduleNotifBefore.value)
+                    )
+                )
+            } else if (contestTimeRemInMillis > minutesToMillis(10)) {
+                val item = contest.getAlarmItem(10)
+
+                SnackbarManager.showMessageWithAction(
+                    messageTextId = UiText.StringResource(R.string.ask_to_set_notif),
+                    actionLabelId = UiText.StringResource(R.string.yes),
+                    action = {
+                        viewModelScope.launch {
+                            alarmRepository.addAlarm(item)
+                            item.let(alarmScheduler::schedule)
+                        }
+                        _notificationContestIdList.update { it + contest.id.toString() }
+                    }
+                )
+            } else {
+                SnackbarManager.showMessage(UiText.StringResource(R.string.contest_starting_in_ten))
             }
-            _notificationContestIdList.update { it + contest.id.toString() }
-            SnackbarManager.showMessage(messageTextId = R.string.notification_set_confirmation)
         }
     }
 
@@ -162,7 +188,7 @@ class ContestViewModel @Inject constructor(
             alarmRepository.deleteALlAlarms()
         }
 
-        SnackbarManager.showMessage(R.string.all_notification_cleared)
+        SnackbarManager.showMessage(UiText.StringResource(R.string.all_notif_cleared))
     }
 
     init {
@@ -189,11 +215,4 @@ class ContestViewModel @Inject constructor(
     companion object {
         private const val TAG = "Contest ViewModel"
     }
-}
-
-enum class ContestSites(val title: String) {
-    Codeforces(title = "CodeForces"),
-    CodeChef(title = "CodeChef"),
-    AtCoder(title = "AtCoder"),
-    LeetCode(title = "LeetCode")
 }

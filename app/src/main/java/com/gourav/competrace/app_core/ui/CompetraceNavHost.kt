@@ -7,8 +7,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import com.gourav.competrace.app_core.util.Screens
+import com.gourav.competrace.app_core.util.TopAppBarManager
 import com.gourav.competrace.contests.contests
+import com.gourav.competrace.contests.presentation.ContestScreenActions
 import com.gourav.competrace.contests.presentation.ContestViewModel
 import com.gourav.competrace.problemset.presentation.ProblemSetViewModel
 import com.gourav.competrace.problemset.problemSet
@@ -16,6 +19,7 @@ import com.gourav.competrace.progress.participated_contests.presentation.Partici
 import com.gourav.competrace.progress.progress
 import com.gourav.competrace.progress.user.presentation.UserViewModel
 import com.gourav.competrace.progress.user_submissions.presentation.UserSubmissionsViewModel
+import com.gourav.competrace.settings.SettingsScreen
 
 
 @SuppressLint("CoroutineCreationDuringComposition")
@@ -34,17 +38,21 @@ fun CompetraceNavHost(
     NavHost(
         navController = appState.navController,
         startDestination = Screens.ContestsScreen.route,
-        modifier = Modifier.padding(top = paddingValues.calculateTopPadding())
+        modifier = Modifier.padding(
+            top = paddingValues.calculateTopPadding()
+        )
     ) {
 
         contests(
             sharedViewModel = sharedViewModel,
             contestViewModel = contestViewModel,
+            appState = appState
         )
 
         problemSet(
             sharedViewModel = sharedViewModel,
             problemSetViewModel = problemSetViewModel,
+            appState = appState
         )
 
         progress(
@@ -52,7 +60,18 @@ fun CompetraceNavHost(
             userViewModel = userViewModel,
             userSubmissionsViewModel = userSubmissionsViewModel,
             participatedContestViewModel = participatedContestViewModel,
-            navController = appState.navController
+            appState = appState,
+            paddingValues = paddingValues
         )
+
+        composable(route = Screens.SettingsScreen.route) {
+            LaunchedEffect(Unit) {
+                TopAppBarManager.updateTopAppBar(screen = Screens.SettingsScreen)
+            }
+            SettingsScreen(
+                contestViewModel = contestViewModel,
+                settingsViewModel = hiltViewModel()
+            )
+        }
     }
 }

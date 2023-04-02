@@ -1,7 +1,10 @@
 package com.gourav.competrace.app_core.ui.components
 
 import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
+import androidx.compose.animation.*
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
@@ -56,7 +59,8 @@ fun CompetraceIconButton(
     modifier: Modifier = Modifier,
     text: String? = null,
     contentDescription: String? = null,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    iconColor: Color = LocalContentColor.current
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -65,10 +69,14 @@ fun CompetraceIconButton(
     ) {
         IconButton(
             onClick = onClick,
-            enabled = enabled
+            enabled = enabled,
+            colors = IconButtonDefaults.iconButtonColors(
+                contentColor = iconColor
+            )
         ) {
             Icon(
-                painter = painterResource(id = iconId), contentDescription = contentDescription
+                painter = painterResource(id = iconId),
+                contentDescription = contentDescription
             )
         }
         text?.let {
@@ -155,6 +163,43 @@ fun CompetraceBadgeIconButton(
             Icon(
                 painter = painterResource(id = iconId),
                 contentDescription = contentDescription,
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+fun TwoStateAnimatedIconButton(
+    isOn: Boolean,
+    @DrawableRes onStateIconId: Int,
+    @DrawableRes offStateIconId: Int,
+    onClick: () -> Unit,
+    contentDescription: String? = null
+) {
+    IconButton(onClick = onClick) {
+        AnimatedContent(
+            targetState = isOn,
+            transitionSpec = {
+                scaleIn(
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioLowBouncy,
+                        stiffness = Spring.StiffnessLow
+                    ),
+                    initialScale = 0.2f
+                ) + fadeIn() with scaleOut(
+                    animationSpec = tween(durationMillis = 50),
+                    targetScale = 0.2f
+                ) + fadeOut() using (
+                    SizeTransform(clip = false)
+                )
+            }
+        ) {
+            val iconId = if (it) onStateIconId else offStateIconId
+            Icon(
+                painter = painterResource(id = iconId),
+                contentDescription = contentDescription,
+                modifier = Modifier
             )
         }
     }

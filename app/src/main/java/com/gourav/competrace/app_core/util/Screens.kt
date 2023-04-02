@@ -39,5 +39,11 @@ enum class Screens(
         null,
         "home/progress/user-submission",
         false
+    ),
+    SettingsScreen(
+        R.string.settings,
+        R.drawable.ic_baseline_settings_24px,
+        "home/settings",
+        false
     );
 }

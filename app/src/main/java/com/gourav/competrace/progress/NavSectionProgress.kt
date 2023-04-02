@@ -1,8 +1,10 @@
 package com.gourav.competrace.progress
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import com.gourav.competrace.app_core.data.UserPreferences
+import com.gourav.competrace.app_core.ui.CompetraceAppState
 import com.gourav.competrace.app_core.ui.SharedViewModel
 import com.gourav.competrace.progress.participated_contests.participatedContests
 import com.gourav.competrace.progress.participated_contests.presentation.ParticipatedContestViewModel
@@ -16,14 +18,16 @@ fun NavGraphBuilder.progress(
     userViewModel: UserViewModel,
     userSubmissionsViewModel: UserSubmissionsViewModel,
     participatedContestViewModel: ParticipatedContestViewModel,
-    navController: NavController
+    appState: CompetraceAppState,
+    paddingValues: PaddingValues
 ) {
 
     user(
         sharedViewModel = sharedViewModel,
         userViewModel = userViewModel,
         userSubmissionsViewModel = userSubmissionsViewModel,
-        navController = navController
+        appState = appState,
+        paddingValues = paddingValues
     )
 
     userSubmission(

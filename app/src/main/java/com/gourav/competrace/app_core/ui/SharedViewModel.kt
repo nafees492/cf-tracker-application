@@ -2,13 +2,18 @@ package com.gourav.competrace.app_core.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.gourav.competrace.app_core.util.ConnectivityObserver
+import com.gourav.competrace.app_core.util.NetworkConnectivityObserver
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SharedViewModel : ViewModel() {
+@HiltViewModel
+class SharedViewModel @Inject constructor(
+    private val networkConnectivityObserver: ConnectivityObserver
+): ViewModel() {
 
     private val _isSplashScreenOn = MutableStateFlow(true)
     val isSplashScreenOn = _isSplashScreenOn.asStateFlow()
@@ -20,16 +25,16 @@ class SharedViewModel : ViewModel() {
         }
     }
 
-    private val _isSettingsDialogueOpen = MutableStateFlow(false)
-    val isSettingsDialogueOpen = _isSettingsDialogueOpen.asStateFlow()
-
-    fun dismissSettingsDialog() {
-        _isSettingsDialogueOpen.update { false }
-    }
-
-    fun openSettingsDialog() {
-        _isSettingsDialogueOpen.update { true }
-    }
+    val isConnectedToNetwork = networkConnectivityObserver.observe().map {
+        when(it){
+            ConnectivityObserver.Status.Available -> true
+            else -> false
+        }
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(),
+        false
+    )
 
     private val _isPlatformsTabRowVisible = MutableStateFlow(true)
     val isPlatformsTabRowVisible = _isPlatformsTabRowVisible.asStateFlow()

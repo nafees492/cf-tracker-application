@@ -17,7 +17,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.gourav.competrace.R
-import com.gourav.competrace.app_core.AlarmItem
 import com.gourav.competrace.app_core.ui.components.ExpandArrow
 import com.gourav.competrace.contests.model.CompetraceContest
 import com.gourav.competrace.app_core.util.Phase
@@ -28,7 +27,8 @@ fun UpcomingContestScreen(
     contests: List<CompetraceContest>,
     selectedIndex: Int,
     onClickNotificationIcon: (CompetraceContest) -> Unit,
-    notificationContestIdList: Set<String>
+    notificationContestIdList: Set<String>,
+    modifier: Modifier = Modifier
 ) {
     val onGoingContest = remember(contests) {
         contests.filter { it.phase == Phase.CODING }
@@ -47,26 +47,26 @@ fun UpcomingContestScreen(
     fun generateKey(id: Int) = "s${selectedIndex}-i{$id}"
 
     LazyColumn(
-        modifier = Modifier.animateContentSize()
+        modifier = modifier.animateContentSize()
     ) {
-        item(key = generateKey(1)) {
-            Text(
-                text = stringResource(id = R.string.ongoing_contests),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f),
-                modifier = Modifier
-                    .padding(8.dp)
-                    .animateItemPlacement(
-                        animationSpec = tween()
-                    )
+        if (onGoingContest.isNotEmpty()) {
+            item(key = generateKey(1)) {
+                Text(
+                    text = stringResource(id = R.string.ongoing_contests),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f),
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .animateItemPlacement(
+                            animationSpec = tween()
+                        )
 
-            )
-        }
+                )
+            }
 
-        onGoingContest.let { list ->
-            items(count = list.size, key = { list[it].hashCode() }) {
+            items(count = onGoingContest.size, key = { onGoingContest[it].hashCode() }) {
                 ContestCard(
-                    contest = list[it],
+                    contest = onGoingContest[it],
                     modifier = Modifier.animateItemPlacement(
                         animationSpec = tween()
                     ),
@@ -74,16 +74,6 @@ fun UpcomingContestScreen(
                     notificationContestIdList = notificationContestIdList
                 )
             }
-
-            item(key = generateKey(2)) {
-                NoContestTag(
-                    isDisplayed = list.isEmpty(),
-                    modifier = Modifier.animateItemPlacement(
-                        animationSpec = tween()
-                    )
-                )
-            }
-
         }
 
         item(key = generateKey(3)) {

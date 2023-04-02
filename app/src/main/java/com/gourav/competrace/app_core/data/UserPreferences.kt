@@ -37,7 +37,7 @@ class UserPreferences(
             name = GENERAL_PREFERENCES_NAME
         )
         private val SHOW_TAGS = booleanPreferencesKey("show_tags")
-        private val SHOW_PLATFORMS = booleanPreferencesKey("show_platforms")
+        private val SCHEDULE_NOTIF_BEFORE = intPreferencesKey("schedule_notif_before")
         private val SELECTED_CONTEST_SITE_INDEX = intPreferencesKey("selected_contest_site_index")
     }
 
@@ -81,15 +81,15 @@ class UserPreferences(
         }
     }
 
-    /*val showPlatformFlow: Flow<Boolean> = appContext.generalDataStore.data.map {
-        it[SHOW_PLATFORMS] ?: true
+    val scheduleNotifBeforeFlow: Flow<Int> = appContext.generalDataStore.data.map {
+        it[SCHEDULE_NOTIF_BEFORE] ?: 60
     }
 
-    suspend fun setShowPlatform(value: Boolean){
+    suspend fun setScheduleNotifBefore(value: Int){
         appContext.generalDataStore.edit {
-            it[SHOW_PLATFORMS] = value
+            it[SCHEDULE_NOTIF_BEFORE] = value
         }
-    }*/
+    }
 
     val selectedContestSiteIndexFlow: Flow<Int> = appContext.generalDataStore.data.map {
         it[SELECTED_CONTEST_SITE_INDEX] ?: 0
