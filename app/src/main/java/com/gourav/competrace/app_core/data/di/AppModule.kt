@@ -52,6 +52,16 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideNetworkConnectivityObserver(@ApplicationContext context: Context): ConnectivityObserver =
+        NetworkConnectivityObserver(context)
+
+    @Provides
+    @Singleton
+    fun provideUserRepository(@ApplicationContext context: Context): UserRepository =
+        UserRepository(context)
+
+    @Provides
+    @Singleton
     fun provideMoshi(): Moshi = Moshi.Builder()
         .add(KotlinJsonAdapterFactory())
         .build()
