@@ -4,7 +4,7 @@ import androidx.room.*
 import com.gourav.competrace.contests.model.ContestAlarmItem
 
 @Dao
-interface AlarmDao {
+interface ContestAlarmDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addAlarm(alarmItem: ContestAlarmItem)

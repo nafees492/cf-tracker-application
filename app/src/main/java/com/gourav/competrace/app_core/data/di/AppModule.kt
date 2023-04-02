@@ -1,14 +1,14 @@
 package com.gourav.competrace.app_core.data.di
 
 import android.content.Context
-import com.gourav.competrace.contests.data.AlarmScheduler
-import com.gourav.competrace.contests.data.AndroidAlarmScheduler
 import com.gourav.competrace.app_core.data.UserPreferences
 import com.gourav.competrace.app_core.data.network.CodeforcesApiService
 import com.gourav.competrace.app_core.data.network.KontestsApiService
-import com.gourav.competrace.contests.data.repository.AlarmRepository
 import com.gourav.competrace.app_core.util.ConnectivityObserver
 import com.gourav.competrace.app_core.util.NetworkConnectivityObserver
+import com.gourav.competrace.contests.data.ContestAlarmScheduler
+import com.gourav.competrace.contests.data.ContestContestAlarmSchedulerImpl
+import com.gourav.competrace.contests.data.repository.ContestAlarmRepository
 import com.gourav.competrace.progress.user.data.repository.UserRepository
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -32,13 +32,13 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideAlarmRepository(@ApplicationContext context: Context): AlarmRepository =
-        AlarmRepository(context)
+    fun provideAlarmRepository(@ApplicationContext context: Context): ContestAlarmRepository =
+        ContestAlarmRepository(context)
 
     @Provides
     @Singleton
-    fun provideAlarmScheduler(@ApplicationContext context: Context): AlarmScheduler =
-        AndroidAlarmScheduler(context)
+    fun provideAlarmScheduler(@ApplicationContext context: Context): ContestAlarmScheduler =
+        ContestContestAlarmSchedulerImpl(context)
 
     @Provides
     @Singleton

@@ -4,23 +4,23 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.gourav.competrace.contests.data.dao.AlarmDao
+import com.gourav.competrace.contests.data.dao.ContestAlarmDao
 import com.gourav.competrace.contests.model.ContestAlarmItem
 
 @Database(entities = [ContestAlarmItem::class], version = 1, exportSchema = false)
-abstract class AlarmDatabase: RoomDatabase() {
-    abstract fun alarmDao() : AlarmDao
+abstract class ContestAlarmDatabase: RoomDatabase() {
+    abstract fun alarmDao() : ContestAlarmDao
 
     companion object {
-        private var INSTANCE: AlarmDatabase? = null
-        private const val DB_NAME = "alarm_database"
+        private var INSTANCE: ContestAlarmDatabase? = null
+        private const val DB_NAME = "contest_alarm_database"
 
-        fun getInstance(context: Context): AlarmDatabase? {
+        fun getInstance(context: Context): ContestAlarmDatabase? {
             if (INSTANCE == null) {
-                synchronized(AlarmDatabase::class) {
+                synchronized(ContestAlarmDatabase::class) {
                     INSTANCE = Room.databaseBuilder(
                         context.applicationContext,
-                        AlarmDatabase::class.java,
+                        ContestAlarmDatabase::class.java,
                         DB_NAME
                     )
                         .allowMainThreadQueries()

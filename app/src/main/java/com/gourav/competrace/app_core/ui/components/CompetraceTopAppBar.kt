@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import com.gourav.competrace.R
 import com.gourav.competrace.app_core.ui.CompetraceAppState
 import com.gourav.competrace.app_core.ui.SharedViewModel
@@ -61,7 +62,9 @@ fun CompetraceTopAppBar(
                     Text(
                         text = stringResource(id = topAppBarValues.currentScreen.titleId),
                         style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier.animateContentSize()
+                        modifier = Modifier.animateContentSize(),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 },
                 actions = topAppBarValues.actions,

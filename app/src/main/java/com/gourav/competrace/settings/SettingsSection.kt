@@ -15,12 +15,12 @@ fun SettingsSection(
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit,
 ){
-    Column() {
+    Column {
         Text(
             text = title,
             style = MaterialTheme.typography.labelLarge,
             modifier = modifier.padding(16.dp),
-            color =  MaterialTheme.colorScheme.primary
+            color = MaterialTheme.colorScheme.primary
         )
         content()
     }

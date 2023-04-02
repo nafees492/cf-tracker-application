@@ -6,7 +6,15 @@
     <string name="ok">OK</string>
     <string name="filter">Filter</string>
     <string name="more">More</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="go">Go</string>
+    <string name="set">Set</string>
+    <string name="todo">Feature not implemented yet</string>
     <string name="cd_go_back">Go Back</string>
+    <string name="grant_permission_to_continue">Grant Permission to Continue</string>
+    <string name="request">Request</string>
+
     <string name="gourav_email">gourav.ranayara@gmail.com</string>
     <string name="vidhi_email">vid2001work@gmail.com</string>
     <string name="feedback_email_subject">Competrace - Reporting an Issue</string>
@@ -15,7 +23,10 @@
     <string name="privacy_policy_link">https://github.com/gorv02/privacy_policy/blob/master/privacy-policy.md</string>
     <string name="share_app_text">Competrace - CP Contest Tracker\n\nTrack Your Competitive Programming Progress with this App.\n\nDownload It Now: https://play.google.com/store/apps/details?id=com.gourav.competrace</string>
     <string name="share_copied_link">%1$s\n\nShared Via: *Competrace*\nDownload it from: https://play.google.com/store/apps/details?id=com.gourav.competrace</string>
-    <string name="network_unavailable">Network Unavailable!</string>
+
+    <string name="cd_connectivity_icon">Connectivity Icon</string>
+    <string name="back_online">Back Online!</string>
+    <string name="no_internet__connection">No Internet Connection!</string>
 
     <!-- Sites Title -->
     <string name="codeforces">CodeForces</string>
@@ -36,7 +47,10 @@
     <string name="contest_channel_name">Contest Notifications</string>
     <string name="cd_add_to_calender">Add to calender</string>
     <string name="cd_toggle_notif">Toggle Notification</string>
-    <string name="notif_set_confirmation">You will be notified within %1$s before the contest starts. You Can Change the timing in Settings.</string>
+    <string name="conf_notif_set">You will be notified within %1$s before the contest starts. You Can Change the timing in Settings.</string>
+    <string name="ask_to_set_notif">Do you want to set notification 10 minutes before Contest.</string>
+    <string name="contest_starting_in_ten">Contest is going to start within 10 minutes.</string>
+
 
     <!-- Problem Set Screen -->
     <string name="problem_set">Problem Set</string>
@@ -94,30 +108,20 @@
     <string name="share_competrace_via">Share "Competrace" Via:</string>
     <string name="designed_by">Designed By: Vidhi Khosla - </string>
     <string name="developed_by">Developed By: Lokesh Patidar - </string>
-
-
-    <string name="searching">Searching...</string>
     <string name="clear_all_set_notif">Clear All Set Notifications</string>
     <string name="test_notif">Test Notification</string>
     <string name="desc_clear_all_notif">Do you want to clear set notifications for all contests?</string>
-    <string name="no">No</string>
-    <string name="yes">Yes</string>
     <string name="schedule_notif_before">Schedule Notification Before</string>
-    <string name="one_hour">1 hour</string>
-    <string name="todo">Feature not implemented yet</string>
+    <string name="please_enter_int">Please enter a valid Integer</string>
+    <string name="go_to_settings">Go to Settings</string>
     <string name="information">Information</string>
-    <string name="schedule_notif_before_note">Refresh Contests to Apply Changes</string>
-    <string name="ask_to_set_notif">Do you want to set notification 10 minutes before Contest.</string>
-    <string name="contest_starting_in_ten">Contest is going to start within 10 minutes.</string>
+    <string name="note_schedule_notif_before">Refresh Contests to Apply Changes</string>
     <string name="cant_schedule_notif_msg">Turn on Schedule Exact Notification to get notifications for contests</string>
     <string name="turn_on">Turn On</string>
-    <string name="grant_permission_to_continue">Grant Permission to Continue</string>
-    <string name="cd_connectivity_icon">Connectivity Icon</string>
-    <string name="back_online">Back Online!</string>
-    <string name="no_internet__connection">No Internet Connection!</string>
+    <string name="schedule_notif_after">Schedule a notification after</string>
+    <string name="enter_minutes">Enter Minutes</string>
     <string name="exact_alarm_request">Exact Alarm Permission is not granted. Grant permission to get notified on exact time.</string>
-    <string name="request">Request</string>
-    <string name="go_to_settings">Go to Settings</string>
-    <string name="go">Go</string>
+    <string name="note_test_notif">Previously set Test Notification will be dismissed</string>
+    <string name="conf_test_notif_set">Test Notification will arrive in %1$d minutes.</string>
 
 </resources>

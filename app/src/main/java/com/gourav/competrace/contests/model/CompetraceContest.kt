@@ -1,10 +1,10 @@
 package com.gourav.competrace.contests.model
 
 import android.content.Context
-import com.gourav.competrace.contests.util.addEventToCalendar
 import com.gourav.competrace.app_core.util.ContestRatedCategories
 import com.gourav.competrace.app_core.util.minutesToMillis
 import com.gourav.competrace.app_core.util.unixToTime
+import com.gourav.competrace.contests.util.addEventToCalendar
 import com.gourav.competrace.settings.ScheduleNotifBeforeOptions
 import java.util.*
 
@@ -44,7 +44,7 @@ data class CompetraceContest(
         append(" to Go.\n")
     }
 
-    fun getAlarmItem(timeBeforeStart: Int) = AlarmItem(
+    fun getAlarmItem(timeBeforeStart: Int) = ContestAlarmItem(
         id = uniqueId(),
         contestId = id.toString(),
         timeInMillis = startTimeInMillis - minutesToMillis(timeBeforeStart),

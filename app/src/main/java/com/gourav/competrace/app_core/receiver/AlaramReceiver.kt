@@ -7,7 +7,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.core.app.NotificationCompat
 import com.gourav.competrace.R
-import com.gourav.competrace.contests.data.AlarmScheduler
+import com.gourav.competrace.contests.data.ContestAlarmScheduler
 import com.gourav.competrace.app_core.AndroidNotification
 import com.gourav.competrace.app_core.NotificationItem
 import com.gourav.competrace.app_core.Notification
@@ -21,9 +21,9 @@ class AlarmReceiver : BroadcastReceiver() {
     private fun handleAlarmData(context: Context?, intent: Intent) {
 
         context?.let {
-            val title = intent.getStringExtra(AlarmScheduler.TITLE) ?: ""
-            val description = intent.getStringExtra(AlarmScheduler.MESSAGE) ?: ""
-            val registrationUrl = intent.getStringExtra(AlarmScheduler.REGISTRATION_URL) ?: ""
+            val title = intent.getStringExtra(ContestAlarmScheduler.TITLE) ?: ""
+            val description = intent.getStringExtra(ContestAlarmScheduler.MESSAGE) ?: ""
+            val registrationUrl = intent.getStringExtra(ContestAlarmScheduler.REGISTRATION_URL) ?: ""
 
             val registrationAction = if(registrationUrl.isNotBlank()){
                 NotificationCompat.Action(

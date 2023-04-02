@@ -77,7 +77,7 @@ private val DarkColorScheme = darkColorScheme(
 
 @Composable
 fun CompetraceTheme(
-    currentTheme: String = com.gourav.competrace.app_core.ui.theme.CompetraceThemeNames.DEFAULT,
+    currentTheme: String = CompetraceThemeNames.DEFAULT,
     darkModePref: String = DarkModePref.SYSTEM_DEFAULT,
     isSysInDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
@@ -85,12 +85,12 @@ fun CompetraceTheme(
     val context = LocalContext.current
 
     val myColorScheme = when(currentTheme){
-        com.gourav.competrace.app_core.ui.theme.CompetraceThemeNames.DYNAMIC -> {
-            when(darkModePref){
+        CompetraceThemeNames.DYNAMIC -> {
+            when (darkModePref) {
                 DarkModePref.DARK -> dynamicDarkColorScheme(context)
                 DarkModePref.LIGHT -> dynamicLightColorScheme(context)
                 else -> {
-                    if(isSysInDarkTheme) dynamicDarkColorScheme(context)
+                    if (isSysInDarkTheme) dynamicDarkColorScheme(context)
                     else dynamicLightColorScheme(context)
                 }
             }

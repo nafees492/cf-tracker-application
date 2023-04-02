@@ -4,13 +4,13 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gourav.competrace.R
-import com.gourav.competrace.contests.data.AlarmScheduler
 import com.gourav.competrace.app_core.data.UserPreferences
 import com.gourav.competrace.app_core.data.repository.remote.KontestsRepository
-import com.gourav.competrace.contests.data.repository.AlarmRepository
 import com.gourav.competrace.app_core.util.*
-import com.gourav.competrace.contests.model.AlarmItem
+import com.gourav.competrace.contests.data.ContestAlarmScheduler
+import com.gourav.competrace.contests.data.repository.ContestAlarmRepository
 import com.gourav.competrace.contests.model.CompetraceContest
+import com.gourav.competrace.contests.model.ContestAlarmItem
 import com.gourav.competrace.settings.ScheduleNotifBeforeOptions
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -22,8 +22,8 @@ import javax.inject.Inject
 class ContestViewModel @Inject constructor(
     private val kontestsRepository: KontestsRepository,
     private val userPreferences: UserPreferences,
-    private val alarmRepository: AlarmRepository,
-    private val alarmScheduler: AlarmScheduler,
+    private val contestAlarmRepository: ContestAlarmRepository,
+    private val contestAlarmScheduler: ContestAlarmScheduler,
 ) : ViewModel() {
     val contestSites = Sites.values().filter { it.isContestSite }
 
@@ -118,7 +118,7 @@ class ContestViewModel @Inject constructor(
                                 scheduleNotifBefore.value
                             )
                         )
-                            alarmRepository.updateAlarm(contest.getAlarmItem(scheduleNotifBefore.value))
+                            contestAlarmRepository.updateAlarm(contest.getAlarmItem(scheduleNotifBefore.value))
                     }
 
                     _responseForKontestsContestList.update { ApiState.Success }
@@ -136,8 +136,8 @@ class ContestViewModel @Inject constructor(
             val item = contest.getAlarmItem(scheduleNotifBefore.value)
 
             viewModelScope.launch {
-                alarmRepository.deleteAlarm(item)
-                item.let(alarmScheduler::cancel)
+                contestAlarmRepository.deleteAlarm(item)
+                item.let(contestAlarmScheduler::cancel)
             }
             _notificationContestIdList.update { it - contest.id.toString() }
         } else {
@@ -146,14 +146,14 @@ class ContestViewModel @Inject constructor(
                 val item = contest.getAlarmItem(scheduleNotifBefore.value)
 
                 viewModelScope.launch {
-                    alarmRepository.addAlarm(item)
-                    item.let(alarmScheduler::schedule)
+                    contestAlarmRepository.addAlarm(item)
+                    item.let(contestAlarmScheduler::schedule)
                 }
                 _notificationContestIdList.update { it + contest.id.toString() }
 
                 SnackbarManager.showMessage(
                     message = UiText.StringResource(
-                        R.string.notif_set_confirmation,
+                        R.string.conf_notif_set,
                         ScheduleNotifBeforeOptions.getOption(scheduleNotifBefore.value)
                     )
                 )
@@ -165,8 +165,8 @@ class ContestViewModel @Inject constructor(
                     actionLabelId = UiText.StringResource(R.string.yes),
                     action = {
                         viewModelScope.launch {
-                            alarmRepository.addAlarm(item)
-                            item.let(alarmScheduler::schedule)
+                            contestAlarmRepository.addAlarm(item)
+                            item.let(contestAlarmScheduler::schedule)
                         }
                         _notificationContestIdList.update { it + contest.id.toString() }
                     }
@@ -179,13 +179,13 @@ class ContestViewModel @Inject constructor(
 
     fun clearAllNotifications() {
         viewModelScope.launch {
-            alarmRepository.getAllAlarms().collect { list ->
+            contestAlarmRepository.getAllAlarms().collect { list ->
                 list.forEach { alarm ->
-                    alarmScheduler.cancel(alarm)
+                    contestAlarmScheduler.cancel(alarm)
                     _notificationContestIdList.update { it - alarm.contestId }
                 }
             }
-            alarmRepository.deleteALlAlarms()
+            contestAlarmRepository.deleteALlAlarms()
         }
 
         SnackbarManager.showMessage(UiText.StringResource(R.string.all_notif_cleared))
@@ -195,19 +195,19 @@ class ContestViewModel @Inject constructor(
         getContestListFromKontests()
 
         viewModelScope.launch {
-            val alarmsToDelete = mutableListOf<AlarmItem>()
+            val alarmsToDelete = mutableListOf<ContestAlarmItem>()
 
-            alarmRepository.getAllAlarms().collect { list ->
+            contestAlarmRepository.getAllAlarms().collect { list ->
                 list.forEach { alarm ->
                     if (alarm.timeInMillis > getCurrentTimeInMillis()) {
-                        alarmScheduler.schedule(alarm)
+                        contestAlarmScheduler.schedule(alarm)
                         _notificationContestIdList.update { it + alarm.contestId }
                     } else alarmsToDelete.add(alarm)
                 }
             }
 
             alarmsToDelete.forEach {
-                alarmRepository.deleteAlarm(it)
+                contestAlarmRepository.deleteAlarm(it)
             }
         }
     }

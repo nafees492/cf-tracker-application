@@ -1,29 +1,21 @@
 package com.gourav.competrace.settings
 
-import android.Manifest
 import android.app.AlarmManager
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Build
 import android.provider.Settings
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import com.gourav.competrace.R
 import com.gourav.competrace.app_core.ui.components.CompetraceAlertDialog
-import com.gourav.competrace.app_core.util.SnackbarManager
 
 enum class ScheduleNotifBeforeOptions(val option: String, val value: Int) {
     TenMinutes(option = "10 Minutes", value = 10),
@@ -98,7 +90,7 @@ fun AlertScheduleNotifBefore(
 
             item {
                 Text(
-                    text = stringResource(R.string.schedule_notif_before_note),
+                    text = stringResource(R.string.note_schedule_notif_before),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                 )

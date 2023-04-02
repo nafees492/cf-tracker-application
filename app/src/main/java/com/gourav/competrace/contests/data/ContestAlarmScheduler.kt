@@ -9,7 +9,7 @@ import com.gourav.competrace.app_core.receiver.AlarmReceiver
 import com.gourav.competrace.app_core.util.minutesToMillis
 import com.gourav.competrace.contests.model.ContestAlarmItem
 
-interface AlarmScheduler {
+interface ContestAlarmScheduler {
     fun schedule(item: ContestAlarmItem)
     fun cancel(item: ContestAlarmItem)
 
@@ -20,9 +20,9 @@ interface AlarmScheduler {
     }
 }
 
-class ContestAlarmScheduler(
+class ContestContestAlarmSchedulerImpl(
     private val context: Context
-) : AlarmScheduler {
+) : ContestAlarmScheduler {
 
     private val alarmManager = context.getSystemService(AlarmManager::class.java)
 
@@ -32,9 +32,9 @@ class ContestAlarmScheduler(
 
     override fun schedule(item: ContestAlarmItem) {
         val alarmIntent = Intent(context, AlarmReceiver::class.java).apply {
-            putExtra(AlarmScheduler.TITLE, item.title)
-            putExtra(AlarmScheduler.MESSAGE, item.message)
-            putExtra(AlarmScheduler.REGISTRATION_URL, item.registrationUrl)
+            putExtra(ContestAlarmScheduler.TITLE, item.title)
+            putExtra(ContestAlarmScheduler.MESSAGE, item.message)
+            putExtra(ContestAlarmScheduler.REGISTRATION_URL, item.registrationUrl)
         }
 
         if (canScheduleExactAlarm) {

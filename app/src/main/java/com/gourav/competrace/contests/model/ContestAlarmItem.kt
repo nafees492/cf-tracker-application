@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "scheduled_alarms")
-data class AlarmItem(
+data class ContestAlarmItem(
     @PrimaryKey(autoGenerate = false) val id: Int,
     val contestId: String,
     val timeInMillis: Long,

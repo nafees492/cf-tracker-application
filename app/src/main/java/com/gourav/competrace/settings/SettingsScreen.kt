@@ -34,8 +34,9 @@ import com.gourav.competrace.app_core.ui.components.CompetraceClickableText
 import com.gourav.competrace.app_core.ui.components.CompetraceIconButton
 import com.gourav.competrace.app_core.ui.theme.CompetraceThemeNames
 import com.gourav.competrace.app_core.ui.theme.DarkModePref
-import com.gourav.competrace.app_core.util.loadUrl
-import com.gourav.competrace.app_core.util.shareTextToOtherApp
+import com.gourav.competrace.app_core.util.*
+import com.gourav.competrace.contests.data.ContestContestAlarmSchedulerImpl
+import com.gourav.competrace.contests.model.ContestAlarmItem
 import com.gourav.competrace.contests.presentation.ContestViewModel
 import com.gourav.competrace.utils.sendEmail
 
@@ -108,6 +109,36 @@ fun SettingsScreen(
         dismissDialog = { isDarkModePrefAlertOpen = false }
     )
 
+    var isTestNotifAlertOpen by rememberSaveable {
+        mutableStateOf(false)
+    }
+
+    AlertTestNotif(
+        isOpen = isTestNotifAlertOpen,
+        onSelectOk = {
+            ContestContestAlarmSchedulerImpl(context).schedule(
+                ContestAlarmItem(
+                    id = 0,
+                    contestId = "test-notification-alarm",
+                    timeInMillis = getCurrentTimeInMillis() + minutesToMillis(it),
+                    title = Sites.Codeforces.title,
+                    message = buildString {
+                        append("{Contest.name}")
+                        append(" is going to start at ")
+                        append("{startTime}")
+                        append(". Hurry Up!!\n")
+                        append("{timeLeft}")
+                        append(" to Go.\n")
+                    },
+                    registrationUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                )
+            )
+
+            SnackbarManager.showMessage(UiText.StringResource(R.string.conf_test_notif_set, it))
+        },
+        dismissDialog = { isTestNotifAlertOpen = false }
+    )
+
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
@@ -142,35 +173,7 @@ fun SettingsScreen(
                 RowWithLeadingIcon(
                     title = stringResource(id = R.string.test_notif),
                     leadingIconId = R.drawable.ic_notifications_24px,
-                    onClick = {
-                        AndroidNotification(context).fireNotification(
-                            NotificationItem(
-                                channelId = Notification.CONTEST_CHANNEL_ID,
-                                title = "{Site.Name}",
-                                description = buildString {
-                                    append("{Contest.name}")
-                                    append(" is going to start at ")
-                                    append("{startTime}")
-                                    append(". Hurry Up!!\n")
-                                    append("{timeLeft}")
-                                    append(" to Go.\n")
-                                    append("Register if you haven't done it yet.")
-                                },
-                                largeIconId = R.drawable.logo_codeforces_white_96,
-                                priority = NotificationCompat.PRIORITY_HIGH
-                            ),
-                            NotificationCompat.Action(
-                                R.drawable.ic_priority_high_24px,
-                                context.getString(R.string.register_now),
-                                PendingIntent.getActivity(
-                                    context,
-                                    0,
-                                    Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/watch?v=dQw4w9WgXcQ")),
-                                    PendingIntent.FLAG_IMMUTABLE
-                                )
-                            )
-                        )
-                    }
+                    onClick = { isTestNotifAlertOpen = true }
                 )
             }
         }
