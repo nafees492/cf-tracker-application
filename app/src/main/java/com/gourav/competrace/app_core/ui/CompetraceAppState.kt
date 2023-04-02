@@ -57,21 +57,24 @@ class CompetraceAppState(
     init {
         coroutineScope.launch {
             snackbarManager.messages.collect { currentMessages ->
-                if (currentMessages.isNotEmpty()) {
-                    val message = currentMessages[0]
-                    val text = resources.getString(message.messageId)
-                    val actionLabel = message.actionLabelId?.let { resources.getString(it) }
+                currentMessages?.let { message ->
+                    snackbarHostState.currentSnackbarData?.dismiss()
+
+                    val text = message.message.asString(context)
+                    val actionLabel = message.actionLabel?.asString(context)
                     val duration = message.duration
 
-                    val action = snackbarHostState.showSnackbar(
-                        message = text,
-                        actionLabel = actionLabel,
-                        duration = duration
-                    )
+                    launch {
+                        val action = snackbarHostState.showSnackbar(
+                            message = text,
+                            actionLabel = actionLabel,
+                            duration = duration
+                        )
 
-                    if (action == SnackbarResult.ActionPerformed) message.action()
+                        if (action == SnackbarResult.ActionPerformed) message.action()
 
-                    snackbarManager.setMessageShown(message.id)
+                        snackbarManager.setMessageShown(message.id)
+                    }
                 }
             }
         }
@@ -101,6 +104,18 @@ class CompetraceAppState(
                 }
             }
         }
+    }
+
+    fun navigateToSettings(){
+        navController.navigate(route = Screens.SettingsScreen.route)
+    }
+
+    fun navigateToUserSubmissionScreen(){
+        navController.navigate(route = Screens.UserSubmissionsScreen.route)
+    }
+
+    fun navigateToParticipatedContestsScreen(){
+        navController.navigate(route = Screens.ParticipatedContestsScreen.route)
     }
 }
 

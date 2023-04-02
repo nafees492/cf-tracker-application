@@ -1,12 +1,15 @@
 package com.gourav.competrace.app_core.data.di
 
 import android.content.Context
-import com.gourav.competrace.app_core.AlarmScheduler
-import com.gourav.competrace.app_core.AndroidAlarmScheduler
+import com.gourav.competrace.contests.data.AlarmScheduler
+import com.gourav.competrace.contests.data.AndroidAlarmScheduler
 import com.gourav.competrace.app_core.data.UserPreferences
 import com.gourav.competrace.app_core.data.network.CodeforcesApiService
 import com.gourav.competrace.app_core.data.network.KontestsApiService
-import com.gourav.competrace.app_core.room_database.AlarmRepository
+import com.gourav.competrace.contests.data.repository.AlarmRepository
+import com.gourav.competrace.app_core.util.ConnectivityObserver
+import com.gourav.competrace.app_core.util.NetworkConnectivityObserver
+import com.gourav.competrace.progress.user.data.repository.UserRepository
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
@@ -36,6 +39,16 @@ object AppModule {
     @Singleton
     fun provideAlarmScheduler(@ApplicationContext context: Context): AlarmScheduler =
         AndroidAlarmScheduler(context)
+
+    @Provides
+    @Singleton
+    fun provideNetworkConnectivityObserver(@ApplicationContext context: Context): ConnectivityObserver =
+        NetworkConnectivityObserver(context)
+
+    @Provides
+    @Singleton
+    fun provideUserRepository(@ApplicationContext context: Context): UserRepository =
+        UserRepository(context)
 
     @Provides
     @Singleton

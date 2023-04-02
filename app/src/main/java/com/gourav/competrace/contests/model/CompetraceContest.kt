@@ -3,7 +3,9 @@ package com.gourav.competrace.contests.model
 import android.content.Context
 import com.gourav.competrace.contests.util.addEventToCalendar
 import com.gourav.competrace.app_core.util.ContestRatedCategories
-import java.security.MessageDigest
+import com.gourav.competrace.app_core.util.minutesToMillis
+import com.gourav.competrace.app_core.util.unixToTime
+import com.gourav.competrace.settings.ScheduleNotifBeforeOptions
 import java.util.*
 
 data class CompetraceContest(
@@ -16,21 +18,40 @@ data class CompetraceContest(
     val within7Days: Boolean = false,
     val registrationOpen: Boolean = false,
     val registrationUrl: String? = null,
-    val site: String? = null,
+    val site: String,
 ) {
     val endTimeInMillis = startTimeInMillis + durationInMillis
     val ratedCategories = arrayListOf<ContestRatedCategories>()
-   /* fun uniqueId(): Int = MessageDigest.getInstance("SHA-256")
-        .digest(websiteUrl.toByteArray())
-        .fold(-50) { acc, byte -> (acc shl 8) or byte.toInt() }*/
-
-    fun uniqueId(): Int {
-        return UUID.nameUUIDFromBytes(websiteUrl.toByteArray()).mostSignificantBits.toInt()
-    }
 
     var newRating: Int = 0
     var ratingChange: Int = 0
     var rank: Int = 0
+
+   /* fun uniqueId(): Int = MessageDigest.getInstance("SHA-256")
+        .digest(websiteUrl.toByteArray())
+        .fold(-50) { acc, byte -> (acc shl 8) or byte.toInt() }*/
+
+    private fun uniqueId(): Int {
+        return UUID.nameUUIDFromBytes(websiteUrl.toByteArray()).mostSignificantBits.toInt()
+    }
+
+    private fun getNotificationMessage(timeBeforeStart: Int) = buildString {
+        append(name)
+        append(" is going to start at ")
+        append(unixToTime(startTimeInMillis))
+        append(". Hurry Up!!\n")
+        append(ScheduleNotifBeforeOptions.getOption(timeBeforeStart))
+        append(" to Go.\n")
+    }
+
+    fun getAlarmItem(timeBeforeStart: Int) = AlarmItem(
+        id = uniqueId(),
+        contestId = id.toString(),
+        timeInMillis = startTimeInMillis - minutesToMillis(timeBeforeStart),
+        title = site,
+        message = getNotificationMessage(timeBeforeStart),
+        registrationUrl = registrationUrl ?: ""
+    )
 
     fun addToCalender(context: Context) {
         addEventToCalendar(

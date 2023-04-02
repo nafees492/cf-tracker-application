@@ -1,15 +1,13 @@
 package com.gourav.competrace.progress.user.presentation
 
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gourav.competrace.app_core.data.CodeforcesDatabase
 import com.gourav.competrace.app_core.data.UserPreferences
-import com.gourav.competrace.app_core.data.repository.CodeforcesRepository
+import com.gourav.competrace.app_core.data.repository.remote.CodeforcesRepository
 import com.gourav.competrace.app_core.util.ApiState
+import com.gourav.competrace.app_core.util.Sites
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -22,16 +20,18 @@ class UserViewModel @Inject constructor(
     private val userPreferences: UserPreferences
 ) : ViewModel() {
 
+    val userSites = Sites.values().filter { it.isUserSite }
+
     val userHandle = userPreferences.handleNameFlow
     private val codeforcesDatabase: CodeforcesDatabase = CodeforcesDatabase.instance as CodeforcesDatabase
 
-    private val _responseForUserInfo = MutableStateFlow<ApiState>(ApiState.Loading)
+    private val _responseForUserInfo = MutableStateFlow<ApiState>(ApiState.Success)
     val responseForUserInfo = _responseForUserInfo.asStateFlow()
 
     val currentUser = codeforcesDatabase.currentUserFlow.asStateFlow()
 
     fun refreshUserInfo() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             userPreferences.handleNameFlow.collect {
                 if(it.isNotBlank()) getUserInfo(it)
             }
@@ -42,7 +42,7 @@ class UserViewModel @Inject constructor(
     val isUserRefreshing = _isUserRefreshing.asStateFlow()
 
     private fun getUserInfo(handle: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             codeforcesRepository.getUserInfo(handle = handle)
                 .onStart {
                     _responseForUserInfo.update { ApiState.Loading }

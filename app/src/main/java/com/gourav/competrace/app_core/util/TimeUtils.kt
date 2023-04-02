@@ -11,6 +11,8 @@ import java.util.*
 
 fun getCurrentTimeInMillis() = Date().time
 
+fun minutesToMillis(minutes: Int) = minutes * 60 * 1000L
+
 @SuppressLint("SimpleDateFormat")
 fun getTodaysDate(): String = SimpleDateFormat("EEE, d-MMM").format(Date())
 
@@ -76,7 +78,7 @@ fun unixToDMET(timeStampInMillis: Long): AnnotatedString {
 
 @SuppressLint("SimpleDateFormat")
 fun unixToTime(timeStampInMillis: Long): String {
-    val format = SimpleDateFormat("hh:mm a z")
+    val format = SimpleDateFormat("hh:mm a")
     return format.format(Date(timeStampInMillis))
 }
 

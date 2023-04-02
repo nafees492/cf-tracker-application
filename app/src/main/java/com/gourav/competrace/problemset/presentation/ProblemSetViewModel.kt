@@ -5,8 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gourav.competrace.app_core.data.CodeforcesDatabase
 import com.gourav.competrace.app_core.data.UserPreferences
-import com.gourav.competrace.app_core.data.repository.CodeforcesRepository
+import com.gourav.competrace.app_core.data.repository.remote.CodeforcesRepository
 import com.gourav.competrace.app_core.util.ApiState
+import com.gourav.competrace.app_core.util.Sites
 import com.gourav.competrace.contests.model.CompetraceContest
 import com.gourav.competrace.problemset.util.processCodeforcesContestFromAPIResult
 import com.gourav.competrace.problemset.model.CompetraceProblem
@@ -24,6 +25,7 @@ class ProblemSetViewModel @Inject constructor(
     private val codeforcesRepository: CodeforcesRepository,
     private val userPreferences: UserPreferences
 ) : ViewModel() {
+    val problemSetSites = Sites.values().filter { it.isProblemSetSite }
 
     private val codeforcesDatabase = CodeforcesDatabase.instance as CodeforcesDatabase
 

@@ -10,10 +10,10 @@ import androidx.compose.material3.SnackbarDuration
 
 data class SnackbarMessage(
     val id: Long,
-    @StringRes val messageId: Int,
-    @StringRes val actionLabelId: Int? = null,
+    val message: UiText,
+    val actionLabel: UiText? = null,
     val action: () -> Unit = {},
-    val duration: SnackbarDuration = SnackbarDuration.Short
+    val duration: SnackbarDuration = SnackbarDuration.Short,
 )
 
 /**
@@ -21,33 +21,33 @@ data class SnackbarMessage(
  */
 object SnackbarManager {
 
-    private val messagesFlow: MutableStateFlow<List<SnackbarMessage>> = MutableStateFlow(emptyList())
-    val messages: StateFlow<List<SnackbarMessage>> get() = messagesFlow.asStateFlow()
+    private val messagesFlow: MutableStateFlow<SnackbarMessage?> = MutableStateFlow(null)
+    val messages: StateFlow<SnackbarMessage?> get() = messagesFlow.asStateFlow()
 
     fun showMessage(
-        @StringRes messageTextId: Int,
+        message: UiText,
         duration: SnackbarDuration = SnackbarDuration.Short
     ) {
-        messagesFlow.update { currentMessages ->
-            currentMessages + SnackbarMessage(
+        messagesFlow.update {
+             SnackbarMessage(
                 id = UUID.randomUUID().mostSignificantBits,
-                messageId = messageTextId,
+                message = message,
                 duration = duration
             )
         }
     }
 
     fun showMessageWithAction(
-        @StringRes messageTextId: Int,
-        @StringRes actionLabelId: Int,
+        messageTextId: UiText,
+        actionLabelId: UiText,
         duration: SnackbarDuration = SnackbarDuration.Short,
         action: () -> Unit
     ) {
-        messagesFlow.update { currentMessages ->
-            currentMessages + SnackbarMessage(
+        messagesFlow.update {
+            SnackbarMessage(
                 id = UUID.randomUUID().mostSignificantBits,
-                messageId = messageTextId,
-                actionLabelId = actionLabelId,
+                message = messageTextId,
+                actionLabel = actionLabelId,
                 action = action,
                 duration = duration
             )
@@ -55,8 +55,6 @@ object SnackbarManager {
     }
 
     fun setMessageShown(messageId: Long) {
-        messagesFlow.update { currentMessages ->
-            currentMessages.filterNot { it.id == messageId }
-        }
+        messagesFlow.update {null }
     }
 }

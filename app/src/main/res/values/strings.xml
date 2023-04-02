@@ -30,13 +30,13 @@
     <string name="next_7_days">Next 7 Days</string>
     <string name="after_7_days">After 7 Days</string>
     <string name="no_contest">No Contest</string>
-    <string name="register_now">Register Now!</string>
+    <string name="register_now">Register Now</string>
     <string name="contest_link_copied">Contest Link Copied</string>
-    <string name="all_notification_cleared">All Notification Cleared</string>
+    <string name="all_notif_cleared">All Notification Cleared</string>
     <string name="contest_channel_name">Contest Notifications</string>
     <string name="cd_add_to_calender">Add to calender</string>
-    <string name="cd_toggle_notification">Toggle Notification</string>
-    <string name="notification_set_confirmation">You will be notified within 60 minutes before the contest starts</string>
+    <string name="cd_toggle_notif">Toggle Notification</string>
+    <string name="notif_set_confirmation">You will be notified within %1$s before the contest starts. You Can Change the timing in Settings.</string>
 
     <!-- Problem Set Screen -->
     <string name="problem_set">Problem Set</string>
@@ -48,7 +48,7 @@
 
     <!-- Progress Screen -->
     <string name="progress">Progress</string>
-    <string name="logout">Logout</string>
+    <string name="switch_user">Switch User</string>
     <string name="participated_contests">Participated Contests</string>
     <string name="your_submissions">Your Submissions</string>
 
@@ -97,5 +97,27 @@
 
 
     <string name="searching">Searching...</string>
+    <string name="clear_all_set_notif">Clear All Set Notifications</string>
+    <string name="test_notif">Test Notification</string>
+    <string name="desc_clear_all_notif">Do you want to clear set notifications for all contests?</string>
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
+    <string name="schedule_notif_before">Schedule Notification Before</string>
+    <string name="one_hour">1 hour</string>
+    <string name="todo">Feature not implemented yet</string>
+    <string name="information">Information</string>
+    <string name="schedule_notif_before_note">Refresh Contests to Apply Changes</string>
+    <string name="ask_to_set_notif">Do you want to set notification 10 minutes before Contest.</string>
+    <string name="contest_starting_in_ten">Contest is going to start within 10 minutes.</string>
+    <string name="cant_schedule_notif_msg">Turn on Schedule Exact Notification to get notifications for contests</string>
+    <string name="turn_on">Turn On</string>
+    <string name="grant_permission_to_continue">Grant Permission to Continue</string>
+    <string name="cd_connectivity_icon">Connectivity Icon</string>
+    <string name="back_online">Back Online!</string>
+    <string name="no_internet__connection">No Internet Connection!</string>
+    <string name="exact_alarm_request">Exact Alarm Permission is not granted. Grant permission to get notified on exact time.</string>
+    <string name="request">Request</string>
+    <string name="go_to_settings">Go to Settings</string>
+    <string name="go">Go</string>
 
 </resources>

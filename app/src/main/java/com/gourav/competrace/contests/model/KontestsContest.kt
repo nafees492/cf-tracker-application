@@ -32,7 +32,7 @@ data class KontestsContest(
         id = this.getId(),
         name = this.name,
         phase = this.status,
-        site = this.site,
+        site = this.site ?: "Competrace",
         websiteUrl = this.getWebsiteLink(),
         startTimeInMillis = this.startTimeInMillis(),
         durationInMillis = this.durationInMillis(),

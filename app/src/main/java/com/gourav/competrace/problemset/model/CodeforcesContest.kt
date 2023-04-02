@@ -1,5 +1,6 @@
 package com.gourav.competrace.problemset.model
 
+import com.gourav.competrace.app_core.util.Sites
 import com.gourav.competrace.contests.model.CompetraceContest
 
 data class CodeforcesContest(
@@ -34,6 +35,6 @@ data class CodeforcesContest(
         websiteUrl = this.getLink(),
         startTimeInMillis = this.startTimeInMillis(),
         durationInMillis = this.durationInMillis(),
-        site = "CodeForces"
+        site = Sites.Codeforces.name
     )
 }

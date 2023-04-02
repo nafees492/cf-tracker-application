@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gourav.competrace.app_core.data.CodeforcesDatabase
 import com.gourav.competrace.app_core.data.UserPreferences
-import com.gourav.competrace.app_core.data.repository.CodeforcesRepository
+import com.gourav.competrace.app_core.data.repository.remote.CodeforcesRepository
 import com.gourav.competrace.app_core.util.ApiState
 import com.gourav.competrace.contests.model.CompetraceContest
 import com.gourav.competrace.progress.participated_contests.model.UserRatingChanges

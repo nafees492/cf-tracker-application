@@ -22,9 +22,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gourav.competrace.R
-import com.gourav.competrace.app_core.AlarmItem
-import com.gourav.competrace.app_core.AndroidAlarmScheduler
 import com.gourav.competrace.app_core.ui.components.CompetraceIconButton
+import com.gourav.competrace.app_core.ui.components.TwoStateAnimatedIconButton
 import com.gourav.competrace.app_core.util.getCurrentTimeInMillis
 import com.gourav.competrace.app_core.util.getFormattedTime
 import com.gourav.competrace.app_core.util.unixToDMET
@@ -199,13 +198,12 @@ fun ContestCard(
                         contentDescription = stringResource(R.string.cd_add_to_calender),
                     )
 
-                    val notificationIcon = if (contest.id.toString() in notificationContestIdList) R.drawable.ic_notifications_active_24px
-                    else R.drawable.ic_notifications_24px
-
-                    CompetraceIconButton(
-                        iconId = notificationIcon,
+                    TwoStateAnimatedIconButton(
+                        onStateIconId = R.drawable.ic_notifications_active_filled_24px,
+                        offStateIconId = R.drawable.ic_notifications_24px,
+                        isOn = contest.id.toString() in notificationContestIdList,
                         onClick = { onClickNotificationIcon(contest) },
-                        contentDescription = stringResource(R.string.cd_toggle_notification),
+                        contentDescription = stringResource(R.string.cd_toggle_notif)
                     )
                 }
             }

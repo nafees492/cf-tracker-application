@@ -26,22 +26,22 @@ import com.gourav.competrace.problemset.presentation.ProblemSetScreenActions
 import com.gourav.competrace.problemset.presentation.ProblemSetViewModel
 import com.gourav.competrace.problemset.presentation.RatingRangeSlider
 import com.gourav.competrace.ui.components.SearchAppBar
-import com.gourav.competrace.settings.SettingsAlertDialog
 import com.gourav.competrace.app_core.ui.NetworkFailScreen
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.gourav.competrace.R
+import com.gourav.competrace.app_core.ui.CompetraceAppState
 import com.gourav.competrace.app_core.util.TopAppBarManager
 
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.problemSet(
     sharedViewModel: SharedViewModel,
     problemSetViewModel: ProblemSetViewModel,
+    appState: CompetraceAppState
 ) {
     composable(route = Screens.ProblemSetScreen.route) {
         val scope = rememberCoroutineScope()
 
-        val isSettingsDialogueOpen by sharedViewModel.isSettingsDialogueOpen.collectAsState()
         val isPlatformTabRowVisible by sharedViewModel.isPlatformsTabRowVisible.collectAsState()
 
         val showTagsInProblemSet by problemSetViewModel.showTags.collectAsState(initial = true)
@@ -66,7 +66,7 @@ fun NavGraphBuilder.problemSet(
             }
         }
 
-        LaunchedEffect(Unit){
+        LaunchedEffect(Unit) {
             TopAppBarManager.updateTopAppBar(
                 screen = Screens.ProblemSetScreen,
                 expandedTopAppBarContent = {
@@ -87,7 +87,7 @@ fun NavGraphBuilder.problemSet(
                 actions = {
                     ProblemSetScreenActions(
                         onClickSearch = onClickSearch,
-                        onClickSettings = sharedViewModel::openSettingsDialog,
+                        onClickSettings = appState::navigateToSettings,
                         onClickFilterIcon = TopAppBarManager::toggleExpandedState,
                         badgeConditionForSearch = searchQuery.isNotBlank(),
                         badgeConditionForFilter = ratingRangeValue != 800..3500
@@ -96,21 +96,18 @@ fun NavGraphBuilder.problemSet(
             )
         }
 
-        SettingsAlertDialog(
-            openSettingsDialog = isSettingsDialogueOpen,
-            dismissSettingsDialogue = sharedViewModel::dismissSettingsDialog
-        )
-
         val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = isRefreshing)
 
         var selectedTabIndex by rememberSaveable { mutableStateOf(0) }
-        val tabTitles = listOf("CodeForces")
 
         Column {
-            AnimatedVisibility(visible = isPlatformTabRowVisible, modifier = Modifier.fillMaxWidth()) {
+            AnimatedVisibility(
+                visible = isPlatformTabRowVisible,
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 CompetracePlatformRow(
                     selectedTabIndex = selectedTabIndex,
-                    tabTitles = tabTitles,
+                    platforms = problemSetViewModel.problemSetSites,
                     onClickTab = { selectedTabIndex = it }
                 )
             }
@@ -124,7 +121,7 @@ fun NavGraphBuilder.problemSet(
                         Box(modifier = Modifier.fillMaxSize())
                     }
                     is ApiState.Failure -> {
-                        NetworkFailScreen(onClickRetry = problemSetViewModel::refreshProblemSetAndContests )
+                        NetworkFailScreen(onClickRetry = problemSetViewModel::refreshProblemSetAndContests)
                     }
                     is ApiState.Success -> {
                         ProblemSetScreen(

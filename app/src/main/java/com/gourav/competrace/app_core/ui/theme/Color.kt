@@ -110,6 +110,9 @@ val dark_IncorrectRedContainer = Color(0xffCE7171)
 val RegistrationRed = Color(0xffcc0000)
 val BlueTickColor = Color(0xff1da2f5)
 
+val ConnectivityGreen = Color(0xff6FCF97)
+val ConnectivityRed = Color(0xffEB5757)
+
 
 
 

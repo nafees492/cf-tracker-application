@@ -3,19 +3,16 @@ package com.gourav.competrace.progress.user
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.gourav.competrace.app_core.ui.CompetraceAppState
 import com.gourav.competrace.app_core.ui.SharedViewModel
 import com.gourav.competrace.app_core.ui.components.CompetracePlatformRow
 import com.gourav.competrace.app_core.ui.components.CompetraceSwipeRefreshIndicator
@@ -24,33 +21,36 @@ import com.gourav.competrace.app_core.util.Screens
 import com.gourav.competrace.app_core.util.TopAppBarManager
 import com.gourav.competrace.progress.user.presentation.*
 import com.gourav.competrace.progress.user_submissions.presentation.UserSubmissionsViewModel
-import com.gourav.competrace.settings.SettingsAlertDialog
 import com.gourav.competrace.app_core.ui.NetworkFailScreen
+import com.gourav.competrace.progress.user.presentation.login.LoginScreen
+import com.gourav.competrace.progress.user.presentation.login.LoginViewModel
 
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.user(
     sharedViewModel: SharedViewModel,
     userViewModel: UserViewModel,
     userSubmissionsViewModel: UserSubmissionsViewModel,
-    navController: NavController
+    appState: CompetraceAppState,
+    paddingValues: PaddingValues
 ) {
     composable(route = Screens.ProgressScreen.route) {
         val loginViewModel: LoginViewModel = hiltViewModel()
 
-        val isSettingsDialogueOpen by sharedViewModel.isSettingsDialogueOpen.collectAsState()
         val isPlatformTabRowVisible by sharedViewModel.isPlatformsTabRowVisible.collectAsState()
 
         val userHandle by userViewModel.userHandle.collectAsState(null)
         val responseForUserInfo by userViewModel.responseForUserInfo.collectAsState()
-        val isRefreshing by userViewModel.isUserRefreshing.collectAsState()
         val user by userViewModel.currentUser.collectAsState()
+
+        val isRefreshing by userViewModel.isUserRefreshing.collectAsState()
+        val isLoginScreenLoading by loginViewModel.isLoading.collectAsState()
 
         LaunchedEffect(Unit){
             TopAppBarManager.updateTopAppBar(
                 screen = Screens.ProgressScreen,
                 actions = {
                     ProgressScreenActions(
-                        onClickSettings = sharedViewModel::openSettingsDialog,
+                        onClickSettings = appState::navigateToSettings,
                         onClickLogOut = userViewModel::logoutUser,
                         isLogOutButtonEnabled = !userHandle.isNullOrEmpty()
                     )
@@ -58,21 +58,17 @@ fun NavGraphBuilder.user(
             )
         }
 
-        SettingsAlertDialog(
-            openSettingsDialog = isSettingsDialogueOpen,
-            dismissSettingsDialogue = sharedViewModel::dismissSettingsDialog
-        )
+        val swipeRefreshStateProgress = rememberSwipeRefreshState(isRefreshing = isRefreshing)
 
-        val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = isRefreshing)
+        val swipeRefreshStateLogin = rememberSwipeRefreshState(isRefreshing = isLoginScreenLoading)
 
         var selectedTabIndex by rememberSaveable { mutableStateOf(0) }
-        val tabTitles = listOf("CodeForces")
 
-        Column {
+        Column(modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding())) {
             AnimatedVisibility(visible = isPlatformTabRowVisible, modifier = Modifier.fillMaxWidth()) {
                 CompetracePlatformRow(
                     selectedTabIndex = selectedTabIndex,
-                    tabTitles = tabTitles,
+                    platforms = userViewModel.userSites,
                     onClickTab = { selectedTabIndex = it }
                 )
             }
@@ -81,12 +77,19 @@ fun NavGraphBuilder.user(
                     targetState = handle.isEmpty()
                 ) {
                     if (it) {
-                        LoginScreen(loginViewModel = loginViewModel)
+                        SwipeRefresh(
+                            state = swipeRefreshStateLogin,
+                            onRefresh = { /*TODO*/ },
+                            indicator = CompetraceSwipeRefreshIndicator,
+                            swipeEnabled = false,
+                        ) {
+                            LoginScreen(loginViewModel = loginViewModel)
+                        }
                     } else {
                         SwipeRefresh(
-                            state = swipeRefreshState,
+                            state = swipeRefreshStateProgress,
                             onRefresh = userViewModel::refreshUserInfo,
-                            indicator = CompetraceSwipeRefreshIndicator
+                            indicator = CompetraceSwipeRefreshIndicator,
                         ) {
                             when (responseForUserInfo) {
                                 is ApiState.Loading -> {
@@ -100,12 +103,8 @@ fun NavGraphBuilder.user(
                                 is ApiState.Success -> {
                                     ProgressScreen(
                                         user = user,
-                                        goToSubmission = {
-                                            navController.navigate(Screens.UserSubmissionsScreen.route)
-                                        },
-                                        goToParticipatedContests = {
-                                            navController.navigate(Screens.ParticipatedContestsScreen.route)
-                                        },
+                                        goToSubmission = appState::navigateToUserSubmissionScreen,
+                                        goToParticipatedContests = appState::navigateToParticipatedContestsScreen,
                                         userSubmissionsViewModel = userSubmissionsViewModel,
                                     )
                                 }
