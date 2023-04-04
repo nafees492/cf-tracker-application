@@ -32,23 +32,13 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideAlarmRepository(@ApplicationContext context: Context): ContestAlarmRepository =
+    fun provideContestAlarmRepository(@ApplicationContext context: Context): ContestAlarmRepository =
         ContestAlarmRepository(context)
 
     @Provides
     @Singleton
-    fun provideAlarmScheduler(@ApplicationContext context: Context): ContestAlarmScheduler =
+    fun provideContestAlarmScheduler(@ApplicationContext context: Context): ContestAlarmScheduler =
         ContestContestAlarmSchedulerImpl(context)
-
-    @Provides
-    @Singleton
-    fun provideNetworkConnectivityObserver(@ApplicationContext context: Context): ConnectivityObserver =
-        NetworkConnectivityObserver(context)
-
-    @Provides
-    @Singleton
-    fun provideUserRepository(@ApplicationContext context: Context): UserRepository =
-        UserRepository(context)
 
     @Provides
     @Singleton
