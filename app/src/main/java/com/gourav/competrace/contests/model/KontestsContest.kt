@@ -1,7 +1,7 @@
 package com.gourav.competrace.contests.model
 
-import com.gourav.competrace.app_core.util.formattedStringToUnix
-import com.gourav.competrace.app_core.util.getCurrentTimeInMillis
+import com.gourav.competrace.app_core.util.TimeUtils
+import java.sql.Time
 
 data class KontestsContest(
     private val duration: String,
@@ -15,11 +15,11 @@ data class KontestsContest(
 ){
     private fun getId(): String = url.split('/').last()
 
-    private fun startTimeInMillis(): Long = formattedStringToUnix(start_time)
-    private fun endTimeInMillis(): Long = formattedStringToUnix(end_time)
+    private fun startTimeInMillis(): Long = TimeUtils.formattedStringToUnix(start_time)
+    private fun endTimeInMillis(): Long = TimeUtils.formattedStringToUnix(end_time)
     private fun durationInMillis(): Long = endTimeInMillis() - startTimeInMillis()
 
-    private val daysLeft: Long = (startTimeInMillis() - getCurrentTimeInMillis()) / (24 * 3600 * 1000)
+    private val daysLeft: Long = (startTimeInMillis() - TimeUtils.currentTimeInMillis()) / (24 * 3600 * 1000)
     private fun within7Days(): Boolean = daysLeft in Long.MIN_VALUE..6L
     private fun registrationOpen(): Boolean = if(site == "CodeForces") daysLeft in 0L..1L else false
 

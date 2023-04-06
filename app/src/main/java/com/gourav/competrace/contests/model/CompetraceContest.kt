@@ -2,9 +2,8 @@ package com.gourav.competrace.contests.model
 
 import android.content.Context
 import com.gourav.competrace.app_core.util.ContestRatedCategories
-import com.gourav.competrace.app_core.util.minutesToMillis
-import com.gourav.competrace.app_core.util.unixToTime
-import com.gourav.competrace.contests.util.addEventToCalendar
+import com.gourav.competrace.app_core.util.TimeUtils
+import com.gourav.competrace.app_core.util.addEventToCalendar
 import com.gourav.competrace.settings.ScheduleNotifBeforeOptions
 import java.util.*
 
@@ -38,7 +37,7 @@ data class CompetraceContest(
     private fun getNotificationMessage(timeBeforeStart: Int) = buildString {
         append(name)
         append(" is going to start at ")
-        append(unixToTime(startTimeInMillis))
+        append(TimeUtils.unixToTime(startTimeInMillis))
         append(". Hurry Up!!\n")
         append(ScheduleNotifBeforeOptions.getOption(timeBeforeStart))
         append(" to Go.\n")
@@ -47,15 +46,14 @@ data class CompetraceContest(
     fun getAlarmItem(timeBeforeStart: Int) = ContestAlarmItem(
         id = uniqueId(),
         contestId = id.toString(),
-        timeInMillis = startTimeInMillis - minutesToMillis(timeBeforeStart),
+        timeInMillis = startTimeInMillis - TimeUtils.minutesToMillis(timeBeforeStart),
         title = site,
         message = getNotificationMessage(timeBeforeStart),
         registrationUrl = registrationUrl ?: ""
     )
 
     fun addToCalender(context: Context) {
-        addEventToCalendar(
-            context = context,
+        context.addEventToCalendar(
             title = name,
             startTime = startTimeInMillis,
             endTime = endTimeInMillis,

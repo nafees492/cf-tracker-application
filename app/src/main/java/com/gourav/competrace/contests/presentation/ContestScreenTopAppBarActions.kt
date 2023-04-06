@@ -1,7 +1,6 @@
 package com.gourav.competrace.contests.presentation
 
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -15,8 +14,8 @@ import androidx.compose.ui.res.stringResource
 import com.gourav.competrace.R
 import com.gourav.competrace.app_core.ui.components.CompetraceIconButton
 import com.gourav.competrace.app_core.util.SnackbarManager
+import com.gourav.competrace.app_core.util.TimeUtils
 import com.gourav.competrace.app_core.util.UiText
-import com.gourav.competrace.app_core.util.getTodaysDate
 
 @ExperimentalAnimationApi
 @Composable
@@ -24,7 +23,7 @@ fun ContestScreenActions(
     onClickSettings: () -> Unit
 ) {
     val todaysDate by remember {
-        mutableStateOf(getTodaysDate())
+        mutableStateOf(TimeUtils.todaysDate())
     }
 
     Text(

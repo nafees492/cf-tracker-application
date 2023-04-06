@@ -22,12 +22,9 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gourav.competrace.R
-import com.gourav.competrace.app_core.util.copyTextToClipBoard
-import com.gourav.competrace.app_core.util.loadUrl
-import com.gourav.competrace.app_core.util.unixToDMYETZ
+import com.gourav.competrace.app_core.util.*
 import com.gourav.competrace.contests.model.CompetraceContest
-import com.gourav.competrace.ui.components.BackgroundDesignArrow
-import com.gourav.competrace.utils.*
+import com.gourav.competrace.app_core.ui.components.BackgroundDesignArrow
 import com.gourav.competrace.app_core.util.CardValues.TriangularFractionOfCard
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,10 +42,10 @@ fun ParticipatedContestCard(
         if (contest.ratingChange > 0) "+${contest.ratingChange}" else "${contest.ratingChange}"
 
     val ratingChangeContainerColor =
-        getRatingChangeContainerColor(ratingChange = contest.ratingChange)
+        ColorUtils.getRatingChangeContainerColor(ratingChange = contest.ratingChange)
 
     val onClickContestCard: () -> Unit = {
-        loadUrl(context = context, url = contest.websiteUrl)
+        context.loadUrl(url = contest.websiteUrl)
     }
 
     val onLongClickContestCard: () -> Unit = {
@@ -80,7 +77,7 @@ fun ParticipatedContestCard(
             )
 
             Text(
-                text = unixToDMYETZ(contest.startTimeInMillis),
+                text = TimeUtils.unixToDMYETZ(contest.startTimeInMillis),
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(bottom = 8.dp),
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
@@ -92,7 +89,7 @@ fun ParticipatedContestCard(
                 append("Rank: " + "${contest.rank}")
                 append("  |  ")
                 append("New Rating: ")
-                withStyle(SpanStyle(color = getRatingTextColor(rating = contest.newRating))){
+                withStyle(SpanStyle(color = ColorUtils.getRatingTextColor(rating = contest.newRating))){
                     append(contest.newRating.toString())
                 }
             }
@@ -137,7 +134,7 @@ fun ParticipatedContestCardDesign(
             .padding(4.dp)
             .fillMaxWidth()
             .height(
-                getCardHeight(
+                SizeUtil.getCardHeight(
                     titleLargeTexts = 1,
                     bodyMediumTexts = 2,
                     extraPaddingValues = FilterChipDefaults.Height + 32.dp
@@ -162,7 +159,7 @@ fun ParticipatedContestCardDesign(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .width(
-                        getTextWidthInDp(
+                        SizeUtil.getTextWidthInDp(
                             testSize = MaterialTheme.typography.bodyMedium.fontSize,
                             letters = 4
                         )

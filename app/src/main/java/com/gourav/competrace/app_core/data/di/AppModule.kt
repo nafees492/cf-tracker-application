@@ -5,7 +5,7 @@ import com.gourav.competrace.app_core.data.UserPreferences
 import com.gourav.competrace.app_core.data.network.CodeforcesApiService
 import com.gourav.competrace.app_core.data.network.KontestsApiService
 import com.gourav.competrace.app_core.util.ConnectivityObserver
-import com.gourav.competrace.app_core.util.NetworkConnectivityObserver
+import com.gourav.competrace.app_core.util.ConnectivityObserverImpl
 import com.gourav.competrace.contests.data.ContestAlarmScheduler
 import com.gourav.competrace.contests.data.ContestContestAlarmSchedulerImpl
 import com.gourav.competrace.contests.data.repository.ContestAlarmRepository
@@ -43,7 +43,7 @@ object AppModule {
     @Provides
     @Singleton
     fun provideNetworkConnectivityObserver(@ApplicationContext context: Context): ConnectivityObserver =
-        NetworkConnectivityObserver(context)
+        ConnectivityObserverImpl(context)
 
     @Provides
     @Singleton

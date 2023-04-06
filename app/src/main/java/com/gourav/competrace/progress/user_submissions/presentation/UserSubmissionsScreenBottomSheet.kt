@@ -18,7 +18,7 @@ import com.gourav.competrace.app_core.ui.components.CompetraceClickableText
 import com.gourav.competrace.contests.model.CompetraceContest
 import com.gourav.competrace.problemset.model.CodeforcesProblem
 import com.gourav.competrace.progress.user_submissions.model.Submission
-import com.gourav.competrace.ui.components.BottomSheetDragIndicator
+import com.gourav.competrace.app_core.ui.components.BottomSheetDragIndicator
 import com.gourav.competrace.app_core.util.copyTextToClipBoard
 import com.gourav.competrace.app_core.util.loadUrl
 import com.gourav.competrace.R
@@ -49,7 +49,7 @@ fun UserSubmissionsScreenBottomSheetContent(
             color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center,
             onClick = {
-                loadUrl(context = context, url = codeforcesProblem?.getLinkViaContest())
+                context.loadUrl(url = codeforcesProblem?.getLinkViaContest())
             },
             onLongClick = {
                 context.copyTextToClipBoard(
@@ -77,7 +77,7 @@ fun UserSubmissionsScreenBottomSheetContent(
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
             textAlign = TextAlign.Center,
             onClick = {
-                loadUrl(context = context, url = codeforcesContest?.websiteUrl)
+                context.loadUrl(url = codeforcesContest?.websiteUrl)
             },
             onLongClick = {
                 context.copyTextToClipBoard(

@@ -9,20 +9,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.TransformOrigin
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import com.gourav.competrace.R
 import com.gourav.competrace.app_core.ui.CompetraceAppState
 import com.gourav.competrace.app_core.ui.SharedViewModel
-import com.gourav.competrace.app_core.util.ConnectivityObserver
-import com.gourav.competrace.app_core.util.NetworkConnectivityObserver
 import com.gourav.competrace.app_core.util.TopAppBarManager
-import kotlinx.coroutines.flow.map
 
 @OptIn(ExperimentalAnimationApi::class)
 @ExperimentalMaterial3Api

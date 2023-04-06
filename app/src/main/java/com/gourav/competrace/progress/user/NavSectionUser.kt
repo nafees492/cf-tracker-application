@@ -101,12 +101,14 @@ fun NavGraphBuilder.user(
                                     )
                                 }
                                 is ApiState.Success -> {
-                                    ProgressScreen(
-                                        user = user,
-                                        goToSubmission = appState::navigateToUserSubmissionScreen,
-                                        goToParticipatedContests = appState::navigateToParticipatedContestsScreen,
-                                        userSubmissionsViewModel = userSubmissionsViewModel,
-                                    )
+                                    user?.let { you ->
+                                        ProgressScreen(
+                                            user = you,
+                                            goToSubmission = appState::navigateToUserSubmissionScreen,
+                                            goToParticipatedContests = appState::navigateToParticipatedContestsScreen,
+                                            userSubmissionsViewModel = userSubmissionsViewModel,
+                                        )
+                                    }
                                 }
                             }
                         }

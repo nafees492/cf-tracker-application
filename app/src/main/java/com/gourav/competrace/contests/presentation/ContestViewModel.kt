@@ -114,11 +114,12 @@ class ContestViewModel @Inject constructor(
                         }
                         addContestToAllContests(contest = contest)
 
-                        if (contest.startTimeInMillis - getCurrentTimeInMillis() > minutesToMillis(
-                                scheduleNotifBefore.value
-                            )
+                        if (contest.startTimeInMillis - TimeUtils.currentTimeInMillis() >
+                            TimeUtils.minutesToMillis(scheduleNotifBefore.value)
                         )
-                            contestAlarmRepository.updateAlarm(contest.getAlarmItem(scheduleNotifBefore.value))
+                            contestAlarmRepository.updateAlarm(
+                                contest.getAlarmItem(scheduleNotifBefore.value)
+                            )
                     }
 
                     _responseForKontestsContestList.update { ApiState.Success }
@@ -130,7 +131,7 @@ class ContestViewModel @Inject constructor(
 
 
     fun toggleContestNotification(contest: CompetraceContest) {
-        val contestTimeRemInMillis = contest.startTimeInMillis - getCurrentTimeInMillis()
+        val contestTimeRemInMillis = contest.startTimeInMillis - TimeUtils.currentTimeInMillis()
 
         if (contest.id.toString() in notificationContestIdList.value) {
             val item = contest.getAlarmItem(scheduleNotifBefore.value)
@@ -142,7 +143,7 @@ class ContestViewModel @Inject constructor(
             _notificationContestIdList.update { it - contest.id.toString() }
         } else {
 
-            if (contestTimeRemInMillis > minutesToMillis(scheduleNotifBefore.value)) {
+            if (contestTimeRemInMillis > TimeUtils.minutesToMillis(scheduleNotifBefore.value)) {
                 val item = contest.getAlarmItem(scheduleNotifBefore.value)
 
                 viewModelScope.launch {
@@ -157,7 +158,7 @@ class ContestViewModel @Inject constructor(
                         ScheduleNotifBeforeOptions.getOption(scheduleNotifBefore.value)
                     )
                 )
-            } else if (contestTimeRemInMillis > minutesToMillis(10)) {
+            } else if (contestTimeRemInMillis > TimeUtils.minutesToMillis(10)) {
                 val item = contest.getAlarmItem(10)
 
                 SnackbarManager.showMessageWithAction(
@@ -199,7 +200,7 @@ class ContestViewModel @Inject constructor(
 
             contestAlarmRepository.getAllAlarms().collect { list ->
                 list.forEach { alarm ->
-                    if (alarm.timeInMillis > getCurrentTimeInMillis()) {
+                    if (alarm.timeInMillis > TimeUtils.currentTimeInMillis()) {
                         contestAlarmScheduler.schedule(alarm)
                         _notificationContestIdList.update { it + alarm.contestId }
                     } else alarmsToDelete.add(alarm)

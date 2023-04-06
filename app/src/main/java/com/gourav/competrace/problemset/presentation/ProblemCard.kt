@@ -1,29 +1,27 @@
 package com.gourav.competrace.problemset.presentation
 
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gourav.competrace.app_core.ui.components.FilterChipScrollableRow
-import com.gourav.competrace.app_core.util.copyTextToClipBoard
-import com.gourav.competrace.app_core.util.loadUrl
 import com.gourav.competrace.problemset.model.CompetraceProblem
-import com.gourav.competrace.ui.components.BackgroundDesignArrow
-import com.gourav.competrace.utils.*
+import com.gourav.competrace.app_core.ui.components.BackgroundDesignArrow
 import com.gourav.competrace.R
-import com.gourav.competrace.app_core.util.CardValues
+import com.gourav.competrace.app_core.util.*
 
 @Composable
 fun ProblemCard(
@@ -39,13 +37,13 @@ fun ProblemCard(
     val clipboardManager = LocalClipboardManager.current
     val haptic = LocalHapticFeedback.current
 
-    val ratingContainerColor = getRatingContainerColor(rating = problem.rating)
+    val ratingContainerColor = ColorUtils.getRatingContainerColor(rating = problem.rating)
 
     ProblemCardDesign(
         rating = problem.rating,
         color = ratingContainerColor,
         onClick = {
-            loadUrl(context = context, url = problem.websiteUrl)
+            context.loadUrl(url = problem.websiteUrl)
         },
         onLongClick = {
             context.copyTextToClipBoard(
@@ -100,13 +98,12 @@ fun ProblemCardDesign(
             .padding(4.dp)
             .fillMaxWidth()
             .height(
-                getCardHeight(
+                SizeUtil.getCardHeight(
                     titleLargeTexts = 1,
                     bodyMediumTexts = 1,
                     extraPaddingValues = 24.dp + FilterChipDefaults.Height
                 )
             )
-            .animateContentSize()
             .combinedClickable(
                 onClick = onClick,
                 onLongClick = onLongClick,
@@ -125,7 +122,7 @@ fun ProblemCardDesign(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .width(
-                        getTextWidthInDp(
+                        SizeUtil.getTextWidthInDp(
                             testSize = MaterialTheme.typography.bodyMedium.fontSize,
                             letters = 4
                         )

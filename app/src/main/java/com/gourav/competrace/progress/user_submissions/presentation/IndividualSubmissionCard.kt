@@ -18,13 +18,9 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import com.gourav.competrace.app_core.util.copyTextToClipBoard
-import com.gourav.competrace.app_core.util.loadUrl
-import com.gourav.competrace.app_core.util.unixToDMYETZ
 import com.gourav.competrace.progress.user_submissions.model.Submission
-import com.gourav.competrace.utils.*
 import com.gourav.competrace.R
-import com.gourav.competrace.app_core.util.Verdict
+import com.gourav.competrace.app_core.util.*
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -42,7 +38,7 @@ fun IndividualSubmissionCard(
             .fillMaxWidth()
             .animateContentSize()
             .combinedClickable(
-                onClick = { loadUrl(context = context, url = submission.getLink()) },
+                onClick = { context.loadUrl(url = submission.getLink()) },
                 onLongClick = {
                     context.copyTextToClipBoard(
                         textToCopy = submission.getLink(),
@@ -60,10 +56,11 @@ fun IndividualSubmissionCard(
         val idAndVerdict = buildAnnotatedString {
             append(submission.id.toString())
             append(" - ")
-            withStyle(style = SpanStyle(color = getVerdictColor(
+            withStyle(style = SpanStyle(color = ColorUtils.getVerdictColor(
                 lastVerdict = submission.verdict,
                 hasVerdictOK = submission.verdict == Verdict.OK
-            ))){
+            )
+            )){
                 append(submission.verdict)
             }
         }
@@ -87,7 +84,7 @@ fun IndividualSubmissionCard(
             modifier = Modifier.padding(start = 8.dp, end = 8.dp, bottom = 4.dp)
         )
         Text(
-            text = unixToDMYETZ(submission.creationTimeInMillis()),
+            text = TimeUtils.unixToDMYETZ(submission.creationTimeInMillis()),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
             modifier = Modifier.padding(start = 8.dp, end = 8.dp, bottom = 8.dp),

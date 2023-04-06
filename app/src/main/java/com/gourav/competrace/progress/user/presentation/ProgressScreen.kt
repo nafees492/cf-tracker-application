@@ -5,7 +5,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -23,7 +22,7 @@ import com.gourav.competrace.app_core.util.ApiState
 import com.gourav.competrace.progress.user.model.User
 import com.gourav.competrace.progress.user_submissions.presentation.UserSubmissionsViewModel
 import com.gourav.competrace.app_core.ui.NetworkFailScreen
-import com.gourav.competrace.utils.getRatingTextColor
+import com.gourav.competrace.app_core.util.ColorUtils
 import com.skydoves.landscapist.animation.crossfade.CrossfadePlugin
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.glide.GlideImage
@@ -100,14 +99,14 @@ fun ProgressScreen(
                         text = "Rating: ${user.rating}",
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.padding(vertical = 4.dp),
-                        color = getRatingTextColor(rating = user.rating)
+                        color = ColorUtils.getRatingTextColor(rating = user.rating)
                     )
 
                     Text(
                         text = "Max Rating: ${user.maxRating}",
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.padding(vertical = 4.dp),
-                        color = getRatingTextColor(rating = user.maxRating)
+                        color = ColorUtils.getRatingTextColor(rating = user.maxRating)
                     )
 
                 }

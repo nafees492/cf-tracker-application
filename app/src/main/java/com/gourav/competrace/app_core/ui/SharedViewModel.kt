@@ -3,7 +3,6 @@ package com.gourav.competrace.app_core.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gourav.competrace.app_core.util.ConnectivityObserver
-import com.gourav.competrace.app_core.util.NetworkConnectivityObserver
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*

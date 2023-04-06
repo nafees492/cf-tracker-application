@@ -24,15 +24,11 @@ import androidx.compose.ui.unit.sp
 import com.gourav.competrace.R
 import com.gourav.competrace.app_core.ui.components.CompetraceIconButton
 import com.gourav.competrace.app_core.ui.components.TwoStateAnimatedIconButton
-import com.gourav.competrace.app_core.util.getCurrentTimeInMillis
-import com.gourav.competrace.app_core.util.getFormattedTime
-import com.gourav.competrace.app_core.util.unixToDMET
 import com.gourav.competrace.contests.model.CompetraceContest
 import com.gourav.competrace.contests.util.MyCountDownTimer
 import com.gourav.competrace.app_core.ui.theme.RegistrationRed
-import com.gourav.competrace.app_core.util.Phase
-import com.gourav.competrace.app_core.util.copyTextToClipBoard
-import com.gourav.competrace.app_core.util.loadUrl
+import com.gourav.competrace.app_core.util.*
+import java.sql.Time
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -65,10 +61,7 @@ fun ContestCard(
                 if (contest.registrationOpen && contest.phase == Phase.BEFORE) {
                     ElevatedAssistChip(
                         onClick = {
-                            loadUrl(
-                                context = context,
-                                url = contest.registrationUrl
-                            )
+                            context.loadUrl(url = contest.registrationUrl)
                         },
                         label = {
                             Text(
@@ -87,7 +80,7 @@ fun ContestCard(
     }
 
     val onClickContestCard: () -> Unit = {
-        loadUrl(context = context, url = contest.websiteUrl)
+        context.loadUrl(url = contest.websiteUrl)
     }
 
     val onLongClickContestCard: () -> Unit = {
@@ -128,8 +121,8 @@ fun ContestCard(
                     overflow = TextOverflow.Ellipsis
                 )
 
-                val startTime = unixToDMET(contest.startTimeInMillis)
-                val length = getFormattedTime(contest.durationInMillis, format = "%02d:%02d")
+                val startTime = TimeUtils.unixToDMET(contest.startTimeInMillis)
+                val length = TimeUtils.getFormattedTime(contest.durationInMillis, format = "%02d:%02d")
 
                 val startTimeAndLength = buildAnnotatedString {
                     append(startTime)
@@ -157,9 +150,9 @@ fun ContestCard(
                 if (contest.within7Days) {
                     val totalTimeInMillis =
                         if (contest.phase == Phase.BEFORE)
-                            contest.startTimeInMillis - getCurrentTimeInMillis()
+                            contest.startTimeInMillis - TimeUtils.currentTimeInMillis()
                         else
-                            contest.endTimeInMillis - getCurrentTimeInMillis()
+                            contest.endTimeInMillis - TimeUtils.currentTimeInMillis()
 
                     var timeLeftInMillis by remember { mutableStateOf(totalTimeInMillis) }
 
@@ -183,7 +176,7 @@ fun ContestCard(
                         },
                         label = {
                             Text(
-                                text = getFormattedTime(timeLeftInMillis),
+                                text = TimeUtils.getFormattedTime(timeLeftInMillis),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurface
                             )

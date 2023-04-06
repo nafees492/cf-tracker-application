@@ -1,6 +1,7 @@
 package com.gourav.competrace.progress.user_submissions.presentation
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -52,11 +53,7 @@ fun UserSubmissionsScreen(
         selectedChips = if (isSelected(it)) selectedChips.minus(it) else selectedChips.plus(it)
     }
 
-    val modalSheetState = rememberModalBottomSheetState(
-        initialValue = ModalBottomSheetValue.Hidden,
-        confirmStateChange = { it != ModalBottomSheetValue.HalfExpanded },
-        skipHalfExpanded = true,
-    )
+    val modalSheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
 
     var selectedCodeforcesProblem by remember {
         mutableStateOf<Pair<CodeforcesProblem, ArrayList<Submission>>?>(null)
@@ -74,10 +71,9 @@ fun UserSubmissionsScreen(
         scope.launch { modalSheetState.hide() }
     }
 
-    ModalBottomSheetLayout(
-        sheetState = modalSheetState,
+    ModalBottomSheetLayout(sheetState = modalSheetState,
         sheetShape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp),
-        sheetBackgroundColor = MaterialTheme.colorScheme.surfaceColorAtElevation(8.dp),
+        sheetBackgroundColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
         sheetContentColor = MaterialTheme.colorScheme.onSurface,
         scrimColor = MaterialTheme.colorScheme.scrim.copy(alpha = 0.6f),
         sheetContent = {
@@ -87,8 +83,7 @@ fun UserSubmissionsScreen(
                 codeforcesContest = codeforcesContestListById[selectedCodeforcesProblem?.first?.contestId
                     ?: 0]
             )
-        }
-    ) {
+        }) {
         LazyColumn {
             item {
                 if (filteredList.isEmpty()) {
@@ -103,8 +98,7 @@ fun UserSubmissionsScreen(
                         Text(
                             text = "No Problem Found!",
                             style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier
-                                .padding(8.dp),
+                            modifier = Modifier.padding(8.dp),
                             color = MaterialTheme.colorScheme.onSurface
                         )
                     }
@@ -113,18 +107,14 @@ fun UserSubmissionsScreen(
 
             item {
                 if (selectedChips.isNotEmpty()) {
-                    ElevatedAssistChip(
-                        onClick = { selectedChips = emptySet() },
-                        label = {
-                            Text(
-                                stringResource(R.string.clear_all),
-                                style = MaterialTheme.typography.labelMedium
-                            )
-                        },
-                        enabled = true,
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .animateItemPlacement()
+                    ElevatedAssistChip(onClick = { selectedChips = emptySet() }, label = {
+                        Text(
+                            stringResource(R.string.clear_all),
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                    }, enabled = true, modifier = Modifier
+                        .padding(8.dp)
+                        .animateItemPlacement()
                     )
                 }
             }

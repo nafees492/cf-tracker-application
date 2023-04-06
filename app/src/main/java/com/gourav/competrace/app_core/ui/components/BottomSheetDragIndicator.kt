@@ -1,4 +1,4 @@
-package com.gourav.competrace.ui.components
+package com.gourav.competrace.app_core.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -17,7 +17,7 @@ fun BottomSheetDragIndicator(modifier: Modifier = Modifier){
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(24.dp),
+            .height(48.dp),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {

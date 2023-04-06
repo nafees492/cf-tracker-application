@@ -28,18 +28,12 @@ object Verdict {
     val RED = setOf(WA, FAILED, CE, CRASHED, REJECTED)
 }
 
-
 enum class ContestRatedCategories(val value: String) {
     DIV1("Div. 1"),
     DIV2("Div. 2"),
     DIV3("Div. 3"),
     DIV4("Div. 4"),
     UNRATED("Unrated")
-}
-
-object FinishedContestFilter {
-    const val ALL = "All Contests"
-    const val PARTICIPATED = "Participated Contests"
 }
 
 object UserSubmissionFilter {

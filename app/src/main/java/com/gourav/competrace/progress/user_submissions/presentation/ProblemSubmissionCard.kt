@@ -26,15 +26,11 @@ import androidx.compose.ui.unit.sp
 import com.gourav.competrace.R
 import com.gourav.competrace.app_core.ui.components.FilterChipScrollableRow
 import com.gourav.competrace.app_core.ui.theme.BlueTickColor
-import com.gourav.competrace.app_core.util.CardValues
-import com.gourav.competrace.app_core.util.Verdict
-import com.gourav.competrace.app_core.util.copyTextToClipBoard
-import com.gourav.competrace.app_core.util.unixToDMYE
+import com.gourav.competrace.app_core.util.*
 import com.gourav.competrace.contests.model.CompetraceContest
 import com.gourav.competrace.problemset.model.CodeforcesProblem
 import com.gourav.competrace.progress.user_submissions.model.Submission
-import com.gourav.competrace.ui.components.BackgroundDesignArrow
-import com.gourav.competrace.utils.*
+import com.gourav.competrace.app_core.ui.components.BackgroundDesignArrow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,7 +48,7 @@ fun ProblemSubmissionCard(
     val clipboardManager: ClipboardManager = LocalClipboardManager.current
     val haptic = LocalHapticFeedback.current
 
-    val ratingContainerColor = getRatingContainerColor(rating = codeforcesProblem.rating)
+    val ratingContainerColor = ColorUtils.getRatingContainerColor(rating = codeforcesProblem.rating)
     val codeforcesContest = codeforcesProblem.contestId?.let { codeforcesContestListById[it] }
 
     ProblemSubmissionCardDesign(
@@ -111,7 +107,7 @@ fun ProblemSubmissionCard(
         }
 
         Text(
-            text = "Last Submission: ${unixToDMYE(submissions[0].creationTimeInMillis())}",
+            text = "Last Submission: ${TimeUtils.unixToDMYE(submissions[0].creationTimeInMillis())}",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
             modifier = Modifier.padding(start = 8.dp, end = 8.dp, bottom = 8.dp),
@@ -121,7 +117,7 @@ fun ProblemSubmissionCard(
 
         val status = if (codeforcesProblem.hasVerdictOK) Verdict.OK else submissions[0].verdict
 
-        val statusColor = getVerdictColor(
+        val statusColor = ColorUtils.getVerdictColor(
             lastVerdict = submissions[0].verdict,
             hasVerdictOK = codeforcesProblem.hasVerdictOK
         )
@@ -170,7 +166,7 @@ fun ProblemSubmissionCardDesign(
             .padding(4.dp)
             .fillMaxWidth()
             .height(
-                getCardHeight(
+                SizeUtil.getCardHeight(
                     titleLargeTexts = 1,
                     bodyMediumTexts = 3,
                     extraPaddingValues = FilterChipDefaults.Height + 32.dp
@@ -195,7 +191,7 @@ fun ProblemSubmissionCardDesign(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .width(
-                        getTextWidthInDp(
+                        SizeUtil.getTextWidthInDp(
                             testSize = MaterialTheme.typography.bodyMedium.fontSize,
                             letters = 4
                         )

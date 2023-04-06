@@ -12,16 +12,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
-interface ConnectivityObserver {
-
-    fun observe(): Flow<Status>
-
-    enum class Status {
-        Available, Unavailable, Lost
-    }
-}
-
-class NetworkConnectivityObserver(
+class ConnectivityObserverImpl(
     private val context: Context
 ) : ConnectivityObserver {
 

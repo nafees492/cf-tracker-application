@@ -6,7 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import com.gourav.competrace.app_core.receiver.AlarmReceiver
-import com.gourav.competrace.app_core.util.minutesToMillis
+import com.gourav.competrace.app_core.util.TimeUtils
 import com.gourav.competrace.contests.model.ContestAlarmItem
 
 interface ContestAlarmScheduler {
@@ -52,7 +52,7 @@ class ContestContestAlarmSchedulerImpl(
             alarmManager.setWindow(
                 AlarmManager.RTC_WAKEUP,
                 item.timeInMillis,
-                minutesToMillis(10),
+                TimeUtils.minutesToMillis(10),
                 PendingIntent.getBroadcast(
                     context,
                     item.id,
