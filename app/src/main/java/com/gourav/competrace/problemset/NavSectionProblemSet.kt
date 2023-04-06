@@ -6,6 +6,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
@@ -14,11 +17,8 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.gourav.competrace.app_core.ui.SharedViewModel
 import com.gourav.competrace.app_core.ui.components.CompetracePlatformRow
-import com.gourav.competrace.app_core.ui.components.CompetraceSwipeRefreshIndicator
 import com.gourav.competrace.app_core.util.ApiState
 import com.gourav.competrace.app_core.util.Screens
 import com.gourav.competrace.problemset.presentation.ProblemSetScreen
@@ -31,9 +31,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.gourav.competrace.R
 import com.gourav.competrace.app_core.ui.CompetraceAppState
+import com.gourav.competrace.app_core.ui.components.CompetracePullRefreshIndicator
 import com.gourav.competrace.app_core.util.TopAppBarManager
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 fun NavGraphBuilder.problemSet(
     sharedViewModel: SharedViewModel,
     problemSetViewModel: ProblemSetViewModel,
@@ -96,7 +97,10 @@ fun NavGraphBuilder.problemSet(
             )
         }
 
-        val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = isRefreshing)
+        val pullRefreshState = rememberPullRefreshState(
+            refreshing = isRefreshing,
+            onRefresh = problemSetViewModel::refreshProblemSetAndContests
+        )
 
         var selectedTabIndex by rememberSaveable { mutableStateOf(0) }
 
@@ -111,11 +115,7 @@ fun NavGraphBuilder.problemSet(
                     onClickTab = { selectedTabIndex = it }
                 )
             }
-            SwipeRefresh(
-                state = swipeRefreshState,
-                onRefresh = problemSetViewModel::refreshProblemSetAndContests,
-                indicator = CompetraceSwipeRefreshIndicator
-            ) {
+            Box(Modifier.pullRefresh(pullRefreshState)) {
                 when (responseForProblemSet) {
                     is ApiState.Loading -> {
                         Box(modifier = Modifier.fillMaxSize())
@@ -135,6 +135,7 @@ fun NavGraphBuilder.problemSet(
                         )
                     }
                 }
+                CompetracePullRefreshIndicator(refreshing = isRefreshing, state = pullRefreshState)
             }
         }
     }

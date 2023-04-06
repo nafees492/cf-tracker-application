@@ -4,28 +4,29 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.gourav.competrace.app_core.ui.CompetraceAppState
 import com.gourav.competrace.app_core.ui.SharedViewModel
 import com.gourav.competrace.app_core.ui.components.CompetracePlatformRow
-import com.gourav.competrace.app_core.ui.components.CompetraceSwipeRefreshIndicator
 import com.gourav.competrace.app_core.util.ApiState
 import com.gourav.competrace.app_core.util.Screens
 import com.gourav.competrace.app_core.util.TopAppBarManager
 import com.gourav.competrace.progress.user.presentation.*
 import com.gourav.competrace.progress.user_submissions.presentation.UserSubmissionsViewModel
 import com.gourav.competrace.app_core.ui.NetworkFailScreen
+import com.gourav.competrace.app_core.ui.components.CompetracePullRefreshIndicator
 import com.gourav.competrace.progress.user.presentation.login.LoginScreen
 import com.gourav.competrace.progress.user.presentation.login.LoginViewModel
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 fun NavGraphBuilder.user(
     sharedViewModel: SharedViewModel,
     userViewModel: UserViewModel,
@@ -42,7 +43,7 @@ fun NavGraphBuilder.user(
         val responseForUserInfo by userViewModel.responseForUserInfo.collectAsState()
         val user by userViewModel.currentUser.collectAsState()
 
-        val isRefreshing by userViewModel.isUserRefreshing.collectAsState()
+        val isUserScreenLoading by userViewModel.isUserRefreshing.collectAsState()
         val isLoginScreenLoading by loginViewModel.isLoading.collectAsState()
 
         LaunchedEffect(Unit){
@@ -58,9 +59,15 @@ fun NavGraphBuilder.user(
             )
         }
 
-        val swipeRefreshStateProgress = rememberSwipeRefreshState(isRefreshing = isRefreshing)
+        val pullRefreshStateUser = rememberPullRefreshState(
+            refreshing = isUserScreenLoading,
+            onRefresh = userViewModel::refreshUserInfo
+        )
 
-        val swipeRefreshStateLogin = rememberSwipeRefreshState(isRefreshing = isLoginScreenLoading)
+        val pullRefreshStateLogin = rememberPullRefreshState(
+            refreshing = isLoginScreenLoading,
+            onRefresh = {  }
+        )
 
         var selectedTabIndex by rememberSaveable { mutableStateOf(0) }
 
@@ -77,20 +84,15 @@ fun NavGraphBuilder.user(
                     targetState = handle.isEmpty()
                 ) {
                     if (it) {
-                        SwipeRefresh(
-                            state = swipeRefreshStateLogin,
-                            onRefresh = { /*TODO*/ },
-                            indicator = CompetraceSwipeRefreshIndicator,
-                            swipeEnabled = false,
-                        ) {
+                        Box(Modifier.pullRefresh(pullRefreshStateLogin, enabled = false)) {
                             LoginScreen(loginViewModel = loginViewModel)
+                            CompetracePullRefreshIndicator(
+                                refreshing = isLoginScreenLoading,
+                                state = pullRefreshStateLogin
+                            )
                         }
                     } else {
-                        SwipeRefresh(
-                            state = swipeRefreshStateProgress,
-                            onRefresh = userViewModel::refreshUserInfo,
-                            indicator = CompetraceSwipeRefreshIndicator,
-                        ) {
+                        Box(Modifier.pullRefresh(pullRefreshStateUser)) {
                             when (responseForUserInfo) {
                                 is ApiState.Loading -> {
                                     Box(modifier = Modifier.fillMaxSize())
@@ -111,6 +113,10 @@ fun NavGraphBuilder.user(
                                     }
                                 }
                             }
+                            CompetracePullRefreshIndicator(
+                                refreshing = isUserScreenLoading,
+                                state = pullRefreshStateUser
+                            )
                         }
                     }
                 }

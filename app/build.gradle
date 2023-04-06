@@ -65,6 +65,9 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
     implementation 'androidx.activity:activity-compose:1.7.0'
 
+    // Collect Lifecycle Aware Components.
+    implementation 'androidx.lifecycle:lifecycle-runtime-compose:2.6.1'
+
     // Material
     implementation "androidx.compose.material:material:$compose_material"
     // Material 3
@@ -72,6 +75,9 @@ dependencies {
 
     // Navigation
     implementation "androidx.navigation:navigation-compose:2.6.0-alpha08"
+
+    // Browser Custom Tab
+    implementation "androidx.browser:browser:1.5.0"
 
     // Kotlin components
     api "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4"
@@ -130,9 +136,6 @@ dependencies {
 
     // Splash Scree Api
     implementation("androidx.core:core-splashscreen:1.0.0")
-
-    // Swipe to Refresh
-    implementation "com.google.accompanist:accompanist-swiperefresh:0.28.0"
 
     // In-App Update
     implementation 'com.google.android.play:core:1.10.3'

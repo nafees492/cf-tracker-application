@@ -6,6 +6,9 @@ import android.net.Uri
 import android.provider.CalendarContract
 import android.util.Log
 import androidx.annotation.StringRes
+import androidx.browser.customtabs.CustomTabsIntent
+import androidx.browser.customtabs.CustomTabsIntent.COLOR_SCHEME_SYSTEM
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.ClipboardManager
@@ -20,12 +23,16 @@ fun Context.copyTextToClipBoard(
 ) {
     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
     textToCopy?.let { clipboardManager.setText(AnnotatedString(textToCopy)) }
+
     SnackbarManager.showMessageWithAction(
         UiText.StringResource(toastMessageId),
         UiText.StringResource(R.string.share)
     ) {
         shareTextToOtherApp(
-            textToShare = UiText.StringResource(R.string.share_copied_link, textToCopy.toString())
+            textToShare = UiText.StringResource(
+                R.string.share_copied_link,
+                textToCopy.toString()
+            )
         )
     }
 }
@@ -41,22 +48,25 @@ fun Context.shareTextToOtherApp(textToShare: UiText, heading: UiText? = null) {
 }
 
 fun Context.loadUrl(url: String?) {
-    Log.d(this::class.java.name, "URL is $url")
+    Log.d("Load URL", "URL is $url")
+
     if (url.isNullOrBlank()) return
-    Intent(Intent.ACTION_VIEW, Uri.parse(url)).also(this::startActivity)
+
+    CustomTabsIntent.Builder().build().launchUrl(
+        this, Uri.parse(url)
+    )
 }
 
 fun Context.sendEmail(
     toSendEmail: Array<String>,
     emailSubject: String? = null,
     emailBody: String? = null,
-
-    ) {
+) {
     Intent(Intent.ACTION_VIEW).apply {
         data =
             Uri.parse("mailto:?subject=" + "$emailSubject" + "&body=" + "$emailBody" + "&to=" + toSendEmail[0])
     }.also {
-        startActivity(Intent.createChooser(it, "Send mail..."))
+        startActivity(Intent.createChooser(it, getString(R.string.send_mail)))
     }
 }
 

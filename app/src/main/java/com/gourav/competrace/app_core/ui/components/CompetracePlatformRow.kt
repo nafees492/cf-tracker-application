@@ -13,6 +13,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.gourav.competrace.app_core.util.Sites
@@ -26,6 +28,8 @@ fun CompetracePlatformRow(
     scrollState: LazyListState = rememberLazyListState()
 ) {
 
+    val haptic = LocalHapticFeedback.current
+
     LaunchedEffect(key1 = selectedTabIndex) {
         scrollState.animateScrollToItem(selectedTabIndex, -140)
     }
@@ -37,7 +41,10 @@ fun CompetracePlatformRow(
         items(platforms.size) {
             FilterChip(
                 selected = selectedTabIndex == it,
-                onClick = { (onClickTab(it)) },
+                onClick = {
+                    onClickTab(it)
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                },
                 label = {
                     Text(
                         text = platforms[it].title,

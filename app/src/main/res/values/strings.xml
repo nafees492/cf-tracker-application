@@ -123,5 +123,6 @@
     <string name="exact_alarm_request">Exact Alarm Permission is not granted. Grant permission to get notified on exact time.</string>
     <string name="note_test_notif">Previously set Test Notification will be dismissed</string>
     <string name="conf_test_notif_set">Test Notification will arrive in %1$d minutes.</string>
+    <string name="send_mail">Send mail...</string>
 
 </resources>

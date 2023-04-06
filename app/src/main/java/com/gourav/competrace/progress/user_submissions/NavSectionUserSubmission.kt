@@ -3,6 +3,9 @@ package com.gourav.competrace.progress.user_submissions
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -10,9 +13,6 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import com.gourav.competrace.app_core.ui.components.CompetraceSwipeRefreshIndicator
 import com.gourav.competrace.app_core.util.ApiState
 import com.gourav.competrace.app_core.util.Screens
 import com.gourav.competrace.app_core.util.TopAppBarManager
@@ -25,8 +25,9 @@ import com.gourav.competrace.app_core.util.UserSubmissionFilter
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.gourav.competrace.R
+import com.gourav.competrace.app_core.ui.components.CompetracePullRefreshIndicator
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 fun NavGraphBuilder.userSubmission(
     userSubmissionsViewModel: UserSubmissionsViewModel,
 ) {
@@ -81,13 +82,12 @@ fun NavGraphBuilder.userSubmission(
             )
         }
 
-        val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = isRefreshing)
+        val pullRefreshState = rememberPullRefreshState(
+            refreshing = isRefreshing,
+            onRefresh = userSubmissionsViewModel::refreshUserSubmission
+        )
 
-        SwipeRefresh(
-            state = swipeRefreshState,
-            onRefresh = userSubmissionsViewModel::refreshUserSubmission,
-            indicator = CompetraceSwipeRefreshIndicator
-        ) {
+        Box(Modifier.pullRefresh(pullRefreshState)) {
             when (responseForUserSubmissions) {
                 is ApiState.Loading -> {
                     Box(modifier = Modifier.fillMaxSize())
@@ -108,6 +108,7 @@ fun NavGraphBuilder.userSubmission(
                     )
                 }
             }
+            CompetracePullRefreshIndicator(refreshing = isRefreshing, state = pullRefreshState)
         }
     }
 }

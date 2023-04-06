@@ -9,31 +9,34 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.gourav.competrace.R
 import com.gourav.competrace.app_core.ui.CompetraceAppState
+import com.gourav.competrace.app_core.ui.NetworkFailScreen
 import com.gourav.competrace.app_core.ui.SharedViewModel
 import com.gourav.competrace.app_core.ui.components.CompetracePlatformRow
-import com.gourav.competrace.app_core.ui.components.CompetraceSwipeRefreshIndicator
+import com.gourav.competrace.app_core.ui.components.CompetracePullRefreshIndicator
+import com.gourav.competrace.app_core.util.*
 import com.gourav.competrace.contests.presentation.ContestScreenActions
 import com.gourav.competrace.contests.presentation.ContestViewModel
 import com.gourav.competrace.contests.presentation.UpcomingContestScreen
-import com.gourav.competrace.app_core.ui.NetworkFailScreen
-import com.gourav.competrace.app_core.util.*
-import java.util.*
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 fun NavGraphBuilder.contests(
     sharedViewModel: SharedViewModel,
     contestViewModel: ContestViewModel,
@@ -80,7 +83,10 @@ fun NavGraphBuilder.contests(
             )
         }
 
-        val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = isRefreshing)
+        val pullRefreshState = rememberPullRefreshState(
+            refreshing = isRefreshing,
+            onRefresh = contestViewModel::getContestListFromKontests
+        )
 
         Column {
             AnimatedVisibility(
@@ -94,11 +100,7 @@ fun NavGraphBuilder.contests(
                 )
             }
 
-            SwipeRefresh(
-                state = swipeRefreshState,
-                onRefresh = contestViewModel::getContestListFromKontests,
-                indicator = CompetraceSwipeRefreshIndicator
-            ) {
+            Box(Modifier.pullRefresh(pullRefreshState)) {
                 when (responseForKontestsContestList) {
                     is ApiState.Loading -> {
                         Box(modifier = Modifier.fillMaxSize())
@@ -113,7 +115,7 @@ fun NavGraphBuilder.contests(
                             contests = currentContests,
                             selectedIndex = selectedIndex,
                             onClickNotificationIcon = {
-                                if(hasNotificationPermission)
+                                if (hasNotificationPermission)
                                     contestViewModel.toggleContestNotification(it)
                                 else {
                                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -126,7 +128,10 @@ fun NavGraphBuilder.contests(
                                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                                                 Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
                                                     flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                                                    putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+                                                    putExtra(
+                                                        Settings.EXTRA_APP_PACKAGE,
+                                                        context.packageName
+                                                    )
                                                 }.also(context::startActivity)
                                             }
                                         }
@@ -137,6 +142,7 @@ fun NavGraphBuilder.contests(
                         )
                     }
                 }
+                CompetracePullRefreshIndicator(refreshing = isRefreshing, state = pullRefreshState)
             }
         }
     }
