@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gourav.competrace.R
 import com.gourav.competrace.app_core.ui.CompetraceAppState
 import com.gourav.competrace.app_core.ui.SharedViewModel
@@ -23,16 +24,16 @@ import com.gourav.competrace.app_core.util.TopAppBarManager
 @ExperimentalMaterial3Api
 @Composable
 fun CompetraceTopAppBar(
-    sharedViewModel: SharedViewModel,
     appState: CompetraceAppState
 ) {
-    val isPlatformTabRowVisible by sharedViewModel.isPlatformsTabRowVisible.collectAsState()
-    val topAppBarValues by TopAppBarManager.topAppBarValues.collectAsState()
+    val topAppBarValues by TopAppBarManager.topAppBarValues.collectAsStateWithLifecycle()
+    val isPlatformTabRowVisible by appState.isPlatformsTabRowVisible.collectAsStateWithLifecycle()
+    val isConnected by appState.isConnectedToNetwork.collectAsStateWithLifecycle()
 
     val navigationIcon: @Composable (() -> Unit) = {
         AnimatedContent(targetState = appState.shouldShowBottomBar) {
             if (it) {
-                IconButton(onClick = { sharedViewModel.toggleIsPlatformsTabRowVisibleTo(!isPlatformTabRowVisible) }) {
+                IconButton(onClick = { appState.toggleIsPlatformsTabRowVisibleTo(!isPlatformTabRowVisible) }) {
                     ExpandArrow(expanded = isPlatformTabRowVisible)
                 }
             } else {
@@ -44,8 +45,6 @@ fun CompetraceTopAppBar(
             }
         }
     }
-
-    val isConnected by sharedViewModel.isConnectedToNetwork.collectAsState()
 
     Column(
         modifier = Modifier.animateContentSize()

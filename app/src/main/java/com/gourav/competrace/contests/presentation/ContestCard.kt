@@ -58,7 +58,7 @@ fun ContestCard(
             }
 
             item {
-                if (contest.registrationOpen && contest.phase == Phase.BEFORE) {
+                if (contest.registrationOpen() && contest.phase == Phase.BEFORE) {
                     ElevatedAssistChip(
                         onClick = {
                             context.loadUrl(url = contest.registrationUrl)
@@ -147,7 +147,7 @@ fun ContestCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                if (contest.within7Days) {
+                if (contest.isWithin7Days()) {
                     val totalTimeInMillis =
                         if (contest.phase == Phase.BEFORE)
                             contest.startTimeInMillis - TimeUtils.currentTimeInMillis()
@@ -200,7 +200,7 @@ fun ContestCard(
                     )
                 }
             }
-            if (contest.within7Days) ratedCategoriesRow(Modifier.padding(horizontal = 8.dp))
+            if (contest.isWithin7Days()) ratedCategoriesRow(Modifier.padding(horizontal = 8.dp))
         }
     }
 }

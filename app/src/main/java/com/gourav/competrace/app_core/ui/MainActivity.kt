@@ -9,12 +9,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gourav.competrace.app_core.data.UserPreferences
 import com.gourav.competrace.app_core.ui.theme.CompetraceThemeNames
 import com.gourav.competrace.app_core.ui.theme.DarkModePref
 import com.gourav.competrace.ui.theme.CompetraceTheme
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -33,11 +35,11 @@ class MainActivity : ComponentActivity() {
 
             val userPreferences = UserPreferences(LocalContext.current)
 
-            val currentTheme by userPreferences.currentThemeFlow.collectAsState(initial = CompetraceThemeNames.DEFAULT)
-            val darkModePref by userPreferences.darkModePrefFlow.collectAsState(initial = DarkModePref.SYSTEM_DEFAULT)
+            val currentTheme by userPreferences.currentThemeFlow.collectAsStateWithLifecycle(CompetraceThemeNames.DEFAULT)
+            val darkModePref by userPreferences.darkModePrefFlow.collectAsStateWithLifecycle(DarkModePref.SYSTEM_DEFAULT)
 
             CompetraceTheme(currentTheme = currentTheme, darkModePref = darkModePref) {
-                Application(sharedViewModel = sharedViewModel)
+                Application()
             }
         }
     }

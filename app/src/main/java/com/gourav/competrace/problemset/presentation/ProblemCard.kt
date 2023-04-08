@@ -8,10 +8,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -27,8 +25,8 @@ import com.gourav.competrace.app_core.util.*
 fun ProblemCard(
     problem: CompetraceProblem,
     contestName: String?,
-    showTags: Boolean,
-    selectedChips: Set<String>,
+    isTagsVisible: Boolean,
+    selectedTags: Set<String>,
     onClickFilterChip: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -69,14 +67,14 @@ fun ProblemCard(
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
             modifier = Modifier.padding(horizontal = 8.dp),
-            maxLines = if(showTags) 1 else 2,
+            maxLines = if(isTagsVisible) 1 else 2,
             overflow = TextOverflow.Ellipsis
         )
 
         problem.tags?.let { tags ->
-            if(showTags) FilterChipScrollableRow(
+            if(isTagsVisible) FilterChipScrollableRow(
                 chipList = tags,
-                selectedChips = selectedChips,
+                selectedChips = selectedTags,
                 onClickFilterChip = onClickFilterChip
             )
         }

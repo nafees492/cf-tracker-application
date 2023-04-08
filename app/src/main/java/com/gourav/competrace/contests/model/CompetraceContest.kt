@@ -1,9 +1,7 @@
 package com.gourav.competrace.contests.model
 
 import android.content.Context
-import com.gourav.competrace.app_core.util.ContestRatedCategories
-import com.gourav.competrace.app_core.util.TimeUtils
-import com.gourav.competrace.app_core.util.addEventToCalendar
+import com.gourav.competrace.app_core.util.*
 import com.gourav.competrace.settings.util.ScheduleNotifBeforeOptions
 import java.util.*
 
@@ -14,8 +12,6 @@ data class CompetraceContest(
     val websiteUrl: String,
     val startTimeInMillis: Long,
     val durationInMillis: Long,
-    val within7Days: Boolean = false,
-    val registrationOpen: Boolean = false,
     val registrationUrl: String? = null,
     val site: String,
 ) {
@@ -61,5 +57,17 @@ data class CompetraceContest(
             description = "Add Contest to Calender"
         )
     }
+
+    private fun daysLeft(): Long = (startTimeInMillis - TimeUtils.currentTimeInMillis()) / (24 * 3600 * 1000)
+
+    private fun within7Days(): Boolean = daysLeft() in Long.MIN_VALUE..6L
+
+    fun registrationOpen(): Boolean = if(site == Sites.Codeforces.title) daysLeft() in 0L..1L else false
+
+    fun isOngoing() = phase == Phase.CODING
+
+    fun isWithin7Days() = phase == Phase.BEFORE && within7Days()
+
+    fun isAfter7Days() = phase == Phase.BEFORE && !within7Days()
 }
 

@@ -14,15 +14,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.gourav.competrace.R
@@ -38,7 +36,6 @@ import com.gourav.competrace.contests.presentation.UpcomingContestScreen
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 fun NavGraphBuilder.contests(
-    sharedViewModel: SharedViewModel,
     contestViewModel: ContestViewModel,
     appState: CompetraceAppState
 ) {
@@ -46,14 +43,8 @@ fun NavGraphBuilder.contests(
 
         val context = LocalContext.current
 
-        val isPlatformTabRowVisible by sharedViewModel.isPlatformsTabRowVisible.collectAsState()
-
-        val selectedIndex by contestViewModel.selectedIndex.collectAsState()
-        val currentContests by contestViewModel.contests.collectAsState()
-        val notificationContestIdList by contestViewModel.notificationContestIdList.collectAsState()
-
-        val responseForKontestsContestList by contestViewModel.responseForKontestsContestList.collectAsState()
-        val isRefreshing by contestViewModel.isKontestsContestListRefreshing.collectAsState()
+        val isPlatformTabRowVisible by appState.isPlatformsTabRowVisible.collectAsStateWithLifecycle()
+        val screenState by contestViewModel.screenState.collectAsStateWithLifecycle()
 
         var hasNotificationPermission by remember {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -67,24 +58,20 @@ fun NavGraphBuilder.contests(
 
         val permissionLauncher = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.RequestPermission(),
-            onResult = { isGranted ->
-                hasNotificationPermission = isGranted
-            }
+            onResult = { isGranted -> hasNotificationPermission = isGranted }
         )
 
         LaunchedEffect(Unit) {
             TopAppBarManager.updateTopAppBar(
                 screen = Screens.ContestsScreen,
                 actions = {
-                    ContestScreenActions(
-                        onClickSettings = appState::navigateToSettings
-                    )
+                    ContestScreenActions(onClickSettings = appState::navigateToSettings)
                 }
             )
         }
 
         val pullRefreshState = rememberPullRefreshState(
-            refreshing = isRefreshing,
+            refreshing = screenState.apiState == ApiState.Loading,
             onRefresh = contestViewModel::getContestListFromKontests
         )
 
@@ -94,14 +81,14 @@ fun NavGraphBuilder.contests(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 CompetracePlatformRow(
-                    selectedTabIndex = selectedIndex,
+                    selectedTabIndex = screenState.selectedIndex,
                     platforms = contestViewModel.contestSites,
                     onClickTab = contestViewModel::setSelectedIndexTo
                 )
             }
 
             Box(Modifier.pullRefresh(pullRefreshState)) {
-                when (responseForKontestsContestList) {
+                when (screenState.apiState) {
                     is ApiState.Loading -> {
                         Box(modifier = Modifier.fillMaxSize())
                     }
@@ -112,8 +99,7 @@ fun NavGraphBuilder.contests(
                     }
                     is ApiState.Success -> {
                         UpcomingContestScreen(
-                            contests = currentContests,
-                            selectedIndex = selectedIndex,
+                            state = screenState,
                             onClickNotificationIcon = {
                                 if (hasNotificationPermission)
                                     contestViewModel.toggleContestNotification(it)
@@ -138,11 +124,13 @@ fun NavGraphBuilder.contests(
                                     )
                                 }
                             },
-                            notificationContestIdList = notificationContestIdList
                         )
                     }
                 }
-                CompetracePullRefreshIndicator(refreshing = isRefreshing, state = pullRefreshState)
+                CompetracePullRefreshIndicator(
+                    refreshing = screenState.apiState == ApiState.Loading,
+                    state = pullRefreshState
+                )
             }
         }
     }

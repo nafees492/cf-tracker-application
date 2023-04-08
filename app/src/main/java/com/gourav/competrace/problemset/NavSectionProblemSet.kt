@@ -15,47 +15,35 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.gourav.competrace.app_core.ui.SharedViewModel
+import com.gourav.competrace.R
+import com.gourav.competrace.app_core.ui.CompetraceAppState
+import com.gourav.competrace.app_core.ui.NetworkFailScreen
 import com.gourav.competrace.app_core.ui.components.CompetracePlatformRow
+import com.gourav.competrace.app_core.ui.components.CompetracePullRefreshIndicator
 import com.gourav.competrace.app_core.util.ApiState
 import com.gourav.competrace.app_core.util.Screens
+import com.gourav.competrace.app_core.util.TopAppBarManager
 import com.gourav.competrace.problemset.presentation.ProblemSetScreen
 import com.gourav.competrace.problemset.presentation.ProblemSetScreenActions
 import com.gourav.competrace.problemset.presentation.ProblemSetViewModel
 import com.gourav.competrace.problemset.presentation.RatingRangeSlider
 import com.gourav.competrace.ui.components.SearchAppBar
-import com.gourav.competrace.app_core.ui.NetworkFailScreen
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import com.gourav.competrace.R
-import com.gourav.competrace.app_core.ui.CompetraceAppState
-import com.gourav.competrace.app_core.ui.components.CompetracePullRefreshIndicator
-import com.gourav.competrace.app_core.util.TopAppBarManager
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 fun NavGraphBuilder.problemSet(
-    sharedViewModel: SharedViewModel,
     problemSetViewModel: ProblemSetViewModel,
     appState: CompetraceAppState
 ) {
     composable(route = Screens.ProblemSetScreen.route) {
         val scope = rememberCoroutineScope()
 
-        val isPlatformTabRowVisible by sharedViewModel.isPlatformsTabRowVisible.collectAsState()
-
-        val showTagsInProblemSet by problemSetViewModel.showTags.collectAsState(initial = true)
-
-        val filteredProblems by problemSetViewModel.filteredProblems.collectAsState()
-        val codeforcesContestListById by problemSetViewModel.codeforcesContestListById.collectAsState()
-        val ratingRangeValue by problemSetViewModel.ratingRangeValue.collectAsState()
-        val searchQuery by problemSetViewModel.searchQuery.collectAsState()
-        val allTags by problemSetViewModel.allTags.collectAsState()
-        val selectedChips by problemSetViewModel.selectedChips.collectAsState()
-
-        val responseForProblemSet by problemSetViewModel.responseForProblemSet.collectAsState()
-        val isRefreshing by problemSetViewModel.isProblemSetRefreshing.collectAsState()
+        val isPlatformTabRowVisible by appState.isPlatformsTabRowVisible.collectAsStateWithLifecycle()
+        val state by problemSetViewModel.screenState.collectAsStateWithLifecycle()
 
         val searchBarFocusRequester = remember { FocusRequester() }
 
@@ -72,13 +60,13 @@ fun NavGraphBuilder.problemSet(
                 screen = Screens.ProblemSetScreen,
                 expandedTopAppBarContent = {
                     RatingRangeSlider(
-                        start = ratingRangeValue.first, end = ratingRangeValue.last,
+                        start = state.ratingRangeValue.first, end = state.ratingRangeValue.last,
                         updateStartAndEnd = problemSetViewModel::updateRatingRange
                     )
                 },
                 searchWidget = {
                     SearchAppBar(
-                        query = searchQuery,
+                        query = state.searchQuery,
                         onValueChange = problemSetViewModel::updateSearchQuery,
                         onCloseClicked = TopAppBarManager::closeSearchWidget,
                         modifier = Modifier.focusRequester(searchBarFocusRequester),
@@ -90,19 +78,17 @@ fun NavGraphBuilder.problemSet(
                         onClickSearch = onClickSearch,
                         onClickSettings = appState::navigateToSettings,
                         onClickFilterIcon = TopAppBarManager::toggleExpandedState,
-                        badgeConditionForSearch = searchQuery.isNotBlank(),
-                        badgeConditionForFilter = ratingRangeValue != 800..3500
+                        badgeConditionForSearch = state.searchQuery.isNotBlank(),
+                        badgeConditionForFilter = state.ratingRangeValue != 800..3500
                     )
                 }
             )
         }
 
         val pullRefreshState = rememberPullRefreshState(
-            refreshing = isRefreshing,
+            refreshing = state.apiState == ApiState.Loading,
             onRefresh = problemSetViewModel::refreshProblemSetAndContests
         )
-
-        var selectedTabIndex by rememberSaveable { mutableStateOf(0) }
 
         Column {
             AnimatedVisibility(
@@ -110,13 +96,13 @@ fun NavGraphBuilder.problemSet(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 CompetracePlatformRow(
-                    selectedTabIndex = selectedTabIndex,
+                    selectedTabIndex = state.selectedIndex,
                     platforms = problemSetViewModel.problemSetSites,
-                    onClickTab = { selectedTabIndex = it }
+                    onClickTab = { /* TODO */  }
                 )
             }
             Box(Modifier.pullRefresh(pullRefreshState)) {
-                when (responseForProblemSet) {
+                when (state.apiState) {
                     is ApiState.Loading -> {
                         Box(modifier = Modifier.fillMaxSize())
                     }
@@ -125,17 +111,16 @@ fun NavGraphBuilder.problemSet(
                     }
                     is ApiState.Success -> {
                         ProblemSetScreen(
-                            problems = filteredProblems,
-                            codeforcesContestListById = codeforcesContestListById,
-                            allTags = allTags,
-                            selectedChips = selectedChips,
+                            state = state,
                             updateSelectedChips = problemSetViewModel::updateSelectedChips,
                             clearSelectedChips = problemSetViewModel::clearSelectedChips,
-                            showTags = showTagsInProblemSet
                         )
                     }
                 }
-                CompetracePullRefreshIndicator(refreshing = isRefreshing, state = pullRefreshState)
+                CompetracePullRefreshIndicator(
+                    refreshing = state.apiState == ApiState.Loading,
+                    state = pullRefreshState
+                )
             }
         }
     }

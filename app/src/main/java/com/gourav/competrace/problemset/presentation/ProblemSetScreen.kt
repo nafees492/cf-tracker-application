@@ -14,27 +14,21 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.gourav.competrace.R
 import com.gourav.competrace.app_core.ui.components.FilterChipScrollableRow
-import com.gourav.competrace.contests.model.CompetraceContest
-import com.gourav.competrace.problemset.model.CompetraceProblem
+import com.gourav.competrace.problemset.model.ProblemSetScreenState
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ProblemSetScreen(
-    problems: List<CompetraceProblem>,
-    codeforcesContestListById: Map<Any, CompetraceContest>,
-    allTags: List<String>,
-    selectedChips: Set<String>,
+    state: ProblemSetScreenState,
     updateSelectedChips: (String) -> Unit,
     clearSelectedChips: () -> Unit,
-    showTags: Boolean
 ) {
     LazyColumn {
-
-        if (showTags) item {
+        if (state.isTagsVisible) item {
             Row(
                 modifier = Modifier.background(color = MaterialTheme.colorScheme.surface)
             ) {
-                AnimatedVisibility(visible = selectedChips.isNotEmpty()) {
+                AnimatedVisibility(visible = state.selectedTags.isNotEmpty()) {
                     IconButton(onClick = clearSelectedChips) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_close_24px),
@@ -44,15 +38,15 @@ fun ProblemSetScreen(
                 }
 
                 FilterChipScrollableRow(
-                    chipList = allTags,
-                    selectedChips = selectedChips,
+                    chipList = state.allTags,
+                    selectedChips = state.selectedTags,
                     onClickFilterChip = updateSelectedChips,
                 )
             }
         }
 
         item {
-            if (problems.isEmpty()) {
+            if (state.problems.isEmpty()) {
                 Column(
                     modifier = Modifier
                         .height(120.dp)
@@ -71,12 +65,12 @@ fun ProblemSetScreen(
             }
         }
 
-        items(count = problems.size) {
+        items(count = state.problems.size) {
             ProblemCard(
-                problem = problems[it],
-                contestName = codeforcesContestListById[problems[it].contestId ?: 0]?.name,
-                showTags = showTags,
-                selectedChips = selectedChips,
+                problem = state.problems[it],
+                contestName = state.getContestName(state.problems[it]),
+                isTagsVisible = state.isTagsVisible,
+                selectedTags = state.selectedTags,
                 onClickFilterChip = updateSelectedChips,
                 modifier = Modifier.animateItemPlacement()
             )

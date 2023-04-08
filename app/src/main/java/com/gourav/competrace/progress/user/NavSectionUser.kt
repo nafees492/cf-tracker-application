@@ -28,7 +28,6 @@ import com.gourav.competrace.progress.user.presentation.login.LoginViewModel
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 fun NavGraphBuilder.user(
-    sharedViewModel: SharedViewModel,
     userViewModel: UserViewModel,
     userSubmissionsViewModel: UserSubmissionsViewModel,
     appState: CompetraceAppState,
@@ -37,7 +36,7 @@ fun NavGraphBuilder.user(
     composable(route = Screens.ProgressScreen.route) {
         val loginViewModel: LoginViewModel = hiltViewModel()
 
-        val isPlatformTabRowVisible by sharedViewModel.isPlatformsTabRowVisible.collectAsState()
+        val isPlatformTabRowVisible by appState.isPlatformsTabRowVisible.collectAsState()
 
         val userHandle by userViewModel.userHandle.collectAsState(null)
         val responseForUserInfo by userViewModel.responseForUserInfo.collectAsState()

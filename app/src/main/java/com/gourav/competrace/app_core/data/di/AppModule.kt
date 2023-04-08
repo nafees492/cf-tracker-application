@@ -42,11 +42,6 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideNetworkConnectivityObserver(@ApplicationContext context: Context): ConnectivityObserver =
-        ConnectivityObserverImpl(context)
-
-    @Provides
-    @Singleton
     fun provideUserRepository(@ApplicationContext context: Context): UserRepository =
         UserRepository(context)
 

@@ -5,8 +5,10 @@ import android.content.res.Resources
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavDestination
 import androidx.navigation.NavGraph
 import androidx.navigation.NavHostController
@@ -14,6 +16,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.gourav.competrace.app_core.util.*
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 @Composable
@@ -53,7 +56,6 @@ class CompetraceAppState(
     coroutineScope: CoroutineScope,
     context: Context
 ) {
-    // Process snackbars coming from SnackbarManager
     init {
         coroutineScope.launch {
             snackbarManager.messages.collect { currentMessages ->
@@ -78,6 +80,26 @@ class CompetraceAppState(
                 }
             }
         }
+    }
+
+    private val networkConnectivityObserver = ConnectivityObserverImpl(context)
+
+    val isConnectedToNetwork = networkConnectivityObserver.observe().map {
+        when(it){
+            ConnectivityObserver.Status.Available -> true
+            else -> false
+        }
+    }.stateIn(
+        coroutineScope,
+        SharingStarted.WhileSubscribed(),
+        false
+    )
+
+    private val _isPlatformsTabRowVisible = MutableStateFlow(true)
+    val isPlatformsTabRowVisible = _isPlatformsTabRowVisible.asStateFlow()
+
+    fun toggleIsPlatformsTabRowVisibleTo(value: Boolean) {
+        _isPlatformsTabRowVisible.update { value }
     }
 
     val currentRoute: String?
