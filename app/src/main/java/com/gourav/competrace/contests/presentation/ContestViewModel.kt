@@ -11,7 +11,7 @@ import com.gourav.competrace.contests.data.ContestAlarmScheduler
 import com.gourav.competrace.contests.data.repository.ContestAlarmRepository
 import com.gourav.competrace.contests.model.CompetraceContest
 import com.gourav.competrace.contests.model.ContestAlarmItem
-import com.gourav.competrace.settings.ScheduleNotifBeforeOptions
+import com.gourav.competrace.settings.util.ScheduleNotifBeforeOptions
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*

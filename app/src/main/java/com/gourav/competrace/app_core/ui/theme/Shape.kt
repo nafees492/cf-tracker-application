@@ -1,4 +1,4 @@
-package com.gourav.competrace.ui.theme
+package com.gourav.competrace.app_core.ui.theme
 
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material3.ShapeDefaults

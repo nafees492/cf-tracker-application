@@ -32,6 +32,7 @@ import com.gourav.competrace.contests.data.ContestContestAlarmSchedulerImpl
 import com.gourav.competrace.contests.model.ContestAlarmItem
 import com.gourav.competrace.contests.presentation.ContestViewModel
 import com.gourav.competrace.app_core.util.sendEmail
+import com.gourav.competrace.settings.util.ScheduleNotifBeforeOptions
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -81,7 +82,7 @@ fun SettingsScreen(
         mutableStateOf(false)
     }
 
-    if (settingsViewModel.isDeviceAbove12) AlertTheme(
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) AlertTheme(
         isOpen = isThemeAlertOpen,
         themeOptions = settingsViewModel.themeOptions,
         selectedOption = currentTheme,
@@ -148,8 +149,7 @@ fun SettingsScreen(
                     RowWithLeadingIcon(
                         title = stringResource(id = R.string.schedule_notif_before),
                         leadingIconId = R.drawable.ic_schedule_24px,
-                        subTitle = ScheduleNotifBeforeOptions.values()
-                            .find { it.value == scheduleNotifBefore }?.option,
+                        subTitle = ScheduleNotifBeforeOptions.getOption(scheduleNotifBefore),
                         onClick = { isScheduleNotifBeforeAlertOpen = true },
                         showError = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
                             !alarmManager.canScheduleExactAlarms() else false
@@ -172,7 +172,7 @@ fun SettingsScreen(
 
         item {
             SettingsSection(title = stringResource(id = R.string.theme)) {
-                if (settingsViewModel.isDeviceAbove12) RowWithLeadingIcon(
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) RowWithLeadingIcon(
                     title = stringResource(id = R.string.theme),
                     leadingIconId = R.drawable.ic_palette_24px,
                     subTitle = currentTheme,

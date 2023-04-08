@@ -4,7 +4,7 @@ import android.content.Context
 import com.gourav.competrace.app_core.util.ContestRatedCategories
 import com.gourav.competrace.app_core.util.TimeUtils
 import com.gourav.competrace.app_core.util.addEventToCalendar
-import com.gourav.competrace.settings.ScheduleNotifBeforeOptions
+import com.gourav.competrace.settings.util.ScheduleNotifBeforeOptions
 import java.util.*
 
 data class CompetraceContest(
