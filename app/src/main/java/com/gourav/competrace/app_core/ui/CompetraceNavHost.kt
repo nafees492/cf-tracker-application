@@ -30,8 +30,8 @@ fun CompetraceNavHost(
 ) {
     val contestViewModel: ContestViewModel = hiltViewModel()
     val problemSetViewModel: ProblemSetViewModel = hiltViewModel()
-    val userSubmissionsViewModel: UserSubmissionsViewModel = hiltViewModel()
     val userViewModel: UserViewModel = hiltViewModel()
+    val userSubmissionsViewModel: UserSubmissionsViewModel = hiltViewModel()
     val participatedContestViewModel: ParticipatedContestViewModel = hiltViewModel()
 
     NavHost(
@@ -44,12 +44,14 @@ fun CompetraceNavHost(
 
         contests(
             contestViewModel = contestViewModel,
-            appState = appState
+            appState = appState,
+            paddingValues = paddingValues
         )
 
         problemSet(
             problemSetViewModel = problemSetViewModel,
-            appState = appState
+            appState = appState,
+            paddingValues = paddingValues
         )
 
         progress(

@@ -20,7 +20,7 @@ import com.gourav.competrace.progress.user_submissions.presentation.UserSubmissi
 import com.gourav.competrace.progress.user_submissions.presentation.UserSubmissionsScreenActions
 import com.gourav.competrace.progress.user_submissions.presentation.UserSubmissionsViewModel
 import com.gourav.competrace.ui.components.SearchAppBar
-import com.gourav.competrace.app_core.ui.NetworkFailScreen
+import com.gourav.competrace.app_core.ui.FailureScreen
 import com.gourav.competrace.app_core.util.UserSubmissionFilter
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -88,13 +88,14 @@ fun NavGraphBuilder.userSubmission(
         )
 
         Box(Modifier.pullRefresh(pullRefreshState)) {
-            when (responseForUserSubmissions) {
+            when (val apiState = responseForUserSubmissions) {
                 is ApiState.Loading -> {
                     Box(modifier = Modifier.fillMaxSize())
                 }
                 is ApiState.Failure -> {
-                    NetworkFailScreen(
-                        onClickRetry = userSubmissionsViewModel::refreshUserSubmission
+                    FailureScreen(
+                        onClickRetry = userSubmissionsViewModel::refreshUserSubmission,
+                        errorMessage = apiState.message
                     )
                 }
                 ApiState.Success -> {

@@ -7,6 +7,7 @@ import com.gourav.competrace.app_core.data.CodeforcesDatabase
 import com.gourav.competrace.app_core.data.UserPreferences
 import com.gourav.competrace.app_core.data.repository.remote.CodeforcesRepository
 import com.gourav.competrace.app_core.util.ApiState
+import com.gourav.competrace.app_core.util.ErrorEntity
 import com.gourav.competrace.app_core.util.UiText
 import com.gourav.competrace.problemset.model.CodeforcesProblem
 import com.gourav.competrace.progress.user_submissions.model.Submission
@@ -63,21 +64,22 @@ class UserSubmissionsViewModel @Inject constructor(
                 .onStart {
                     _isUserSubmissionRefreshing.update { true }
                     _responseForUserSubmission.update { ApiState.Loading }
-                }.catch {
-                    _responseForUserSubmission.update { ApiState.Failure }
+                }.catch {e->
+                    val errorMessage = ErrorEntity.getError(e).messageId
+                    _responseForUserSubmission.update { ApiState.Failure(UiText.StringResource(errorMessage)) }
                     _isUserSubmissionRefreshing.update { false }
-                    Log.e(TAG, "getUserSubmission: $it")
-                }.collect {
-                    if (it.status == "OK") {
+                    Log.e(TAG, "getUserSubmission: $e")
+                }.collect {apiResult ->
+                    if (apiResult.status == "OK") {
 
-                        processUserSubmissionsFromAPIResult(codeforcesApiResult = it)
+                        processUserSubmissionsFromAPIResult(codeforcesApiResult = apiResult)
 
                         _responseForUserSubmission.update { ApiState.Success }
 
                         Log.d(TAG, "Got - User Submissions")
                     } else {
-                        _responseForUserSubmission.update { ApiState.Failure }
-                        Log.e(TAG, "getUserSubmission: " + it.comment.toString())
+                        _responseForUserSubmission.update { ApiState.Failure(UiText.DynamicString(apiResult.comment.toString())) }
+                        Log.e(TAG, "getUserSubmission: " + apiResult.comment.toString())
                     }
                     _isUserSubmissionRefreshing.update { false }
                 }

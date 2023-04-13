@@ -14,14 +14,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.gourav.competrace.app_core.ui.CompetraceAppState
-import com.gourav.competrace.app_core.ui.SharedViewModel
 import com.gourav.competrace.app_core.ui.components.CompetracePlatformRow
 import com.gourav.competrace.app_core.util.ApiState
 import com.gourav.competrace.app_core.util.Screens
 import com.gourav.competrace.app_core.util.TopAppBarManager
 import com.gourav.competrace.progress.user.presentation.*
 import com.gourav.competrace.progress.user_submissions.presentation.UserSubmissionsViewModel
-import com.gourav.competrace.app_core.ui.NetworkFailScreen
+import com.gourav.competrace.app_core.ui.FailureScreen
 import com.gourav.competrace.app_core.ui.components.CompetracePullRefreshIndicator
 import com.gourav.competrace.progress.user.presentation.login.LoginScreen
 import com.gourav.competrace.progress.user.presentation.login.LoginViewModel
@@ -92,13 +91,14 @@ fun NavGraphBuilder.user(
                         }
                     } else {
                         Box(Modifier.pullRefresh(pullRefreshStateUser)) {
-                            when (responseForUserInfo) {
+                            when (val apiState = responseForUserInfo) {
                                 is ApiState.Loading -> {
                                     Box(modifier = Modifier.fillMaxSize())
                                 }
                                 is ApiState.Failure -> {
-                                    NetworkFailScreen(
-                                        onClickRetry = userViewModel::refreshUserInfo
+                                    FailureScreen(
+                                        onClickRetry = userViewModel::refreshUserInfo,
+                                        errorMessage = apiState.message
                                     )
                                 }
                                 is ApiState.Success -> {

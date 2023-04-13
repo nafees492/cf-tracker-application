@@ -8,12 +8,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.gourav.competrace.R
 import com.gourav.competrace.app_core.ui.components.CompetraceButton
+import com.gourav.competrace.app_core.util.UiText
 
 @Composable
-fun NetworkFailScreen(onClickRetry: () -> Unit) {
+fun FailureScreen(
+    onClickRetry: () -> Unit,
+    errorMessage: UiText = UiText.StringResource(R.string.something_went_wrong)
+) {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -21,17 +26,19 @@ fun NetworkFailScreen(onClickRetry: () -> Unit) {
     ) {
         Icon(
             painter = painterResource(id = R.drawable.ic_error_48px),
-            contentDescription = "Network Error",
-            modifier = Modifier.size(80.dp).padding(8.dp)
+            contentDescription = stringResource(R.string.error),
+            modifier = Modifier
+                .size(80.dp)
+                .padding(8.dp)
         )
         Text(
-            text = "Something Went Wrong!",
+            text = errorMessage.asString(),
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.padding(8.dp),
             color = MaterialTheme.colorScheme.onSurface
         )
         CompetraceButton(
-            text = "Retry",
+            text = stringResource(R.string.retry),
             onClick = onClickRetry,
         )
     }

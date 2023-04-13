@@ -7,11 +7,13 @@ import com.gourav.competrace.app_core.data.CodeforcesDatabase
 import com.gourav.competrace.app_core.data.UserPreferences
 import com.gourav.competrace.app_core.data.repository.remote.CodeforcesRepository
 import com.gourav.competrace.app_core.util.ApiState
+import com.gourav.competrace.app_core.util.ErrorEntity
 import com.gourav.competrace.app_core.util.Sites
+import com.gourav.competrace.app_core.util.UiText
 import com.gourav.competrace.contests.model.CompetraceContest
-import com.gourav.competrace.problemset.util.processCodeforcesContestFromAPIResult
 import com.gourav.competrace.problemset.model.CompetraceProblem
 import com.gourav.competrace.problemset.model.ProblemSetScreenState
+import com.gourav.competrace.problemset.util.processCodeforcesContestFromAPIResult
 import com.gourav.competrace.problemset.util.processCodeforcesProblemSetFromAPIResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -45,11 +47,11 @@ class ProblemSetViewModel @Inject constructor(
         codeforcesDatabase.addContestToContestListById(contest = codeforcesContest)
     }
 
-    fun clearProblemsFromCodeforcesDatabase(){
+    fun clearProblemsFromCodeforcesDatabase() {
         codeforcesDatabase.clearProblems()
     }
 
-    fun addAllProblemsToCodeforcesDatabase(problem: List<CompetraceProblem>){
+    fun addAllProblemsToCodeforcesDatabase(problem: List<CompetraceProblem>) {
         codeforcesDatabase.addAllProblems(problems = problem)
     }
 
@@ -95,38 +97,38 @@ class ProblemSetViewModel @Inject constructor(
     private val _showTags = userPreferences.showTagsFlow
     private val _allTags = MutableStateFlow(emptyList<String>())
 
-    fun updateAllTags(value: List<String>){
+    fun updateAllTags(value: List<String>) {
         _allTags.update { value }
     }
 
 
     private val _ratingRangeValue = MutableStateFlow(800..3500)
 
-    fun updateRatingRange(start: Int, end: Int){
+    fun updateRatingRange(start: Int, end: Int) {
         _ratingRangeValue.update { start..end }
     }
 
     private val _searchQuery = MutableStateFlow("")
 
-    fun updateSearchQuery(value: String){
+    fun updateSearchQuery(value: String) {
         _searchQuery.update { value }
     }
 
     private val _selectedChips = MutableStateFlow(setOf<String>())
     private fun isChipSelected(value: String) = _selectedChips.value.contains(value)
 
-    fun updateSelectedChips(value: String){
-        if(isChipSelected(value)) _selectedChips.update { it - value }
+    fun updateSelectedChips(value: String) {
+        if (isChipSelected(value)) _selectedChips.update { it - value }
         else _selectedChips.update { it + value }
     }
 
-    fun clearSelectedChips(){
+    fun clearSelectedChips() {
         _selectedChips.update { emptySet() }
     }
 
     private val _filteredProblems = _allProblems
-        .combine(_searchQuery){ problems, searchQuery ->
-            if(searchQuery.isBlank()) problems
+        .combine(_searchQuery) { problems, searchQuery ->
+            if (searchQuery.isBlank()) problems
             else {
                 problems.filter {
                     val isProblemMatched = it.name.contains(searchQuery, ignoreCase = true)
@@ -136,14 +138,14 @@ class ProblemSetViewModel @Inject constructor(
                 }
             }
         }
-        .combine(_ratingRangeValue){ problems, ratingRange ->
+        .combine(_ratingRangeValue) { problems, ratingRange ->
             problems.filter {
                 val isDefault =
                     (it.rating == null && ratingRange.first == 800 && ratingRange.last == 3500)
                 isDefault || (it.rating in ratingRange)
             }
         }
-        .combine(_selectedChips){ problems, selectedChips ->
+        .combine(_selectedChips) { problems, selectedChips ->
             problems.filter {
                 selectedChips.isEmpty() || it.tags?.containsAll(selectedChips) ?: false
             }
@@ -151,25 +153,25 @@ class ProblemSetViewModel @Inject constructor(
 
     private val _screenState = MutableStateFlow(ProblemSetScreenState())
     val screenState = _screenState
-        .combine(_showTags){ state, showTags ->
+        .combine(_showTags) { state, showTags ->
             state.copy(isTagsVisible = showTags)
         }
-        .combine(_allTags){ state, tags ->
+        .combine(_allTags) { state, tags ->
             state.copy(allTags = tags)
         }
-        .combine(_ratingRangeValue){ state, ratingRange ->
+        .combine(_ratingRangeValue) { state, ratingRange ->
             state.copy(ratingRangeValue = ratingRange)
         }
-        .combine(_searchQuery){ state, searchQuery ->
+        .combine(_searchQuery) { state, searchQuery ->
             state.copy(searchQuery = searchQuery)
         }
-        .combine(_selectedChips){state, chips ->
+        .combine(_selectedChips) { state, chips ->
             state.copy(selectedTags = chips)
         }
-        .combine(_filteredProblems){ state, problems ->
+        .combine(_filteredProblems) { state, problems ->
             state.copy(problems = problems)
         }
-        .combine(_codeforcesContest){ state, codeforcesContests ->
+        .combine(_codeforcesContest) { state, codeforcesContests ->
             state.copy(codeforcesContests = codeforcesContests)
         }
         .stateIn(
@@ -184,17 +186,22 @@ class ProblemSetViewModel @Inject constructor(
             codeforcesRepository.getProblemSet()
                 .onStart {
                     _screenState.update { it.copy(apiState = ApiState.Loading) }
-                }.catch {e ->
-                    _screenState.update { it.copy(apiState = ApiState.Failure) }
+                }.catch { e ->
+                    val errorMessage = ErrorEntity.getError(e).messageId
+                    _screenState.update {
+                        it.copy(apiState = ApiState.Failure(UiText.StringResource(errorMessage)))
+                    }
                     Log.e(TAG, "getProblemSet: ${e.cause}")
                 }.collect { apiResult ->
-                    if(apiResult.status == "OK"){
+                    if (apiResult.status == "OK") {
                         processCodeforcesProblemSetFromAPIResult(apiResult = apiResult)
                         Log.d(TAG, "Got - Problem Set")
                         _screenState.update { it.copy(apiState = ApiState.Success) }
                     } else {
                         Log.e(TAG, "getProblemSet: " + apiResult.comment.toString())
-                        _screenState.update { it.copy(apiState = ApiState.Failure) }
+                        _screenState.update {
+                            it.copy(apiState = ApiState.Failure(UiText.DynamicString(apiResult.comment.toString())))
+                        }
                     }
                 }
         }

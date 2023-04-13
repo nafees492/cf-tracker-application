@@ -9,10 +9,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -25,8 +22,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.gourav.competrace.R
 import com.gourav.competrace.app_core.ui.CompetraceAppState
-import com.gourav.competrace.app_core.ui.NetworkFailScreen
-import com.gourav.competrace.app_core.ui.SharedViewModel
+import com.gourav.competrace.app_core.ui.FailureScreen
 import com.gourav.competrace.app_core.ui.components.CompetracePlatformRow
 import com.gourav.competrace.app_core.ui.components.CompetracePullRefreshIndicator
 import com.gourav.competrace.app_core.util.*
@@ -37,7 +33,8 @@ import com.gourav.competrace.contests.presentation.UpcomingContestScreen
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 fun NavGraphBuilder.contests(
     contestViewModel: ContestViewModel,
-    appState: CompetraceAppState
+    appState: CompetraceAppState,
+    paddingValues: PaddingValues
 ) {
     composable(route = Screens.ContestsScreen.route) {
 
@@ -75,7 +72,7 @@ fun NavGraphBuilder.contests(
             onRefresh = contestViewModel::getContestListFromKontests
         )
 
-        Column {
+        Column(Modifier.padding(bottom = paddingValues.calculateBottomPadding())) {
             AnimatedVisibility(
                 visible = isPlatformTabRowVisible,
                 modifier = Modifier.fillMaxWidth()
@@ -88,13 +85,14 @@ fun NavGraphBuilder.contests(
             }
 
             Box(Modifier.pullRefresh(pullRefreshState)) {
-                when (screenState.apiState) {
+                when (val apiState = screenState.apiState) {
                     is ApiState.Loading -> {
                         Box(modifier = Modifier.fillMaxSize())
                     }
                     is ApiState.Failure -> {
-                        NetworkFailScreen(
+                        FailureScreen(
                             onClickRetry = contestViewModel::getContestListFromKontests,
+                            errorMessage = apiState.message
                         )
                     }
                     is ApiState.Success -> {

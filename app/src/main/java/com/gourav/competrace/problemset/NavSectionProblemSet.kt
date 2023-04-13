@@ -2,15 +2,14 @@ package com.gourav.competrace.problemset
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
-import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -20,7 +19,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.gourav.competrace.R
 import com.gourav.competrace.app_core.ui.CompetraceAppState
-import com.gourav.competrace.app_core.ui.NetworkFailScreen
+import com.gourav.competrace.app_core.ui.FailureScreen
 import com.gourav.competrace.app_core.ui.components.CompetracePlatformRow
 import com.gourav.competrace.app_core.ui.components.CompetracePullRefreshIndicator
 import com.gourav.competrace.app_core.util.ApiState
@@ -37,7 +36,8 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 fun NavGraphBuilder.problemSet(
     problemSetViewModel: ProblemSetViewModel,
-    appState: CompetraceAppState
+    appState: CompetraceAppState,
+    paddingValues: PaddingValues
 ) {
     composable(route = Screens.ProblemSetScreen.route) {
         val scope = rememberCoroutineScope()
@@ -90,7 +90,7 @@ fun NavGraphBuilder.problemSet(
             onRefresh = problemSetViewModel::refreshProblemSetAndContests
         )
 
-        Column {
+        Column(Modifier.padding(bottom = paddingValues.calculateBottomPadding())) {
             AnimatedVisibility(
                 visible = isPlatformTabRowVisible,
                 modifier = Modifier.fillMaxWidth()
@@ -98,16 +98,19 @@ fun NavGraphBuilder.problemSet(
                 CompetracePlatformRow(
                     selectedTabIndex = state.selectedIndex,
                     platforms = problemSetViewModel.problemSetSites,
-                    onClickTab = { /* TODO */  }
+                    onClickTab = { /* TODO */ }
                 )
             }
             Box(Modifier.pullRefresh(pullRefreshState)) {
-                when (state.apiState) {
+                when (val apiState = state.apiState) {
                     is ApiState.Loading -> {
                         Box(modifier = Modifier.fillMaxSize())
                     }
                     is ApiState.Failure -> {
-                        NetworkFailScreen(onClickRetry = problemSetViewModel::refreshProblemSetAndContests)
+                        FailureScreen(
+                            onClickRetry = problemSetViewModel::refreshProblemSetAndContests,
+                            errorMessage = apiState.message
+                        )
                     }
                     is ApiState.Success -> {
                         ProblemSetScreen(

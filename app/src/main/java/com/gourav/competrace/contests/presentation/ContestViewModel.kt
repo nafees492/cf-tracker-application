@@ -84,7 +84,10 @@ class ContestViewModel @Inject constructor(
                     _screenState.update { it.copy(apiState = ApiState.Loading) }
                 }
                 .catch { e ->
-                    _screenState.update { it.copy(apiState = ApiState.Failure) }
+                    val errorMessage = ErrorEntity.getError(e).messageId
+                    _screenState.update {
+                        it.copy(apiState = ApiState.Failure(UiText.StringResource(errorMessage)))
+                    }
                     Log.e(TAG, "getContestListFromKontests: ${e.cause}")
                 }
                 .collect { apiResult ->

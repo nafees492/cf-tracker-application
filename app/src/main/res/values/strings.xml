@@ -126,4 +126,14 @@
     <string name="conf_test_notif_set">Test Notification will arrive in %1$d minutes.</string>
     <string name="send_mail">Send mail…</string>
 
+    <!-- Error -->
+    <string name="error">Error</string>
+    <string name="something_went_wrong">Something Went Wrong!</string>
+    <string name="retry">Retry</string>
+    <string name="not_found_error">Page Not Found!</string>
+    <string name="access_denied_error">Page Access Denied!</string>
+    <string name="service_unavailable_error">Service Unavailable!</string>
+
+
+
 </resources>

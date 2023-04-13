@@ -7,6 +7,8 @@ import com.gourav.competrace.app_core.data.CodeforcesDatabase
 import com.gourav.competrace.app_core.data.UserPreferences
 import com.gourav.competrace.app_core.data.repository.remote.CodeforcesRepository
 import com.gourav.competrace.app_core.util.ApiState
+import com.gourav.competrace.app_core.util.ErrorEntity
+import com.gourav.competrace.app_core.util.UiText
 import com.gourav.competrace.contests.model.CompetraceContest
 import com.gourav.competrace.progress.participated_contests.model.UserRatingChanges
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,23 +29,24 @@ class ParticipatedContestViewModel @Inject constructor(
 
     private val _userRatingChanges = MutableStateFlow(listOf<UserRatingChanges>())
 
-    val participatedContests = combine(_userRatingChanges, contestListById) { ratingChanges, contestListById ->
-        val contests = mutableListOf<CompetraceContest>()
-        ratingChanges.forEach {
-            contestListById[it.contestId]?.apply {
-                ratingChange = it.newRating - it.oldRating
-                newRating = it.newRating
-                rank = it.rank
-            }?.also { contest ->
-                contests.add(contest)
+    val participatedContests =
+        combine(_userRatingChanges, contestListById) { ratingChanges, contestListById ->
+            val contests = mutableListOf<CompetraceContest>()
+            ratingChanges.forEach {
+                contestListById[it.contestId]?.apply {
+                    ratingChange = it.newRating - it.oldRating
+                    newRating = it.newRating
+                    rank = it.rank
+                }?.also { contest ->
+                    contests.add(contest)
+                }
             }
-        }
-        contests
-    }.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(),
-        emptyList()
-    )
+            contests
+        }.stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(),
+            emptyList()
+        )
 
     private val _isUserRatingChangesRefreshing = MutableStateFlow(false)
     val isUserRatingChangesRefreshing = _isUserRatingChangesRefreshing.asStateFlow()
@@ -51,7 +54,7 @@ class ParticipatedContestViewModel @Inject constructor(
     fun refreshUserRatingChanges() {
         viewModelScope.launch {
             userPreferences.handleNameFlow.collect {
-                if(it.isNotBlank()) getUserRatingChanges(it)
+                if (it.isNotBlank()) getUserRatingChanges(it)
             }
         }
     }
@@ -65,10 +68,17 @@ class ParticipatedContestViewModel @Inject constructor(
                 .onStart {
                     _responseForUserRatingChanges.update { ApiState.Loading }
                     _isUserRatingChangesRefreshing.update { true }
-                }.catch {
-                    _responseForUserRatingChanges.update { ApiState.Failure }
+                }.catch { e ->
+                    val errorMessage = ErrorEntity.getError(e).messageId
+                    _responseForUserRatingChanges.update {
+                        ApiState.Failure(
+                            UiText.StringResource(
+                                errorMessage
+                            )
+                        )
+                    }
                     _isUserRatingChangesRefreshing.update { false }
-                    Log.e(TAG, "getUserRatingChanges: $it")
+                    Log.e(TAG, "getUserRatingChanges: $e")
                 }.collect { apiResult ->
                     if (apiResult.status == "OK") {
                         val userRatingChanges = apiResult.result as List<UserRatingChanges>
@@ -77,7 +87,13 @@ class ParticipatedContestViewModel @Inject constructor(
                         _responseForUserRatingChanges.update { ApiState.Success }
                         Log.d(TAG, "Got - User Rating Changes")
                     } else {
-                        _responseForUserRatingChanges.update { ApiState.Failure }
+                        _responseForUserRatingChanges.update {
+                            ApiState.Failure(
+                                UiText.DynamicString(
+                                    apiResult.comment.toString()
+                                )
+                            )
+                        }
                         Log.e(TAG, "getUserRatingChanges: " + apiResult.comment.toString())
                     }
                     _isUserRatingChangesRefreshing.update { false }

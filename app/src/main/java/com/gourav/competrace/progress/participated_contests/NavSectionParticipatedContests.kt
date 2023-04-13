@@ -16,7 +16,7 @@ import com.gourav.competrace.app_core.util.Screens
 import com.gourav.competrace.app_core.util.TopAppBarManager
 import com.gourav.competrace.progress.participated_contests.presentation.ParticipatedContestViewModel
 import com.gourav.competrace.progress.participated_contests.presentation.ParticipatedContestsScreen
-import com.gourav.competrace.app_core.ui.NetworkFailScreen
+import com.gourav.competrace.app_core.ui.FailureScreen
 import com.gourav.competrace.app_core.ui.components.CompetracePullRefreshIndicator
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -39,12 +39,15 @@ fun NavGraphBuilder.participatedContests(
         }
 
         Box(Modifier.pullRefresh(pullRefreshState)) {
-            when (responseForUserRatingChanges) {
+            when (val apiState = responseForUserRatingChanges) {
                 is ApiState.Loading -> {
                     Box(modifier = Modifier.fillMaxSize())
                 }
                 is ApiState.Failure -> {
-                    NetworkFailScreen(onClickRetry = participatedContestViewModel::refreshUserRatingChanges)
+                    FailureScreen(
+                        onClickRetry = participatedContestViewModel::refreshUserRatingChanges,
+                        errorMessage = apiState.message
+                    )
                 }
                 ApiState.Success -> {
                     ParticipatedContestsScreen(participatedCodeforcesContests = participatedContests)

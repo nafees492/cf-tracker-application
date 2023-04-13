@@ -21,7 +21,7 @@ import com.gourav.competrace.app_core.ui.components.MyCircularProgressIndicator
 import com.gourav.competrace.app_core.util.ApiState
 import com.gourav.competrace.progress.user.model.User
 import com.gourav.competrace.progress.user_submissions.presentation.UserSubmissionsViewModel
-import com.gourav.competrace.app_core.ui.NetworkFailScreen
+import com.gourav.competrace.app_core.ui.FailureScreen
 import com.gourav.competrace.app_core.util.ColorUtils
 import com.skydoves.landscapist.animation.crossfade.CrossfadePlugin
 import com.skydoves.landscapist.components.rememberImageComponent
@@ -148,7 +148,7 @@ fun ProgressScreen(
                         MyCircularProgressIndicator(isDisplayed = true)
                     }
                     is ApiState.Failure -> {
-                        NetworkFailScreen(
+                        FailureScreen(
                             onClickRetry = userSubmissionsViewModel::refreshUserSubmission
                         )
                     }
