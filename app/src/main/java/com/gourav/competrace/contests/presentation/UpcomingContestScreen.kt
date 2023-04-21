@@ -163,9 +163,6 @@ fun UpcomingContestScreen(
                 }
             }
         }
-        item {
-            Spacer(modifier = Modifier.height(120.dp))
-        }
     }
 }
 

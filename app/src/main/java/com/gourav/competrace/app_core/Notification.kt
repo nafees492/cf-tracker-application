@@ -74,7 +74,7 @@ class AndroidNotification(private val context: Context) : Notification {
         val builder = NotificationCompat.Builder(context, item.channelId).apply {
             priority = item.priority
 
-            setSmallIcon(R.drawable.competrace_96)
+            setSmallIcon(R.drawable.competrace_notification_icon)
             setContentTitle(item.title)
             setContentText(item.description)
             setStyle(NotificationCompat.BigTextStyle().bigText(item.description))

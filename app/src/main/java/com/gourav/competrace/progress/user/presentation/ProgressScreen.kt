@@ -34,7 +34,7 @@ fun ProgressScreen(
     user: User,
     goToSubmission: () -> Unit,
     goToParticipatedContests: () -> Unit,
-    userSubmissionsViewModel: UserSubmissionsViewModel,
+    userSubmissionsViewModel: UserSubmissionsViewModel
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -54,15 +54,10 @@ fun ProgressScreen(
                         .size(120.dp)
                         .clip(RoundedCornerShape(4.dp)),
                     component = rememberImageComponent {
-                        // shows a crossFade animation when the image is loaded.
-                        +CrossfadePlugin()
-
-                        // shows a shimmering effect when loading an image.
                         +ShimmerPlugin(
                             baseColor = MaterialTheme.colorScheme.surface,
                             highlightColor = MaterialTheme.colorScheme.onSurface
                         )
-                        // Failure Image
                         +PlaceholderPlugin.Failure(
                             painterResource(
                                 id = R.drawable.broken_image_48px
@@ -174,10 +169,6 @@ fun ProgressScreen(
                     }
                 }
             }
-        }
-
-        item {
-            Spacer(modifier = Modifier.height(120.dp))
         }
     }
 }

@@ -32,7 +32,7 @@ enum class Sites(
     ),
     Competrace(
         title = "Competrace",
-        iconId = R.drawable.competrace_96,
+        iconId = R.drawable.competrace_notification_icon,
         false, false, false
     );
 

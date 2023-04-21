@@ -9,9 +9,9 @@
     <application
         android:name=".CompetraceApp"
         android:allowBackup="true"
-        android:icon="@mipmap/competrace_logo"
+        android:icon="@mipmap/competrace_logo2"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/competrace_logo_round"
+        android:roundIcon="@mipmap/competrace_logo2_round"
         android:supportsRtl="true"
         android:theme="@style/CustomSplashScreenTheme">
 
