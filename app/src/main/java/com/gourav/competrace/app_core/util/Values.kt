@@ -40,6 +40,8 @@ object UserSubmissionFilter {
     val ALL = UiText.StringResource(R.string.all_submissions)
     val CORRECT = UiText.StringResource(R.string.correct_submissions)
     val INCORRECT = UiText.StringResource(R.string.incorrect_submissions)
+
+    fun values() = listOf(ALL, CORRECT, INCORRECT)
 }
 
 object CardValues {

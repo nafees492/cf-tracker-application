@@ -48,7 +48,7 @@ fun CompetracePlatformRow(
                 label = {
                     Text(
                         text = platforms[it].title,
-                        style = MaterialTheme.typography.labelLarge
+                        style = MaterialTheme.typography.titleMedium
                     )
                 },
                 leadingIcon = {

@@ -65,17 +65,7 @@ fun NavGraphBuilder.userSubmission(
                 },
                 actions = {
                     UserSubmissionsScreenActions(
-                        currentSelectionForUserSubmissions = currentSelection,
                         onClickSearch = openSearchWidget,
-                        onClickAll = {
-                            userSubmissionsViewModel.updateCurrentSelection(UserSubmissionFilter.ALL)
-                        },
-                        onClickCorrect = {
-                            userSubmissionsViewModel.updateCurrentSelection(UserSubmissionFilter.CORRECT)
-                        },
-                        onClickIncorrect = {
-                            userSubmissionsViewModel.updateCurrentSelection(UserSubmissionFilter.INCORRECT)
-                        },
                         badgeConditionForSearch = searchQuery.isNotBlank()
                     )
                 }
@@ -105,7 +95,9 @@ fun NavGraphBuilder.userSubmission(
                     UserSubmissionsScreen(
                         submittedProblemsWithSubmissions = filteredProblemsWithSubmission,
                         codeforcesContestListById = contestListById,
-                        showTags = showTags
+                        showTags = showTags,
+                        currentSelection = currentSelection,
+                        updateCurrentSelection = userSubmissionsViewModel::updateCurrentSelection
                     )
                 }
             }

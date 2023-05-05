@@ -1,42 +1,42 @@
 package com.gourav.competrace.progress.user_submissions.presentation
 
-import androidx.activity.compose.BackHandler
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetLayout
-import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.gourav.competrace.R
+import com.gourav.competrace.app_core.ui.components.addScrollConnection
+import com.gourav.competrace.app_core.ui.components.rememberScrollConnectionState
+import com.gourav.competrace.app_core.util.UiText
 import com.gourav.competrace.contests.model.CompetraceContest
 import com.gourav.competrace.problemset.model.CodeforcesProblem
 import com.gourav.competrace.progress.user_submissions.model.Submission
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 @OptIn(
     ExperimentalMaterial3Api::class,
     ExperimentalFoundationApi::class,
-    ExperimentalMaterialApi::class
 )
 @Composable
 fun UserSubmissionsScreen(
     submittedProblemsWithSubmissions: List<Pair<CodeforcesProblem, ArrayList<Submission>>>,
     codeforcesContestListById: Map<Any, CompetraceContest>,
-    showTags: Boolean
+    showTags: Boolean,
+    currentSelection: UiText,
+    updateCurrentSelection: (UiText) -> Unit
 ) {
-    val scope = rememberCoroutineScope()
-
     var selectedChips by rememberSaveable { mutableStateOf(emptySet<String>()) }
 
     val isSelected: (String) -> Boolean = { selectedChips.contains(it) }
@@ -53,38 +53,35 @@ fun UserSubmissionsScreen(
         selectedChips = if (isSelected(it)) selectedChips.minus(it) else selectedChips.plus(it)
     }
 
-    val modalSheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
-
     var selectedCodeforcesProblem by remember {
         mutableStateOf<Pair<CodeforcesProblem, ArrayList<Submission>>?>(null)
     }
 
+    var isSheetVisible by remember {
+        mutableStateOf(false)
+    }
+
     fun onClickSubmissionCard(it: Pair<CodeforcesProblem, ArrayList<Submission>>?) {
         selectedCodeforcesProblem = it
-        scope.launch {
-            delay(100)
-            modalSheetState.show()
+        isSheetVisible = true
+    }
+
+    val scrollConnectionState = rememberScrollConnectionState()
+
+    Scaffold(
+        topBar = {
+            Surface(modifier = Modifier.addScrollConnection(scrollConnectionState)) {
+                UserSubmissionFilterRow(
+                    currentSelection = currentSelection,
+                    updateCurrentSelection = updateCurrentSelection
+                )
+            }
         }
-    }
-
-    BackHandler(modalSheetState.isVisible) {
-        scope.launch { modalSheetState.hide() }
-    }
-
-    ModalBottomSheetLayout(sheetState = modalSheetState,
-        sheetShape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp),
-        sheetBackgroundColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
-        sheetContentColor = MaterialTheme.colorScheme.onSurface,
-        scrimColor = MaterialTheme.colorScheme.scrim.copy(alpha = 0.6f),
-        sheetContent = {
-            UserSubmissionsScreenBottomSheetContent(
-                codeforcesProblem = selectedCodeforcesProblem?.first,
-                submissions = selectedCodeforcesProblem?.second,
-                codeforcesContest = codeforcesContestListById[selectedCodeforcesProblem?.first?.contestId
-                    ?: 0]
-            )
-        }) {
-        LazyColumn {
+    ) { paddingValues ->
+        LazyColumn(
+            modifier = Modifier.nestedScroll(scrollConnectionState.nestedScrollConnection),
+            contentPadding = paddingValues
+        ) {
             item {
                 if (filteredList.isEmpty()) {
                     Column(
@@ -96,26 +93,12 @@ fun UserSubmissionsScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "No Problem Found!",
+                            text = stringResource(id = R.string.no_problem_found),
                             style = MaterialTheme.typography.bodyLarge,
                             modifier = Modifier.padding(8.dp),
                             color = MaterialTheme.colorScheme.onSurface
                         )
                     }
-                }
-            }
-
-            item {
-                if (selectedChips.isNotEmpty()) {
-                    ElevatedAssistChip(onClick = { selectedChips = emptySet() }, label = {
-                        Text(
-                            stringResource(R.string.clear_all),
-                            style = MaterialTheme.typography.labelMedium
-                        )
-                    }, enabled = true, modifier = Modifier
-                        .padding(8.dp)
-                        .animateItemPlacement()
-                    )
                 }
             }
 
@@ -133,4 +116,13 @@ fun UserSubmissionsScreen(
             }
         }
     }
+
+    UserSubmissionsModelBottomSheet(
+        isVisible = isSheetVisible,
+        onDismiss = { isSheetVisible = false },
+        codeforcesProblem = selectedCodeforcesProblem?.first,
+        submissions = selectedCodeforcesProblem?.second,
+        codeforcesContest =
+        codeforcesContestListById[selectedCodeforcesProblem?.first?.contestId ?: 0]
+    )
 }

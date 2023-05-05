@@ -2,7 +2,9 @@ package com.gourav.competrace.progress.user_submissions.presentation
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -22,9 +24,13 @@ import com.gourav.competrace.app_core.ui.components.BottomSheetDragIndicator
 import com.gourav.competrace.app_core.util.copyTextToClipBoard
 import com.gourav.competrace.app_core.util.loadUrl
 import com.gourav.competrace.R
+import com.gourav.competrace.app_core.ui.components.CompetraceModelBottomSheet
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserSubmissionsScreenBottomSheetContent(
+fun UserSubmissionsModelBottomSheet(
+    isVisible: Boolean,
+    onDismiss: () -> Unit,
     codeforcesProblem: CodeforcesProblem?,
     submissions: ArrayList<Submission>?,
     codeforcesContest: CompetraceContest?,
@@ -33,72 +39,75 @@ fun UserSubmissionsScreenBottomSheetContent(
     val clipboardManager = LocalClipboardManager.current
     val hapticFeedback = LocalHapticFeedback.current
 
-    BottomSheetDragIndicator()
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 8.dp, end = 8.dp, top = 12.dp),
-        horizontalArrangement = Arrangement.Center
-    ) {
-        CompetraceClickableText(
-            text = AnnotatedString(
-                text = "${codeforcesProblem?.index}. ${codeforcesProblem?.name}",
-                spanStyle = SpanStyle(textDecoration = TextDecoration.Underline)
-            ),
-            style = MaterialTheme.typography.titleLarge.copy(fontSize = 18.sp),
-            color = MaterialTheme.colorScheme.onSurface,
-            textAlign = TextAlign.Center,
-            onClick = {
-                context.loadUrl(url = codeforcesProblem?.getLinkViaContest())
-            },
-            onLongClick = {
-                context.copyTextToClipBoard(
-                    textToCopy = codeforcesProblem?.getLinkViaContest(),
-                    toastMessageId = R.string.problem_link_copied,
-                    clipboardManager = clipboardManager,
-                    haptic = hapticFeedback
-                )
-            }
-        )
-    }
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 8.dp, end = 8.dp, bottom = 12.dp),
-        horizontalArrangement = Arrangement.Center
-    ) {
-        CompetraceClickableText(
-            text = AnnotatedString(
-                text = codeforcesContest?.name.toString(),
-                spanStyle = SpanStyle(textDecoration = TextDecoration.Underline)
-            ),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-            textAlign = TextAlign.Center,
-            onClick = {
-                context.loadUrl(url = codeforcesContest?.websiteUrl)
-            },
-            onLongClick = {
-                context.copyTextToClipBoard(
-                    textToCopy = codeforcesContest?.websiteUrl,
-                    toastMessageId = R.string.contest_link_copied,
-                    clipboardManager = clipboardManager,
-                    haptic = hapticFeedback
-                )
-            }
-        )
-    }
-
-    submissions?.let { list ->
-        LazyColumn(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp)
+    CompetraceModelBottomSheet(isVisible = isVisible, onDismiss = onDismiss) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 8.dp, end = 8.dp, top = 12.dp),
+            horizontalArrangement = Arrangement.Center
         ) {
-            items(list.size) {
-                IndividualSubmissionCard(submission = list[it])
-            }
-            item {
-                Spacer(modifier = Modifier.height(24.dp))
+            CompetraceClickableText(
+                text = AnnotatedString(
+                    text = "${codeforcesProblem?.index}. ${codeforcesProblem?.name}",
+                    spanStyle = SpanStyle(textDecoration = TextDecoration.Underline)
+                ),
+                style = MaterialTheme.typography.titleLarge.copy(fontSize = 18.sp),
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Center,
+                onClick = {
+                    context.loadUrl(url = codeforcesProblem?.getLinkViaContest())
+                },
+                onLongClick = {
+                    context.copyTextToClipBoard(
+                        textToCopy = codeforcesProblem?.getLinkViaContest(),
+                        toastMessageId = R.string.problem_link_copied,
+                        clipboardManager = clipboardManager,
+                        haptic = hapticFeedback
+                    )
+                }
+            )
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 8.dp, end = 8.dp, bottom = 12.dp),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            CompetraceClickableText(
+                text = AnnotatedString(
+                    text = codeforcesContest?.name.toString(),
+                    spanStyle = SpanStyle(textDecoration = TextDecoration.Underline)
+                ),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                textAlign = TextAlign.Center,
+                onClick = {
+                    context.loadUrl(url = codeforcesContest?.websiteUrl)
+                },
+                onLongClick = {
+                    context.copyTextToClipBoard(
+                        textToCopy = codeforcesContest?.websiteUrl,
+                        toastMessageId = R.string.contest_link_copied,
+                        clipboardManager = clipboardManager,
+                        haptic = hapticFeedback
+                    )
+                }
+            )
+        }
+
+        submissions?.let { list ->
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 4.dp)
+            ) {
+                items(list.size) {
+                    IndividualSubmissionCard(index = it, submission = list[it])
+                }
+                item {
+                    Spacer(modifier = Modifier.height(24.dp))
+                }
             }
         }
     }

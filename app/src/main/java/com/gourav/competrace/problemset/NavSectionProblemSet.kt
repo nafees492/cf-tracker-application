@@ -58,12 +58,6 @@ fun NavGraphBuilder.problemSet(
         LaunchedEffect(Unit) {
             TopAppBarManager.updateTopAppBar(
                 screen = Screens.ProblemSetScreen,
-                expandedTopAppBarContent = {
-                    RatingRangeSlider(
-                        start = state.ratingRangeValue.first, end = state.ratingRangeValue.last,
-                        updateStartAndEnd = problemSetViewModel::updateRatingRange
-                    )
-                },
                 searchWidget = {
                     SearchAppBar(
                         query = state.searchQuery,
@@ -117,6 +111,7 @@ fun NavGraphBuilder.problemSet(
                             state = state,
                             updateSelectedChips = problemSetViewModel::updateSelectedChips,
                             clearSelectedChips = problemSetViewModel::clearSelectedChips,
+                            updateRatingRange = problemSetViewModel::updateRatingRange
                         )
                     }
                 }

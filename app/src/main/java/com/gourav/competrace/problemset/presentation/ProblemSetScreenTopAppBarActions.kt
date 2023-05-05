@@ -20,23 +20,17 @@ fun ProblemSetScreenActions(
     badgeConditionForFilter: Boolean,
 ) {
 
-    CompetraceBadgeIconButton(
-        badgeCondition = badgeConditionForSearch,
-        iconId = R.drawable.ic_search_24px,
-        onClick = onClickSearch,
-        contentDescription = stringResource(id = R.string.cd_search_icon)
-    )
-
     CompetraceIconButton(
         iconId = R.drawable.ic_baseline_settings_24px,
         onClick = onClickSettings,
         contentDescription = stringResource(id = R.string.settings)
     )
 
-    CompetraceFilterIconButton(
-        isActive = false,
-        badgeCondition = badgeConditionForFilter,
-        onClick = onClickFilterIcon
+    CompetraceBadgeIconButton(
+        badgeCondition = badgeConditionForSearch,
+        iconId = R.drawable.ic_search_24px,
+        onClick = onClickSearch,
+        contentDescription = stringResource(id = R.string.cd_search_icon)
     )
 }
 

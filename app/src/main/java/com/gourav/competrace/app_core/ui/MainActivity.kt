@@ -13,10 +13,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gourav.competrace.app_core.data.UserPreferences
 import com.gourav.competrace.app_core.ui.theme.CompetraceThemeNames
 import com.gourav.competrace.app_core.ui.theme.DarkModePref
-import com.gourav.competrace.ui.theme.CompetraceTheme
+import com.gourav.competrace.app_core.ui.theme.CompetraceTheme
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
