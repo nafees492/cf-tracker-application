@@ -19,7 +19,7 @@ data class NotificationItem(
     val channelId: String,
     val title: String,
     val description: String,
-    val priority: Int,
+    val priority: Int = NotificationCompat.PRIORITY_HIGH,
     val largeIconId: Int? = null
 )
 
@@ -34,6 +34,7 @@ interface Notification {
 
     companion object {
         const val CONTEST_CHANNEL_ID = "contest-channel-id"
+        const val FIREBASE_CHANNEL_ID = "firebase-channel-id"
     }
 }
 
@@ -48,16 +49,23 @@ class AndroidNotification(private val context: Context) : Notification {
         // the NotificationChannel class is new and not in the support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
-            val channel = NotificationChannel(
+            val contestChannel = NotificationChannel(
                 Notification.CONTEST_CHANNEL_ID,
                 context.getString(R.string.contest_channel_name),
+                NotificationManager.IMPORTANCE_HIGH
+            )
+
+            val firebaseChannel = NotificationChannel(
+                Notification.FIREBASE_CHANNEL_ID,
+                context.getString(R.string.miscellaneous),
                 NotificationManager.IMPORTANCE_HIGH
             )
             // Register the channel with the system
             val notificationManager: NotificationManager =
                 context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
 
+            notificationManager.createNotificationChannel(contestChannel)
+            notificationManager.createNotificationChannel(firebaseChannel)
         }
     }
 

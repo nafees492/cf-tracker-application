@@ -46,7 +46,6 @@ class AlarmReceiver : BroadcastReceiver() {
                     title = title,
                     description = description,
                     largeIconId = site.iconId,
-                    priority = NotificationCompat.PRIORITY_HIGH
                 ),
                 registrationAction
             )

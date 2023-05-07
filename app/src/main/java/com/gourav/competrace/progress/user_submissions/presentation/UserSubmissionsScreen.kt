@@ -8,13 +8,8 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.gourav.competrace.R
 import com.gourav.competrace.app_core.ui.components.addScrollConnection
@@ -23,7 +18,6 @@ import com.gourav.competrace.app_core.util.UiText
 import com.gourav.competrace.contests.model.CompetraceContest
 import com.gourav.competrace.problemset.model.CodeforcesProblem
 import com.gourav.competrace.progress.user_submissions.model.Submission
-import kotlin.math.roundToInt
 
 @OptIn(
     ExperimentalMaterial3Api::class,
@@ -47,6 +41,10 @@ fun UserSubmissionsScreen(
         submittedProblemsWithSubmissions.filter {
             it.first.tags?.containsAll(selectedChips) ?: false
         }
+    }
+
+    val problemCountOnScreen by remember(filteredList) {
+        mutableStateOf(filteredList.size)
     }
 
     val onClickFilterChip: (String) -> Unit = {
@@ -73,6 +71,7 @@ fun UserSubmissionsScreen(
             Surface(modifier = Modifier.addScrollConnection(scrollConnectionState)) {
                 UserSubmissionFilterRow(
                     currentSelection = currentSelection,
+                    problemCountOnScreen = problemCountOnScreen,
                     updateCurrentSelection = updateCurrentSelection
                 )
             }
