@@ -26,7 +26,11 @@ fun ProblemSetScreen(
 ) {
     val scrollConnectionState = rememberScrollConnectionState()
 
-    var isSheetVisible by rememberSaveable {
+    var isRatingSheetVisible by remember {
+        mutableStateOf(false)
+    }
+
+    var isTagSheetVisible by remember {
         mutableStateOf(false)
     }
 
@@ -42,7 +46,8 @@ fun ProblemSetScreen(
         topBar = {
             Surface(modifier = Modifier.addScrollConnection(scrollConnectionState)) {
                 ProblemSetFilterRow(
-                    showBottomSheet = { isSheetVisible = true },
+                    showRatingSheet = { isRatingSheetVisible = true },
+                    showTagSheet = { isTagSheetVisible = true },
                     ratingRange = state.ratingRangeValue,
                     tagString = tagString
                 )
@@ -87,13 +92,18 @@ fun ProblemSetScreen(
         }
     }
 
-    RatingAndTagModelBottomSheet(
-        isVisible = isSheetVisible,
-        onDismiss = { isSheetVisible = false },
+    RatingModelBottomSheet(
+        isVisible = isRatingSheetVisible,
+        onDismiss = { isRatingSheetVisible = false },
         ratingRange = state.ratingRangeValue,
+        updateRatingRange = updateRatingRange,
+    )
+
+    TagModelBottomSheet(
+        isVisible = isTagSheetVisible,
+        onDismiss = { isTagSheetVisible = false },
         allTags = state.allTags,
         selectedTags = state.selectedTags,
-        updateRatingRange = updateRatingRange,
         updateSelectedChips = updateSelectedChips
     )
 }

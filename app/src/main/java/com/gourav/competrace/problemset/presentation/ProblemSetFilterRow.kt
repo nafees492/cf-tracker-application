@@ -23,7 +23,8 @@ import com.gourav.competrace.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProblemSetFilterRow(
-    showBottomSheet: () -> Unit,
+    showRatingSheet: () -> Unit,
+    showTagSheet: () -> Unit,
     ratingRange: IntRange,
     tagString: String
 ) {
@@ -31,7 +32,7 @@ fun ProblemSetFilterRow(
         modifier = Modifier.fillMaxWidth(),
     ) {
         Card(
-            onClick = showBottomSheet,
+            onClick = showRatingSheet,
             modifier = Modifier.weight(1f),
             colors = CardDefaults.elevatedCardColors()
         ) {
@@ -65,7 +66,7 @@ fun ProblemSetFilterRow(
         }
 
         Card(
-            onClick = showBottomSheet,
+            onClick = showTagSheet,
             modifier = Modifier.weight(1f),
             colors = CardDefaults.elevatedCardColors()
         ) {
