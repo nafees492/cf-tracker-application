@@ -6,7 +6,6 @@ import com.gourav.competrace.contests.model.CompetraceContest
 data class ProblemSetScreenState(
     val selectedIndex: Int = 0,
     val apiState: ApiState = ApiState.Loading,
-    val searchQuery: String = "",
     val isTagsVisible: Boolean = true,
     val allTags: List<String> = emptyList(),
     val selectedTags: Set<String> = emptySet(),

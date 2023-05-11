@@ -8,6 +8,7 @@ class CompetraceFMS: FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         Log.d(TAG, "Refreshed token: $token")
+        super.onNewToken(token)
     }
 
     override fun onMessageReceived(message: RemoteMessage) {

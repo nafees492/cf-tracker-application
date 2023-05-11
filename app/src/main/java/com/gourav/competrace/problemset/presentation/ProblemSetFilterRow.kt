@@ -1,11 +1,14 @@
 package com.gourav.competrace.problemset.presentation
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ContentAlpha
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -19,6 +22,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.gourav.competrace.R
+import com.gourav.competrace.app_core.ui.components.CompetraceBadgeIconButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -26,8 +30,18 @@ fun ProblemSetFilterRow(
     showRatingSheet: () -> Unit,
     showTagSheet: () -> Unit,
     ratingRange: IntRange,
-    tagString: String
+    selectedTags: Set<String>,
+    isTagsVisible: Boolean
 ) {
+
+    val tagString = buildString {
+        if (selectedTags.isEmpty()) append("None")
+        selectedTags.forEach { tag ->
+            append(tag)
+            if (tag != selectedTags.last()) append(", ")
+        }
+    }
+
     Row(
         modifier = Modifier.fillMaxWidth(),
     ) {
@@ -58,17 +72,25 @@ fun ProblemSetFilterRow(
                         overflow = TextOverflow.Ellipsis
                     )
                 }
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_arrow_drop_down_24px),
-                    contentDescription = null,
-                )
+                BadgedBox(
+                    badge = { if(ratingRange != 800..3500) Badge()},
+                    modifier = Modifier.padding(horizontal = 4.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_arrow_drop_down_24px),
+                        contentDescription = null,
+                    )
+                }
             }
         }
 
         Card(
             onClick = showTagSheet,
             modifier = Modifier.weight(1f),
-            colors = CardDefaults.elevatedCardColors()
+            colors = CardDefaults.elevatedCardColors(
+                disabledContainerColor = MaterialTheme.colorScheme.surface,
+            ),
+            enabled = isTagsVisible
         ) {
             Row(
                 modifier = Modifier
@@ -92,10 +114,15 @@ fun ProblemSetFilterRow(
                         overflow = TextOverflow.Ellipsis
                     )
                 }
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_arrow_drop_down_24px),
-                    contentDescription = null,
-                )
+                BadgedBox(
+                    badge = { if(selectedTags.isNotEmpty()) Badge{ Text(text = selectedTags.size.toString()) }},
+                    modifier = Modifier.padding(horizontal = 4.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_arrow_drop_down_24px),
+                        contentDescription = null,
+                    )
+                }
             }
         }
     }

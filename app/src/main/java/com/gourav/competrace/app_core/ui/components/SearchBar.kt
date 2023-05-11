@@ -1,4 +1,4 @@
-package com.gourav.competrace.ui.components
+package com.gourav.competrace.app_core.ui.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,7 +17,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.gourav.competrace.R
-import com.gourav.competrace.app_core.ui.components.CompetraceIconButton
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
@@ -31,7 +30,13 @@ fun SearchAppBar(
     val keyboardController = LocalSoftwareKeyboardController.current
 
     val trailingIcon: (@Composable () -> Unit)? = if (query.isNotBlank()) {
-        { CompetraceIconButton(iconId = R.drawable.ic_close_24px, onClick = { onValueChange("") }) }
+        {
+            CompetraceIconButton(
+                iconId = R.drawable.ic_close_24px,
+                onClick = { onValueChange("") },
+                contentDescription = null
+            )
+        }
     } else null
 
     val placeHolder: (@Composable () -> Unit)? = placeHolderText?.let {
@@ -60,7 +65,11 @@ fun SearchAppBar(
             textStyle = MaterialTheme.typography.bodyLarge,
             singleLine = true,
             leadingIcon = {
-                CompetraceIconButton(iconId = R.drawable.ic_arrow_back_24px, onClick = onCloseClicked)
+                CompetraceIconButton(
+                    iconId = R.drawable.ic_arrow_back_24px,
+                    onClick = onCloseClicked,
+                    contentDescription = null
+                )
             },
             trailingIcon = trailingIcon,
             keyboardOptions = KeyboardOptions(

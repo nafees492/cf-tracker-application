@@ -52,13 +52,14 @@ fun CompetraceButton(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CompetraceIconButton(
     @DrawableRes iconId: Int,
     onClick: () -> Unit,
+    contentDescription: String?,
     modifier: Modifier = Modifier,
     text: String? = null,
-    contentDescription: String? = null,
     enabled: Boolean = true,
     iconColor: Color = LocalContentColor.current
 ) {
@@ -67,17 +68,20 @@ fun CompetraceIconButton(
         verticalArrangement = Arrangement.Center,
         modifier = modifier
     ) {
-        IconButton(
-            onClick = onClick,
-            enabled = enabled,
-            colors = IconButtonDefaults.iconButtonColors(
-                contentColor = iconColor
-            )
-        ) {
-            Icon(
-                painter = painterResource(id = iconId),
-                contentDescription = contentDescription
-            )
+        CompetraceTooltipBox(text = contentDescription) {
+            IconButton(
+                onClick = onClick,
+                enabled = enabled,
+                colors = IconButtonDefaults.iconButtonColors(
+                    contentColor = iconColor
+                ),
+                modifier = Modifier.tooltipAnchor()
+            ) {
+                Icon(
+                    painter = painterResource(id = iconId),
+                    contentDescription = contentDescription
+                )
+            }
         }
         text?.let {
             Text(
@@ -153,7 +157,7 @@ fun CompetraceBadgeIconButton(
     badgeCondition: Boolean,
     onClick: () -> Unit,
     @DrawableRes iconId: Int,
-    contentDescription: String? = null
+    contentDescription: String?
 ) {
     IconButton(onClick = onClick) {
         BadgedBox(

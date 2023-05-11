@@ -11,6 +11,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
 
@@ -24,15 +25,15 @@ fun rememberScrollConnectionState(): ScrollConnectionState {
     val topBarHeightPx = with(LocalDensity.current) {
         64.dp.roundToPx().toFloat()
     }
-    val topBarOffsetHeightPx = remember { mutableStateOf(0f) }
+    val heightOffset = remember { mutableStateOf(0f) }
 
     val nestedScrollConnection = object : NestedScrollConnection {
         override fun onPreScroll(
             available: Offset,
             source: NestedScrollSource
         ): Offset {
-            val newOffset = topBarOffsetHeightPx.value + available.y
-            topBarOffsetHeightPx.value =
+            val newOffset = heightOffset.value + available.y
+            heightOffset.value =
                 newOffset.coerceIn(-topBarHeightPx, 0f)
             return Offset.Zero
         }
@@ -40,7 +41,7 @@ fun rememberScrollConnectionState(): ScrollConnectionState {
 
     return remember {
         ScrollConnectionState(
-            topBarOffsetHeightPx,
+            heightOffset,
             nestedScrollConnection
         )
     }

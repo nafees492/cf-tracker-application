@@ -12,6 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -67,11 +68,11 @@ fun CompetraceTopAppBar(
                 visible = topAppBarValues.isSearchWidgetOpen,
                 enter = scaleIn(
                     animationSpec = tween(easing = FastOutSlowInEasing),
-                    transformOrigin = TransformOrigin(0.8f, 0.5f)
+                    transformOrigin = TransformOrigin(0.9f, 0.5f)
                 ) + fadeIn(animationSpec = tween(easing = FastOutSlowInEasing)),
                 exit = scaleOut(
                     animationSpec = tween(easing = FastOutSlowInEasing),
-                    transformOrigin = TransformOrigin(0.8f, 0.5f)
+                    transformOrigin = TransformOrigin(0.9f, 0.5f)
                 ) + fadeOut(animationSpec = tween(easing = FastOutSlowInEasing))
             ) {
                 topAppBarValues.searchWidget()

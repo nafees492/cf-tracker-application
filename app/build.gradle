@@ -23,7 +23,12 @@ android {
     }
 
     buildTypes {
+        debug {
+            resValue("bool", "FIREBASE_ANALYTICS_DEACTIVATED", "true")
+        }
         release {
+            resValue("bool", "FIREBASE_ANALYTICS_DEACTIVATED", "false")
+
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -80,6 +85,8 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:32.0.0')
     implementation 'com.google.firebase:firebase-analytics-ktx'
     implementation 'com.google.firebase:firebase-messaging'
+    implementation 'com.google.firebase:firebase-inappmessaging-display-ktx'
+    implementation 'com.google.firebase:firebase-inappmessaging-ktx'
 
     // Collect Lifecycle Aware Components.
     implementation 'androidx.lifecycle:lifecycle-runtime-compose:2.6.1'

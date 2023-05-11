@@ -19,9 +19,8 @@ import com.gourav.competrace.app_core.util.TopAppBarManager
 import com.gourav.competrace.progress.user_submissions.presentation.UserSubmissionsScreen
 import com.gourav.competrace.progress.user_submissions.presentation.UserSubmissionsScreenActions
 import com.gourav.competrace.progress.user_submissions.presentation.UserSubmissionsViewModel
-import com.gourav.competrace.ui.components.SearchAppBar
+import com.gourav.competrace.app_core.ui.components.SearchAppBar
 import com.gourav.competrace.app_core.ui.FailureScreen
-import com.gourav.competrace.app_core.util.UserSubmissionFilter
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.gourav.competrace.R

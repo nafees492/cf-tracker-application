@@ -58,7 +58,7 @@
     <string name="no_problem_found">No Problem Found!</string>
     <string name="search_problem_contest">Search Problem / Contest</string>
     <string name="problem_link_copied">Problem Link Copied</string>
-    <string name="cd_search_icon">Search in problem set</string>
+    <string name="cd_search_icon">Search</string>
 
     <!-- Progress Screen -->
     <string name="progress">Progress</string>
@@ -133,8 +133,15 @@
     <string name="not_found_error">Page Not Found!</string>
     <string name="access_denied_error">Page Access Denied!</string>
     <string name="service_unavailable_error">Service Unavailable!</string>
+
+
     <string name="clear_all_tags">Clear all tags</string>
     <string name="miscellaneous">Miscellaneous</string>
+    <string name="url_not_set">No URL is associated with this action</string>
+    <string name="open_in_browser">Open in Browser</string>
+    <string name="remove_user_from_recent">Remove User from recent</string>
+    <string name="reset">Reset</string>
+    <string name="notifications">Notifications</string>
 
 
 </resources>

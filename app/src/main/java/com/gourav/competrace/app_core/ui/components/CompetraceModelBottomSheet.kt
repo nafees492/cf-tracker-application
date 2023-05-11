@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.surfaceColorAtElevation
@@ -26,9 +27,9 @@ fun CompetraceModelBottomSheet(
     isVisible: Boolean,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
+    sheetState: SheetState = rememberModalBottomSheetState(),
     content: @Composable ColumnScope.() -> Unit
 ) {
-    val sheetState = rememberModalBottomSheetState()
     if(isVisible) ModalBottomSheet(
         sheetState = sheetState,
         shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp),

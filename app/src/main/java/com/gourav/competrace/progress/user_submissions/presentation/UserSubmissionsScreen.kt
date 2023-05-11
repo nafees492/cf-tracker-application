@@ -20,7 +20,6 @@ import com.gourav.competrace.problemset.model.CodeforcesProblem
 import com.gourav.competrace.progress.user_submissions.model.Submission
 
 @OptIn(
-    ExperimentalMaterial3Api::class,
     ExperimentalFoundationApi::class,
 )
 @Composable

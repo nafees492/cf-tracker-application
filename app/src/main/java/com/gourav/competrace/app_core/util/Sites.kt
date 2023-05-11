@@ -8,27 +8,34 @@ enum class Sites(
     @DrawableRes val iconId: Int,
     val isContestSite: Boolean,
     val isProblemSetSite: Boolean,
-    val isUserSite: Boolean
+    val isUserSite: Boolean,
+    val contestsUrl: String? = null,
+    val problemSetUrl: String? = null
 ) {
     Codeforces(
         title = "CodeForces",
         iconId = R.drawable.logo_codeforces_white_96,
-        true, true, true
+        true, true, true,
+        contestsUrl = "https://codeforces.com/contests",
+        problemSetUrl = "https://codeforces.com/problemset"
     ),
     CodeChef(
         title = "CodeChef",
         iconId = R.drawable.logo_codechef_white_96,
-        true, false, false
+        true, false, false,
+        contestsUrl = "https://www.codechef.com/contests"
     ),
     AtCoder(
         title = "AtCoder",
         iconId = R.drawable.logo_atcoder_white_96,
-        true, false, false
+        true, false, false,
+        contestsUrl = "https://atcoder.jp/contests"
     ),
     LeetCode(
         title = "LeetCode",
         iconId = R.drawable.logo_leetcode_white_96,
-        true, false, false
+        true, false, false,
+        contestsUrl = "https://leetcode.com/contest"
     ),
     Competrace(
         title = "Competrace",

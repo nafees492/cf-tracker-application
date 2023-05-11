@@ -65,7 +65,9 @@ class AndroidNotification(private val context: Context) : Notification {
                 context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
             notificationManager.createNotificationChannel(contestChannel)
-            notificationManager.createNotificationChannel(firebaseChannel)
+            notificationManager.getNotificationChannel(Notification.FIREBASE_CHANNEL_ID).let {
+                if(it == null) notificationManager.createNotificationChannel(firebaseChannel)
+            }
         }
     }
 

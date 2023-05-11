@@ -1,7 +1,9 @@
 package com.gourav.competrace.settings
 
 import android.app.AlarmManager
+import android.content.Intent
 import android.os.Build
+import android.provider.Settings
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Arrangement
@@ -144,17 +146,19 @@ fun SettingsScreen(
                     onClick = { settingsViewModel.setShowTags(!showTags) },
                     switchState = showTags
                 )
+            }
+        }
 
-
-                    RowWithLeadingIcon(
-                        title = stringResource(id = R.string.schedule_notif_before),
-                        leadingIconId = R.drawable.ic_schedule_24px,
-                        subTitle = ScheduleNotifBeforeOptions.getOption(scheduleNotifBefore),
-                        onClick = { isScheduleNotifBeforeAlertOpen = true },
-                        showError = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
-                            !alarmManager.canScheduleExactAlarms() else false
-                    )
-
+        item {
+            SettingsSection(title = stringResource(R.string.notifications)) {
+                RowWithLeadingIcon(
+                    title = stringResource(id = R.string.schedule_notif_before),
+                    leadingIconId = R.drawable.ic_schedule_24px,
+                    subTitle = ScheduleNotifBeforeOptions.getOption(scheduleNotifBefore),
+                    onClick = { isScheduleNotifBeforeAlertOpen = true },
+                    showError = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+                        !alarmManager.canScheduleExactAlarms() else false
+                )
 
                 RowWithLeadingIcon(
                     title = stringResource(id = R.string.clear_all_set_notif),
@@ -166,6 +170,26 @@ fun SettingsScreen(
                     title = stringResource(id = R.string.test_notif),
                     leadingIconId = R.drawable.ic_notifications_24px,
                     onClick = { isTestNotifAlertOpen = true }
+                )
+
+                RowWithLeadingIcon(
+                    title = "More Notification Settings",
+                    leadingIconId = R.drawable.ic_more_horiz_24px,
+                    onClick = {
+                        Intent().apply {
+                            when {
+                                Build.VERSION.SDK_INT >= Build.VERSION_CODES.O -> {
+                                    action = Settings.ACTION_APP_NOTIFICATION_SETTINGS
+                                    putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+                                }
+                                else -> {
+                                    action = "android.settings.APP_NOTIFICATION_SETTINGS"
+                                    putExtra("app_package", context.packageName)
+                                    putExtra("app_uid", context.applicationInfo.uid)
+                                }
+                            }
+                        }.also(context::startActivity)
+                    }
                 )
             }
         }

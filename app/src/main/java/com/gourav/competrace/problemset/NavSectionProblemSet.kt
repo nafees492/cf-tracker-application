@@ -13,6 +13,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
@@ -28,8 +29,8 @@ import com.gourav.competrace.app_core.util.TopAppBarManager
 import com.gourav.competrace.problemset.presentation.ProblemSetScreen
 import com.gourav.competrace.problemset.presentation.ProblemSetScreenActions
 import com.gourav.competrace.problemset.presentation.ProblemSetViewModel
-import com.gourav.competrace.problemset.presentation.RatingRangeSlider
-import com.gourav.competrace.ui.components.SearchAppBar
+import com.gourav.competrace.app_core.ui.components.SearchAppBar
+import com.gourav.competrace.app_core.util.loadUrl
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -40,10 +41,12 @@ fun NavGraphBuilder.problemSet(
     paddingValues: PaddingValues
 ) {
     composable(route = Screens.ProblemSetScreen.route) {
+        val context = LocalContext.current
         val scope = rememberCoroutineScope()
 
         val isPlatformTabRowVisible by appState.isPlatformsTabRowVisible.collectAsStateWithLifecycle()
         val state by problemSetViewModel.screenState.collectAsStateWithLifecycle()
+        val searchQuery by problemSetViewModel.searchQuery.collectAsStateWithLifecycle()
 
         val searchBarFocusRequester = remember { FocusRequester() }
 
@@ -60,7 +63,7 @@ fun NavGraphBuilder.problemSet(
                 screen = Screens.ProblemSetScreen,
                 searchWidget = {
                     SearchAppBar(
-                        query = state.searchQuery,
+                        query = searchQuery,
                         onValueChange = problemSetViewModel::updateSearchQuery,
                         onCloseClicked = TopAppBarManager::closeSearchWidget,
                         modifier = Modifier.focusRequester(searchBarFocusRequester),
@@ -70,10 +73,13 @@ fun NavGraphBuilder.problemSet(
                 actions = {
                     ProblemSetScreenActions(
                         onClickSearch = onClickSearch,
-                        onClickSettings = appState::navigateToSettings,
-                        onClickFilterIcon = TopAppBarManager::toggleExpandedState,
-                        badgeConditionForSearch = state.searchQuery.isNotBlank(),
-                        badgeConditionForFilter = state.ratingRangeValue != 800..3500
+                        openSettings = appState::navigateToSettings,
+                        openSite = {
+                            val problemSetUrl =
+                                problemSetViewModel.problemSetSites[state.selectedIndex].problemSetUrl
+                            context.loadUrl(problemSetUrl)
+                        },
+                        badgeConditionForSearch = searchQuery.isNotBlank(),
                     )
                 }
             )
@@ -100,17 +106,19 @@ fun NavGraphBuilder.problemSet(
                     is ApiState.Loading -> {
                         Box(modifier = Modifier.fillMaxSize())
                     }
+
                     is ApiState.Failure -> {
                         FailureScreen(
                             onClickRetry = problemSetViewModel::refreshProblemSetAndContests,
                             errorMessage = apiState.message
                         )
                     }
+
                     is ApiState.Success -> {
                         ProblemSetScreen(
                             state = state,
-                            updateSelectedChips = problemSetViewModel::updateSelectedChips,
-                            clearSelectedChips = problemSetViewModel::clearSelectedChips,
+                            updateSelectedTags = problemSetViewModel::updateSelectedTags,
+                            clearSelectedTags = problemSetViewModel::clearSelectedTags,
                             updateRatingRange = problemSetViewModel::updateRatingRange
                         )
                     }

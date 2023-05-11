@@ -62,7 +62,14 @@ fun NavGraphBuilder.contests(
             TopAppBarManager.updateTopAppBar(
                 screen = Screens.ContestsScreen,
                 actions = {
-                    ContestScreenActions(onClickSettings = appState::navigateToSettings)
+                    ContestScreenActions(
+                        openSettings = appState::navigateToSettings,
+                        openSite = {
+                            val contestsUrl =  contestViewModel
+                                .contestSites[screenState.selectedIndex].contestsUrl
+                            context.loadUrl(contestsUrl)
+                        }
+                    )
                 }
             )
         }

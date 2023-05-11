@@ -11,20 +11,22 @@ import androidx.compose.ui.unit.dp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CompetraceTooltipBox(
-    text: String,
+    text: String?,
     tooltipState: RichTooltipState = remember { RichTooltipState() },
     content: @Composable TooltipBoxScope.() -> Unit
 ) {
     RichTooltipBox(
         tooltipState = tooltipState,
         text = {
-            Text(
-                text = text,
-                style = MaterialTheme.typography.labelMedium,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.padding(4.dp),
-                softWrap = false,
-            )
+            text?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.padding(4.dp),
+                    softWrap = false,
+                )
+            }
         },
         modifier = Modifier.padding(horizontal = 8.dp),
         colors = TooltipDefaults.richTooltipColors(

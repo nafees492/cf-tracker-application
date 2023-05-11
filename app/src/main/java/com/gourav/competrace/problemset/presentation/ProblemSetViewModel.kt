@@ -109,20 +109,21 @@ class ProblemSetViewModel @Inject constructor(
     }
 
     private val _searchQuery = MutableStateFlow("")
+    val searchQuery = _searchQuery.asStateFlow()
 
     fun updateSearchQuery(value: String) {
         _searchQuery.update { value }
     }
 
     private val _selectedChips = MutableStateFlow(setOf<String>())
-    private fun isChipSelected(value: String) = _selectedChips.value.contains(value)
+    private fun isTagSelected(value: String) = _selectedChips.value.contains(value)
 
-    fun updateSelectedChips(value: String) {
-        if (isChipSelected(value)) _selectedChips.update { it - value }
+    fun updateSelectedTags(value: String) {
+        if (isTagSelected(value)) _selectedChips.update { it - value }
         else _selectedChips.update { it + value }
     }
 
-    fun clearSelectedChips() {
+    fun clearSelectedTags() {
         _selectedChips.update { emptySet() }
     }
 
@@ -161,9 +162,6 @@ class ProblemSetViewModel @Inject constructor(
         }
         .combine(_ratingRangeValue) { state, ratingRange ->
             state.copy(ratingRangeValue = ratingRange)
-        }
-        .combine(_searchQuery) { state, searchQuery ->
-            state.copy(searchQuery = searchQuery)
         }
         .combine(_selectedChips) { state, chips ->
             state.copy(selectedTags = chips)

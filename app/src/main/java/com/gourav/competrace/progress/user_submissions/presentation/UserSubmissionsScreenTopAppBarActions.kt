@@ -10,6 +10,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.res.stringResource
 import com.gourav.competrace.R
 import com.gourav.competrace.app_core.ui.components.CompetraceBadgeIconButton
 import com.gourav.competrace.app_core.ui.components.CompetraceFilterIconButton
@@ -26,7 +27,8 @@ fun RowScope.UserSubmissionsScreenActions(
     CompetraceBadgeIconButton(
         badgeCondition = badgeConditionForSearch,
         iconId = R.drawable.ic_search_24px,
-        onClick = onClickSearch
+        onClick = onClickSearch,
+        contentDescription = stringResource(id = R.string.cd_search_icon)
     )
 }
 

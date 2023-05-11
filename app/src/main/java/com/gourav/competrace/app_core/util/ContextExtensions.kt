@@ -7,13 +7,13 @@ import android.provider.CalendarContract
 import android.util.Log
 import androidx.annotation.StringRes
 import androidx.browser.customtabs.CustomTabsIntent
-import androidx.browser.customtabs.CustomTabsIntent.COLOR_SCHEME_SYSTEM
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.text.AnnotatedString
+import androidx.core.content.ContextCompat
 import com.gourav.competrace.R
+
 
 fun Context.copyTextToClipBoard(
     textToCopy: String?,
@@ -50,11 +50,21 @@ fun Context.shareTextToOtherApp(textToShare: UiText, heading: UiText? = null) {
 fun Context.loadUrl(url: String?) {
     Log.d("Load URL", "URL is $url")
 
-    if (url.isNullOrBlank()) return
+    if (url.isNullOrBlank()) {
+        SnackbarManager.showMessage(UiText.StringResource(R.string.url_not_set))
+        return
+    }
 
-    CustomTabsIntent.Builder().build().launchUrl(
-        this, Uri.parse(url)
-    )
+    try {
+        CustomTabsIntent.Builder().build().launchUrl(
+            this, Uri.parse(url)
+        )
+    } catch (e: Exception){
+        startActivity(
+            Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        )
+    }
+
 }
 
 fun Context.sendEmail(

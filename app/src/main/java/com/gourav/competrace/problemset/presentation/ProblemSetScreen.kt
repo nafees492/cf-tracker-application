@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -20,8 +19,8 @@ import com.gourav.competrace.problemset.model.ProblemSetScreenState
 @Composable
 fun ProblemSetScreen(
     state: ProblemSetScreenState,
-    updateSelectedChips: (String) -> Unit,
-    clearSelectedChips: () -> Unit,
+    updateSelectedTags: (String) -> Unit,
+    clearSelectedTags: () -> Unit,
     updateRatingRange: (Int, Int) -> Unit
 ) {
     val scrollConnectionState = rememberScrollConnectionState()
@@ -34,14 +33,6 @@ fun ProblemSetScreen(
         mutableStateOf(false)
     }
 
-    val tagString = buildString {
-        if (state.selectedTags.isEmpty()) append("None")
-        state.selectedTags.forEach { tag ->
-            append(tag)
-            if (tag != state.selectedTags.last()) append(", ")
-        }
-    }
-
     Scaffold(
         topBar = {
             Surface(modifier = Modifier.addScrollConnection(scrollConnectionState)) {
@@ -49,7 +40,8 @@ fun ProblemSetScreen(
                     showRatingSheet = { isRatingSheetVisible = true },
                     showTagSheet = { isTagSheetVisible = true },
                     ratingRange = state.ratingRangeValue,
-                    tagString = tagString
+                    selectedTags = state.selectedTags,
+                    isTagsVisible = state.isTagsVisible
                 )
             }
         }
@@ -85,9 +77,13 @@ fun ProblemSetScreen(
                     contestName = state.getContestName(state.problems[it]),
                     isTagsVisible = state.isTagsVisible,
                     selectedTags = state.selectedTags,
-                    onClickFilterChip = updateSelectedChips,
+                    onClickFilterChip = updateSelectedTags,
                     modifier = Modifier.animateItemPlacement()
                 )
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(128.dp))
             }
         }
     }
@@ -104,7 +100,8 @@ fun ProblemSetScreen(
         onDismiss = { isTagSheetVisible = false },
         allTags = state.allTags,
         selectedTags = state.selectedTags,
-        updateSelectedChips = updateSelectedChips
+        updateSelectedTags = updateSelectedTags,
+        clearSelectedTags = clearSelectedTags
     )
 }
 
