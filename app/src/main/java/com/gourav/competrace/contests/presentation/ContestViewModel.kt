@@ -157,8 +157,8 @@ class ContestViewModel @Inject constructor(
                 val item = contest.getAlarmItem(10)
 
                 SnackbarManager.showMessageWithAction(
-                    messageTextId = UiText.StringResource(R.string.ask_to_set_notif),
-                    actionLabelId = UiText.StringResource(R.string.yes),
+                    message = UiText.StringResource(R.string.ask_to_set_notif),
+                    actionLabel = UiText.StringResource(R.string.yes),
                     action = {
                         viewModelScope.launch {
                             contestAlarmRepository.addAlarm(item)

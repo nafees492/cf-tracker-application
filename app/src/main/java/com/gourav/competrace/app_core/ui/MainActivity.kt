@@ -30,12 +30,16 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val isSplashScreenOn by sharedViewModel.isSplashScreenOn.collectAsState()
-            splashScreen.setKeepOnScreenCondition{ isSplashScreenOn }
+            splashScreen.setKeepOnScreenCondition { isSplashScreenOn }
 
             val userPreferences = UserPreferences(LocalContext.current)
 
-            val currentTheme by userPreferences.currentThemeFlow.collectAsStateWithLifecycle(CompetraceThemeNames.DEFAULT)
-            val darkModePref by userPreferences.darkModePrefFlow.collectAsStateWithLifecycle(DarkModePref.SYSTEM_DEFAULT)
+            val currentTheme by userPreferences.currentThemeFlow.collectAsStateWithLifecycle(
+                CompetraceThemeNames.DEFAULT
+            )
+            val darkModePref by userPreferences.darkModePrefFlow.collectAsStateWithLifecycle(
+                DarkModePref.SYSTEM_DEFAULT
+            )
 
             CompetraceTheme(currentTheme = currentTheme, darkModePref = darkModePref) {
                 Application()
@@ -44,6 +48,6 @@ class MainActivity : ComponentActivity() {
     }
 
     companion object {
-        const val TAG = "Main Activity"
+        private const val TAG = "Main Activity"
     }
 }

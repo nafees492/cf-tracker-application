@@ -113,8 +113,8 @@ fun NavGraphBuilder.contests(
                                         permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                                     }
                                     SnackbarManager.showMessageWithAction(
-                                        messageTextId = UiText.StringResource(R.string.grant_permission_to_continue),
-                                        actionLabelId = UiText.StringResource(R.string.go_to_settings),
+                                        message = UiText.StringResource(R.string.grant_permission_to_continue),
+                                        actionLabel = UiText.StringResource(R.string.go_to_settings),
                                         action = {
                                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                                                 Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {

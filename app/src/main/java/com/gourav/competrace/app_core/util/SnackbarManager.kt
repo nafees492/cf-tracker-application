@@ -30,16 +30,16 @@ object SnackbarManager {
     }
 
     fun showMessageWithAction(
-        messageTextId: UiText,
-        actionLabelId: UiText,
+        message: UiText,
+        actionLabel: UiText,
         duration: SnackbarDuration = SnackbarDuration.Short,
         action: () -> Unit
     ) {
         messagesFlow.update {
             SnackbarMessage(
                 id = UUID.randomUUID().mostSignificantBits,
-                message = messageTextId,
-                actionLabel = actionLabelId,
+                message = message,
+                actionLabel = actionLabel,
                 action = action,
                 duration = duration
             )
