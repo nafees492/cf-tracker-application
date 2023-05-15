@@ -20,36 +20,25 @@ import com.gourav.competrace.R
 import com.gourav.competrace.app_core.ui.components.ExpandArrow
 import com.gourav.competrace.contests.model.CompetraceContest
 import com.gourav.competrace.app_core.util.Phase
+import com.gourav.competrace.contests.model.ContestScreenState
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun UpcomingContestScreen(
-    contests: List<CompetraceContest>,
-    selectedIndex: Int,
+    state: ContestScreenState,
     onClickNotificationIcon: (CompetraceContest) -> Unit,
-    notificationContestIdList: Set<String>,
     modifier: Modifier = Modifier
 ) {
-    val onGoingContest = remember(contests) {
-        contests.filter { it.phase == Phase.CODING }
-    }
-    val within7Days = remember(contests) {
-        contests.filter { it.phase == Phase.BEFORE && it.within7Days }
-    }
-    val after7Days = remember(contests) {
-        contests.filter { it.phase == Phase.BEFORE && !it.within7Days }
-    }
-
     var expanded by rememberSaveable {
         mutableStateOf(false)
     }
 
-    fun generateKey(id: Int) = "s${selectedIndex}-i{$id}"
+    fun generateKey(id: Int) = "s${state.selectedIndex}-i{$id}"
 
     LazyColumn(
         modifier = modifier.animateContentSize()
     ) {
-        if (onGoingContest.isNotEmpty()) {
+        if (state.ongoingContests.isNotEmpty()) {
             item(key = generateKey(1)) {
                 Text(
                     text = stringResource(id = R.string.ongoing_contests),
@@ -64,14 +53,14 @@ fun UpcomingContestScreen(
                 )
             }
 
-            items(count = onGoingContest.size, key = { onGoingContest[it].hashCode() }) {
+            items(count = state.ongoingContests.size, key = { state.ongoingContests[it].hashCode() }) {
                 ContestCard(
-                    contest = onGoingContest[it],
+                    contest = state.ongoingContests[it],
                     modifier = Modifier.animateItemPlacement(
                         animationSpec = tween()
                     ),
                     onClickNotificationIcon = onClickNotificationIcon,
-                    notificationContestIdList = notificationContestIdList
+                    notificationContestIdList = state.notificationContestIds
                 )
             }
         }
@@ -89,7 +78,7 @@ fun UpcomingContestScreen(
             )
         }
 
-        within7Days.let { list ->
+        state.next7DaysContests.let { list ->
             item(key = generateKey(4)) {
                 Text(
                     text = stringResource(id = R.string.next_7_days),
@@ -104,16 +93,14 @@ fun UpcomingContestScreen(
             }
 
             items(count = list.size, key = { list[it].hashCode() }) {
-                if (list[it].within7Days) {
-                    ContestCard(
-                        contest = list[it],
-                        modifier = Modifier.animateItemPlacement(
-                            animationSpec = tween()
-                        ),
-                        onClickNotificationIcon = onClickNotificationIcon,
-                        notificationContestIdList = notificationContestIdList
-                    )
-                }
+                ContestCard(
+                    contest = list[it],
+                    modifier = Modifier.animateItemPlacement(
+                        animationSpec = tween()
+                    ),
+                    onClickNotificationIcon = onClickNotificationIcon,
+                    notificationContestIdList = state.notificationContestIds
+                )
             }
 
             item(key = generateKey(5)) {
@@ -126,7 +113,7 @@ fun UpcomingContestScreen(
             }
         }
 
-        after7Days.let { list ->
+        state.after7DaysContests.let { list ->
             item(key = generateKey(6)) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -156,16 +143,14 @@ fun UpcomingContestScreen(
 
             if (expanded) {
                 items(count = list.size, key = { list[it].hashCode() }) {
-                    if (!list[it].within7Days) {
-                        ContestCard(
-                            contest = list[it],
-                            modifier = Modifier.animateItemPlacement(
-                                animationSpec = tween()
-                            ),
-                            onClickNotificationIcon = onClickNotificationIcon,
-                            notificationContestIdList = notificationContestIdList
-                        )
-                    }
+                    ContestCard(
+                        contest = list[it],
+                        modifier = Modifier.animateItemPlacement(
+                            animationSpec = tween()
+                        ),
+                        onClickNotificationIcon = onClickNotificationIcon,
+                        notificationContestIdList = state.notificationContestIds
+                    )
                 }
 
                 item(key = generateKey(7)) {
@@ -177,9 +162,10 @@ fun UpcomingContestScreen(
                     )
                 }
             }
-        }
-        item {
-            Spacer(modifier = Modifier.height(120.dp))
+
+            item {
+                Spacer(modifier = Modifier.height(128.dp))
+            }
         }
     }
 }

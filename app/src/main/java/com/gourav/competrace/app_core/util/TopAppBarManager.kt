@@ -2,22 +2,14 @@ package com.gourav.competrace.app_core.util
 
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
+import com.gourav.competrace.app_core.model.TopAppBarValues
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-data class TopAppBarValues(
-    val currentScreen: Screens = Screens.ContestsScreen,
-    val actions: @Composable RowScope.() -> Unit = {},
-    val isTopAppBarExpanded: Boolean = false,
-    val expandedTopAppBarContent: @Composable () -> Unit = {},
-    val isSearchWidgetOpen: Boolean = false,
-    val searchWidget: @Composable () -> Unit = {}
-)
-
 object TopAppBarManager {
-    private val _topAppBarValues = MutableStateFlow(TopAppBarValues())
-    val topAppBarValues = _topAppBarValues.asStateFlow()
+    private val topAppBarValuesFlow = MutableStateFlow(TopAppBarValues())
+    val topAppBarValues = topAppBarValuesFlow.asStateFlow()
 
     fun updateTopAppBar(
         screen: Screens,
@@ -27,7 +19,7 @@ object TopAppBarManager {
         searchWidget: @Composable () -> Unit = {},
         actions: @Composable RowScope.() -> Unit = {}
     ){
-        _topAppBarValues.update {
+        topAppBarValuesFlow.update {
             it.copy(
                 currentScreen = screen,
                 actions = actions,
@@ -40,19 +32,19 @@ object TopAppBarManager {
     }
 
     fun openSearchWidget(){
-        _topAppBarValues.update {
+        topAppBarValuesFlow.update {
             it.copy(isSearchWidgetOpen = true)
         }
     }
 
     fun closeSearchWidget(){
-        _topAppBarValues.update {
+        topAppBarValuesFlow.update {
             it.copy(isSearchWidgetOpen = false)
         }
     }
 
     fun toggleExpandedState(){
-        _topAppBarValues.update {
+        topAppBarValuesFlow.update {
             val isExpanded = it.isTopAppBarExpanded
             it.copy(isTopAppBarExpanded = !isExpanded)
         }

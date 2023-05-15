@@ -1,4 +1,4 @@
-package com.gourav.competrace.ui.theme
+package com.gourav.competrace.app_core.ui.theme
 
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -6,9 +6,9 @@ import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.gourav.competrace.app_core.data.UserPreferences
-import com.gourav.competrace.app_core.ui.theme.*
 
 private val LightColorScheme = lightColorScheme(
     primary = md_theme_light_primary,
@@ -110,8 +110,12 @@ fun CompetraceTheme(
     val systemUiController = rememberSystemUiController()
     val isDarkTheme = isDarkTheme()
     SideEffect {
-        systemUiController.setSystemBarsColor(
+        systemUiController.setStatusBarColor(
             color = myColorScheme.surface,
+            darkIcons = !isDarkTheme
+        )
+        systemUiController.setNavigationBarColor(
+            color = myColorScheme.surfaceColorAtElevation(3.dp),
             darkIcons = !isDarkTheme
         )
     }

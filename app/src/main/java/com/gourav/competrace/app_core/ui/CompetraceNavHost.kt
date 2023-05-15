@@ -25,14 +25,13 @@ import com.gourav.competrace.settings.SettingsScreen
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun CompetraceNavHost(
-    sharedViewModel: SharedViewModel,
     appState: CompetraceAppState,
     paddingValues: PaddingValues,
 ) {
     val contestViewModel: ContestViewModel = hiltViewModel()
     val problemSetViewModel: ProblemSetViewModel = hiltViewModel()
-    val userSubmissionsViewModel: UserSubmissionsViewModel = hiltViewModel()
     val userViewModel: UserViewModel = hiltViewModel()
+    val userSubmissionsViewModel: UserSubmissionsViewModel = hiltViewModel()
     val participatedContestViewModel: ParticipatedContestViewModel = hiltViewModel()
 
     NavHost(
@@ -44,19 +43,18 @@ fun CompetraceNavHost(
     ) {
 
         contests(
-            sharedViewModel = sharedViewModel,
             contestViewModel = contestViewModel,
-            appState = appState
+            appState = appState,
+            paddingValues = paddingValues
         )
 
         problemSet(
-            sharedViewModel = sharedViewModel,
             problemSetViewModel = problemSetViewModel,
-            appState = appState
+            appState = appState,
+            paddingValues = paddingValues
         )
 
         progress(
-            sharedViewModel = sharedViewModel,
             userViewModel = userViewModel,
             userSubmissionsViewModel = userSubmissionsViewModel,
             participatedContestViewModel = participatedContestViewModel,

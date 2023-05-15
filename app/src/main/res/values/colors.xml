@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="dark_surface">#ff1a1a1d</color>
+    <color name="light_surface">#fffffaff</color>
 
-    <color name="dark_surface">#FF1A1C1E</color>
-    <color name="light_surface">#FFFDFBFF</color>
+    <color name="competrace_logo2_background">#EAEAEA</color>
 </resources>

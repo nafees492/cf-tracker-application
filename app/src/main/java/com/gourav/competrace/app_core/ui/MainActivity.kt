@@ -9,10 +9,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.gourav.competrace.app_core.CompetraceInAppUpdate
 import com.gourav.competrace.app_core.data.UserPreferences
 import com.gourav.competrace.app_core.ui.theme.CompetraceThemeNames
 import com.gourav.competrace.app_core.ui.theme.DarkModePref
-import com.gourav.competrace.ui.theme.CompetraceTheme
+import com.gourav.competrace.app_core.ui.theme.CompetraceTheme
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 
@@ -29,20 +31,27 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val isSplashScreenOn by sharedViewModel.isSplashScreenOn.collectAsState()
-            splashScreen.setKeepOnScreenCondition{ isSplashScreenOn }
+            splashScreen.setKeepOnScreenCondition { isSplashScreenOn }
+
+            val competraceInAppUpdate = CompetraceInAppUpdate(applicationContext)
+            competraceInAppUpdate.checkForAppUpdates()
 
             val userPreferences = UserPreferences(LocalContext.current)
 
-            val currentTheme by userPreferences.currentThemeFlow.collectAsState(initial = CompetraceThemeNames.DEFAULT)
-            val darkModePref by userPreferences.darkModePrefFlow.collectAsState(initial = DarkModePref.SYSTEM_DEFAULT)
+            val currentTheme by userPreferences.currentThemeFlow.collectAsStateWithLifecycle(
+                CompetraceThemeNames.DEFAULT
+            )
+            val darkModePref by userPreferences.darkModePrefFlow.collectAsStateWithLifecycle(
+                DarkModePref.SYSTEM_DEFAULT
+            )
 
             CompetraceTheme(currentTheme = currentTheme, darkModePref = darkModePref) {
-                Application(sharedViewModel = sharedViewModel)
+                Application()
             }
         }
     }
 
     companion object {
-        const val TAG = "Main Activity"
+        private const val TAG = "Main Activity"
     }
 }

@@ -30,7 +30,7 @@ fun RowWithLeadingIcon(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
-            painter = painterResource(id = leadingIconId), contentDescription = "Leading Icon",
+            painter = painterResource(id = leadingIconId), contentDescription = null,
             modifier = Modifier.padding(start = 16.dp, end = 24.dp),
             tint = if(showError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
         )

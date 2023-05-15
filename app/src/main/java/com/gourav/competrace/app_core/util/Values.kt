@@ -28,7 +28,6 @@ object Verdict {
     val RED = setOf(WA, FAILED, CE, CRASHED, REJECTED)
 }
 
-
 enum class ContestRatedCategories(val value: String) {
     DIV1("Div. 1"),
     DIV2("Div. 2"),
@@ -37,15 +36,12 @@ enum class ContestRatedCategories(val value: String) {
     UNRATED("Unrated")
 }
 
-object FinishedContestFilter {
-    const val ALL = "All Contests"
-    const val PARTICIPATED = "Participated Contests"
-}
-
 object UserSubmissionFilter {
     val ALL = UiText.StringResource(R.string.all_submissions)
     val CORRECT = UiText.StringResource(R.string.correct_submissions)
     val INCORRECT = UiText.StringResource(R.string.incorrect_submissions)
+
+    fun values() = listOf(ALL, CORRECT, INCORRECT)
 }
 
 object CardValues {

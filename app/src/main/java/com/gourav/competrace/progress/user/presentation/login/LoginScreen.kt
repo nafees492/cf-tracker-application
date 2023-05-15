@@ -3,13 +3,10 @@ package com.gourav.competrace.progress.user.presentation.login
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
@@ -20,8 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -32,11 +27,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gourav.competrace.R
 import com.gourav.competrace.app_core.ui.components.CompetraceButton
-import com.gourav.competrace.app_core.ui.components.CompetraceIconButton
 
 private const val TAG = "Login Screen"
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun LoginScreen(loginViewModel: LoginViewModel) {
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -85,7 +79,7 @@ fun LoginScreen(loginViewModel: LoginViewModel) {
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Image(
-                                painter = painterResource(id = R.drawable.competrace_shadowed_480),
+                                painter = painterResource(id = R.drawable.competrace_splash_icon),
                                 contentDescription = stringResource(id = R.string.app_name),
                                 modifier = Modifier.size(96.dp),
                             )

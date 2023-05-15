@@ -8,15 +8,13 @@ import com.gourav.competrace.app_core.ui.components.CompetraceTopAppBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Application(
-    sharedViewModel: SharedViewModel
-) {
+fun Application() {
     val appState = rememberCompetraceAppState()
 
     Surface {
         Scaffold(
             topBar = {
-                CompetraceTopAppBar(sharedViewModel = sharedViewModel, appState = appState)
+                CompetraceTopAppBar(appState = appState)
             },
             bottomBar = {
                 CompetraceBottomNavigationBar(appState = appState)
@@ -24,7 +22,6 @@ fun Application(
             snackbarHost = { SnackbarHost(hostState = appState.snackbarHostState) }
         ) {
             CompetraceNavHost(
-                sharedViewModel = sharedViewModel,
                 appState = appState,
                 paddingValues = it
             )

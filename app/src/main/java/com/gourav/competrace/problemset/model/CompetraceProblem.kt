@@ -11,5 +11,4 @@ data class CompetraceProblem(
     val websiteUrl: String?
 ) {
     var hasVerdictOK: Boolean = false
-
 }

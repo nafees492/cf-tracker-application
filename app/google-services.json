@@ -1,0 +1,39 @@
+ {
+  "project_info": {
+    "project_number": "209834034804",
+    "project_id": "competrace-rg31",
+    "storage_bucket": "competrace-rg31.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:209834034804:android:b519dda4a24c3e9e877321",
+        "android_client_info": {
+          "package_name": "com.gourav.competrace"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "209834034804-igus2h0babaelp2qfplb0pjk32mi54u0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD118gx61s4YcioGOTCmxpEKlUuumcRmPY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "209834034804-igus2h0babaelp2qfplb0pjk32mi54u0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,10 +1,9 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
-    id 'kotlin-android-extensions'
     id 'kotlin-kapt'
     id 'dagger.hilt.android.plugin'
-
+    id 'com.google.gms.google-services'
 }
 
 android {
@@ -14,8 +13,8 @@ android {
         applicationId "com.gourav.competrace"
         minSdk 23
         targetSdk 33
-        versionCode 5
-        versionName "0.1.4"
+        versionCode 6
+        versionName "0.1.5"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -24,75 +23,105 @@ android {
     }
 
     buildTypes {
+        debug {
+            resValue("bool", "FIREBASE_ANALYTICS_DEACTIVATED", "true")
+        }
         release {
+            resValue("bool", "FIREBASE_ANALYTICS_DEACTIVATED", "false")
+
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
+
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = JavaVersion.current().toString()
         // useIR = true
     }
+
     buildFeatures {
         compose true
     }
+
     composeOptions {
-        kotlinCompilerExtensionVersion compose_version
+        kotlinCompilerExtensionVersion compose_compiler
         kotlinCompilerVersion kotlin_version
     }
+
     packagingOptions {
         resources {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
     }
+
     namespace 'com.gourav.competrace'
+}
+
+kotlin {
+    jvmToolchain(17)
 }
 
 dependencies {
 
-    implementation 'androidx.core:core-ktx:1.9.0'
-    implementation 'androidx.appcompat:appcompat:1.5.1'
-    implementation 'com.google.android.material:material:1.7.0'
+    def compose_ui = "1.4.3"
+    def compose_material = "1.4.3"
 
-    implementation "androidx.compose.ui:ui:1.4.0-alpha02"
-    implementation "androidx.compose.material:material:$compose_version"
-    implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
+    implementation 'androidx.core:core-ktx:1.10.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.9.0'
 
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
-    implementation 'androidx.activity:activity-compose:1.6.1'
+    implementation "androidx.compose.ui:ui:$compose_ui"
+    implementation "androidx.compose.ui:ui-tooling-preview:$compose_ui"
 
-    //Material 3
-    implementation "androidx.compose.material3:material3:1.1.0-alpha02"
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
+    implementation 'androidx.activity:activity-compose:1.7.0'
 
-    //Navigation
-    implementation "androidx.navigation:navigation-compose:2.6.0-alpha04"
+    // Import the Firebase BoM
+    implementation platform('com.google.firebase:firebase-bom:32.0.0')
+    implementation 'com.google.firebase:firebase-analytics-ktx'
+    implementation 'com.google.firebase:firebase-messaging'
+    implementation 'com.google.firebase:firebase-inappmessaging-display-ktx'
+    implementation 'com.google.firebase:firebase-inappmessaging-ktx'
+
+    // Collect Lifecycle Aware Components.
+    implementation 'androidx.lifecycle:lifecycle-runtime-compose:2.6.1'
+
+    // Material
+    implementation "androidx.compose.material:material:$compose_material"
+    // Material 3
+    implementation "androidx.compose.material3:material3:1.1.0-rc01"
+
+    // Navigation
+    implementation "androidx.navigation:navigation-compose:2.6.0-beta01"
+
+    // Browser Custom Tab
+    implementation "androidx.browser:browser:1.5.0"
 
     // Kotlin components
-    //noinspection GradleDependency
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     api "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4"
     api "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4"
 
-    //Retrofit
+    // Retrofit
     implementation "com.squareup.retrofit2:retrofit:2.9.0"
     implementation "com.squareup.retrofit2:converter-gson:2.0.0"
 
     // Moshi
     implementation "com.squareup.moshi:moshi-kotlin:1.12.0"
     implementation 'com.squareup.retrofit2:converter-moshi:2.9.0'
-    debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
+    debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_ui"
 
-    //Metadata
-    kapt("org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.5.0")
+    // Metadata
+    kapt "org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.5.0"
 
     // Android ktx
-    implementation 'androidx.activity:activity-ktx:1.6.1'
+    implementation 'androidx.activity:activity-ktx:1.7.1'
 
-    //Hilt and Dagger (With Classpath and plugins)
+    // Hilt and Dagger (With Classpath and plugins)
     implementation "com.google.dagger:hilt-android:2.44.2"
     kapt "com.google.dagger:hilt-compiler:2.44.2"
     implementation 'androidx.hilt:hilt-navigation-compose:1.0.0'
@@ -114,10 +143,7 @@ dependencies {
     // FlowRow
     implementation "com.google.accompanist:accompanist-flowlayout:0.26.4-beta"
 
-    // For Notifications
-    implementation 'androidx.core:core-ktx:1.9.0'
-
-    //Load Image from Internet
+    // Load Image from Internet
     implementation 'io.coil-kt:coil-compose:2.2.2'
 
     // Glide To Load Image
@@ -126,29 +152,30 @@ dependencies {
     implementation 'com.github.skydoves:landscapist-placeholder:2.1.0'
 
     // SystemUiController
-    implementation 'com.google.accompanist:accompanist-systemuicontroller:0.27.0'
+    implementation 'com.google.accompanist:accompanist-systemuicontroller:0.28.0'
 
     // Splash Scree Api
-    implementation("androidx.core:core-splashscreen:1.0.0")
-
-    // Swipe to Refresh
-    implementation "com.google.accompanist:accompanist-swiperefresh:0.25.1"
+    implementation("androidx.core:core-splashscreen:1.0.1")
 
     // In-App Update
-    implementation 'com.google.android.play:core:1.10.3'
+    implementation 'com.google.android.play:app-update:2.0.1'
+    implementation 'com.google.android.play:app-update-ktx:2.0.1'
+
+    // In-App Review
+    implementation 'com.google.android.play:review:2.0.1'
+    implementation 'com.google.android.play:review-ktx:2.0.1'
 
     // Room-Database
     def room_version = "2.5.1"
-    implementation("androidx.room:room-runtime:$room_version")
+    implementation "androidx.room:room-runtime:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
-    annotationProcessor("androidx.room:room-compiler:$room_version")
-
+    annotationProcessor "androidx.room:room-compiler:$room_version"
     // To use Kotlin annotation processing tool (kapt)
-    kapt("androidx.room:room-compiler:$room_version")
+    kapt "androidx.room:room-compiler:$room_version"
 
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.4'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
-    androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
-    debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_ui"
+    debugImplementation "androidx.compose.ui:ui-tooling:$compose_ui"
 }

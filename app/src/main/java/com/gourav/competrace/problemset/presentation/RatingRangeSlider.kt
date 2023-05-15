@@ -23,13 +23,14 @@ import com.gourav.competrace.R
 fun RatingRangeSlider(
     start: Int,
     end: Int,
-    updateStartAndEnd: (Int, Int) -> Unit
+    updateStartAndEnd: (Int, Int) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    var sliderPosition by remember {
+    var sliderPosition by remember(start, end) {
         mutableStateOf(start * 1f..end * 1f)
     }
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(

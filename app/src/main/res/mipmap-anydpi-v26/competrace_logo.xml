@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
-    <background android:drawable="@color/competrace_app_icon_bg"/>
-    <foreground android:drawable="@mipmap/competrace_logo_foreground"/>
-</adaptive-icon>

@@ -9,35 +9,32 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.TransformOrigin
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gourav.competrace.R
 import com.gourav.competrace.app_core.ui.CompetraceAppState
 import com.gourav.competrace.app_core.ui.SharedViewModel
-import com.gourav.competrace.app_core.util.ConnectivityObserver
-import com.gourav.competrace.app_core.util.NetworkConnectivityObserver
 import com.gourav.competrace.app_core.util.TopAppBarManager
-import kotlinx.coroutines.flow.map
 
 @OptIn(ExperimentalAnimationApi::class)
 @ExperimentalMaterial3Api
 @Composable
 fun CompetraceTopAppBar(
-    sharedViewModel: SharedViewModel,
     appState: CompetraceAppState
 ) {
-    val isPlatformTabRowVisible by sharedViewModel.isPlatformsTabRowVisible.collectAsState()
-    val topAppBarValues by TopAppBarManager.topAppBarValues.collectAsState()
+    val topAppBarValues by TopAppBarManager.topAppBarValues.collectAsStateWithLifecycle()
+    val isPlatformTabRowVisible by appState.isPlatformsTabRowVisible.collectAsStateWithLifecycle()
+    val isConnected by appState.isConnectedToNetwork.collectAsStateWithLifecycle()
 
     val navigationIcon: @Composable (() -> Unit) = {
         AnimatedContent(targetState = appState.shouldShowBottomBar) {
             if (it) {
-                IconButton(onClick = { sharedViewModel.toggleIsPlatformsTabRowVisibleTo(!isPlatformTabRowVisible) }) {
+                IconButton(onClick = { appState.toggleIsPlatformsTabRowVisibleTo(!isPlatformTabRowVisible) }) {
                     ExpandArrow(expanded = isPlatformTabRowVisible)
                 }
             } else {
@@ -49,8 +46,6 @@ fun CompetraceTopAppBar(
             }
         }
     }
-
-    val isConnected by sharedViewModel.isConnectedToNetwork.collectAsState()
 
     Column(
         modifier = Modifier.animateContentSize()
@@ -73,11 +68,11 @@ fun CompetraceTopAppBar(
                 visible = topAppBarValues.isSearchWidgetOpen,
                 enter = scaleIn(
                     animationSpec = tween(easing = FastOutSlowInEasing),
-                    transformOrigin = TransformOrigin(0.8f, 0.5f)
+                    transformOrigin = TransformOrigin(0.9f, 0.5f)
                 ) + fadeIn(animationSpec = tween(easing = FastOutSlowInEasing)),
                 exit = scaleOut(
                     animationSpec = tween(easing = FastOutSlowInEasing),
-                    transformOrigin = TransformOrigin(0.8f, 0.5f)
+                    transformOrigin = TransformOrigin(0.9f, 0.5f)
                 ) + fadeOut(animationSpec = tween(easing = FastOutSlowInEasing))
             ) {
                 topAppBarValues.searchWidget()

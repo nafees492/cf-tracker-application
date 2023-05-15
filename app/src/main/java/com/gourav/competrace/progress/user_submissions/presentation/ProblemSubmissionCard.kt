@@ -3,10 +3,14 @@ package com.gourav.competrace.progress.user_submissions.presentation
 import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,17 +28,14 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gourav.competrace.R
+import com.gourav.competrace.app_core.ui.components.BackgroundDesignArrow
+import com.gourav.competrace.app_core.ui.components.CompetraceTooltipBox
 import com.gourav.competrace.app_core.ui.components.FilterChipScrollableRow
-import com.gourav.competrace.app_core.ui.theme.BlueTickColor
-import com.gourav.competrace.app_core.util.CardValues
-import com.gourav.competrace.app_core.util.Verdict
-import com.gourav.competrace.app_core.util.copyTextToClipBoard
-import com.gourav.competrace.app_core.util.unixToDMYE
+import com.gourav.competrace.app_core.util.*
 import com.gourav.competrace.contests.model.CompetraceContest
 import com.gourav.competrace.problemset.model.CodeforcesProblem
 import com.gourav.competrace.progress.user_submissions.model.Submission
-import com.gourav.competrace.ui.components.BackgroundDesignArrow
-import com.gourav.competrace.utils.*
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,7 +53,7 @@ fun ProblemSubmissionCard(
     val clipboardManager: ClipboardManager = LocalClipboardManager.current
     val haptic = LocalHapticFeedback.current
 
-    val ratingContainerColor = getRatingContainerColor(rating = codeforcesProblem.rating)
+    val ratingContainerColor = ColorUtils.getRatingContainerColor(rating = codeforcesProblem.rating)
     val codeforcesContest = codeforcesProblem.contestId?.let { codeforcesContestListById[it] }
 
     ProblemSubmissionCardDesign(
@@ -82,17 +83,28 @@ fun ProblemSubmissionCard(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
+
             submissions[0].contestId?.let { id ->
-                val contest = codeforcesContestListById[id]
-                contest?.let {
+                codeforcesContestListById[id]?.let {
                     if (submissions[0].isSubmittedDuringContest(it)) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_blue_tick),
-                            contentDescription = stringResource(R.string.cd_blue_tick),
-                            modifier = Modifier
-                                .requiredSize(16.dp),
-                            tint = BlueTickColor
-                        )
+
+                        val tooltipState = remember { RichTooltipState() }
+                        val scope = rememberCoroutineScope()
+
+                        CompetraceTooltipBox(
+                            tooltipState = tooltipState,
+                            text = stringResource(R.string.ttt_submitted_during_contest)
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.ic_blue_tick_48),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .requiredSize(16.dp)
+                                    .clickable {
+                                        scope.launch { tooltipState.show() }
+                                    }
+                            )
+                        }
                     }
                 }
             }
@@ -111,7 +123,7 @@ fun ProblemSubmissionCard(
         }
 
         Text(
-            text = "Last Submission: ${unixToDMYE(submissions[0].creationTimeInMillis())}",
+            text = "Last Submission: ${TimeUtils.unixToDMYE(submissions[0].creationTimeInMillis())}",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
             modifier = Modifier.padding(start = 8.dp, end = 8.dp, bottom = 8.dp),
@@ -121,13 +133,13 @@ fun ProblemSubmissionCard(
 
         val status = if (codeforcesProblem.hasVerdictOK) Verdict.OK else submissions[0].verdict
 
-        val statusColor = getVerdictColor(
+        val statusColor = ColorUtils.getVerdictColor(
             lastVerdict = submissions[0].verdict,
             hasVerdictOK = codeforcesProblem.hasVerdictOK
         )
 
         val statusAndSubmissions = buildAnnotatedString {
-            withStyle(style = SpanStyle(color = statusColor)){
+            withStyle(style = SpanStyle(color = statusColor)) {
                 append(status)
             }
             append("  |  ")
@@ -170,7 +182,7 @@ fun ProblemSubmissionCardDesign(
             .padding(4.dp)
             .fillMaxWidth()
             .height(
-                getCardHeight(
+                SizeUtil.getCardHeight(
                     titleLargeTexts = 1,
                     bodyMediumTexts = 3,
                     extraPaddingValues = FilterChipDefaults.Height + 32.dp
@@ -195,7 +207,7 @@ fun ProblemSubmissionCardDesign(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .width(
-                        getTextWidthInDp(
+                        SizeUtil.getTextWidthInDp(
                             testSize = MaterialTheme.typography.bodyMedium.fontSize,
                             letters = 4
                         )

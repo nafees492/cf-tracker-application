@@ -5,7 +5,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -22,8 +21,8 @@ import com.gourav.competrace.app_core.ui.components.MyCircularProgressIndicator
 import com.gourav.competrace.app_core.util.ApiState
 import com.gourav.competrace.progress.user.model.User
 import com.gourav.competrace.progress.user_submissions.presentation.UserSubmissionsViewModel
-import com.gourav.competrace.app_core.ui.NetworkFailScreen
-import com.gourav.competrace.utils.getRatingTextColor
+import com.gourav.competrace.app_core.ui.FailureScreen
+import com.gourav.competrace.app_core.util.ColorUtils
 import com.skydoves.landscapist.animation.crossfade.CrossfadePlugin
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.glide.GlideImage
@@ -35,7 +34,7 @@ fun ProgressScreen(
     user: User,
     goToSubmission: () -> Unit,
     goToParticipatedContests: () -> Unit,
-    userSubmissionsViewModel: UserSubmissionsViewModel,
+    userSubmissionsViewModel: UserSubmissionsViewModel
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -55,15 +54,10 @@ fun ProgressScreen(
                         .size(120.dp)
                         .clip(RoundedCornerShape(4.dp)),
                     component = rememberImageComponent {
-                        // shows a crossFade animation when the image is loaded.
-                        +CrossfadePlugin()
-
-                        // shows a shimmering effect when loading an image.
                         +ShimmerPlugin(
                             baseColor = MaterialTheme.colorScheme.surface,
                             highlightColor = MaterialTheme.colorScheme.onSurface
                         )
-                        // Failure Image
                         +PlaceholderPlugin.Failure(
                             painterResource(
                                 id = R.drawable.broken_image_48px
@@ -100,14 +94,14 @@ fun ProgressScreen(
                         text = "Rating: ${user.rating}",
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.padding(vertical = 4.dp),
-                        color = getRatingTextColor(rating = user.rating)
+                        color = ColorUtils.getRatingTextColor(rating = user.rating)
                     )
 
                     Text(
                         text = "Max Rating: ${user.maxRating}",
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.padding(vertical = 4.dp),
-                        color = getRatingTextColor(rating = user.maxRating)
+                        color = ColorUtils.getRatingTextColor(rating = user.maxRating)
                     )
 
                 }
@@ -149,7 +143,7 @@ fun ProgressScreen(
                         MyCircularProgressIndicator(isDisplayed = true)
                     }
                     is ApiState.Failure -> {
-                        NetworkFailScreen(
+                        FailureScreen(
                             onClickRetry = userSubmissionsViewModel::refreshUserSubmission
                         )
                     }
@@ -175,10 +169,6 @@ fun ProgressScreen(
                     }
                 }
             }
-        }
-
-        item {
-            Spacer(modifier = Modifier.height(120.dp))
         }
     }
 }

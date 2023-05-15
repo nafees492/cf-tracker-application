@@ -14,7 +14,6 @@ import com.gourav.competrace.progress.user_submissions.presentation.UserSubmissi
 import com.gourav.competrace.progress.user_submissions.userSubmission
 
 fun NavGraphBuilder.progress(
-    sharedViewModel: SharedViewModel,
     userViewModel: UserViewModel,
     userSubmissionsViewModel: UserSubmissionsViewModel,
     participatedContestViewModel: ParticipatedContestViewModel,
@@ -23,7 +22,6 @@ fun NavGraphBuilder.progress(
 ) {
 
     user(
-        sharedViewModel = sharedViewModel,
         userViewModel = userViewModel,
         userSubmissionsViewModel = userSubmissionsViewModel,
         appState = appState,

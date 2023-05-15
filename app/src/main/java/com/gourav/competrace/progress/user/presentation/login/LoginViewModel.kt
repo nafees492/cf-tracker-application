@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.gourav.competrace.R
 import com.gourav.competrace.app_core.data.UserPreferences
 import com.gourav.competrace.app_core.data.repository.remote.CodeforcesRepository
+import com.gourav.competrace.app_core.util.ErrorEntity
 import com.gourav.competrace.app_core.util.SnackbarManager
 import com.gourav.competrace.app_core.util.UiText
 import com.gourav.competrace.progress.user.data.repository.UserRepository
@@ -65,7 +66,8 @@ class LoginViewModel @Inject constructor (
                     _isLoading.update { true }
                 }.catch {e ->
                     Log.e(TAG, e.toString())
-                    SnackbarManager.showMessage(UiText.StringResource(R.string.user_not_found))
+                    val errorMessage = ErrorEntity.getError(e).messageId
+                    SnackbarManager.showMessage(UiText.StringResource(errorMessage))
                     _isLoading.update { false }
                 }.collect { apiResult ->
                     if(apiResult.status == "OK"){
@@ -77,7 +79,7 @@ class LoginViewModel @Inject constructor (
                         Log.d(TAG, "Got - User Info - $userHandle")
                     } else {
                         Log.e(TAG, apiResult.comment.toString())
-                        SnackbarManager.showMessage(UiText.StringResource(R.string.user_not_found))
+                        SnackbarManager.showMessage(UiText.DynamicString(apiResult.comment.toString()))
                     }
                     _isLoading.update { false }
                 }

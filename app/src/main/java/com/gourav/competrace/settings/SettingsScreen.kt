@@ -1,10 +1,9 @@
 package com.gourav.competrace.settings
 
 import android.app.AlarmManager
-import android.app.PendingIntent
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
+import android.provider.Settings
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Arrangement
@@ -25,11 +24,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.core.app.NotificationCompat
 import com.gourav.competrace.R
-import com.gourav.competrace.app_core.AndroidNotification
-import com.gourav.competrace.app_core.NotificationItem
-import com.gourav.competrace.app_core.Notification
 import com.gourav.competrace.app_core.ui.components.CompetraceClickableText
 import com.gourav.competrace.app_core.ui.components.CompetraceIconButton
 import com.gourav.competrace.app_core.ui.theme.CompetraceThemeNames
@@ -38,7 +33,8 @@ import com.gourav.competrace.app_core.util.*
 import com.gourav.competrace.contests.data.ContestContestAlarmSchedulerImpl
 import com.gourav.competrace.contests.model.ContestAlarmItem
 import com.gourav.competrace.contests.presentation.ContestViewModel
-import com.gourav.competrace.utils.sendEmail
+import com.gourav.competrace.app_core.util.sendEmail
+import com.gourav.competrace.settings.util.ScheduleNotifBeforeOptions
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -55,7 +51,6 @@ fun SettingsScreen(
     val scheduleNotifBefore by settingsViewModel.scheduleNotifBefore.collectAsState()
 
     val appLink = stringResource(id = R.string.app_link_on_playstore)
-    val shareAppText = stringResource(id = R.string.share_app_text)
     val feedbackEmailAddress = stringResource(id = R.string.gourav_email)
     val feedbackEmailSubject = stringResource(id = R.string.feedback_email_subject)
     val feedbackEmailBody = stringResource(id = R.string.feedback_email_body)
@@ -89,7 +84,7 @@ fun SettingsScreen(
         mutableStateOf(false)
     }
 
-    if (settingsViewModel.isDeviceAbove12) AlertTheme(
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) AlertTheme(
         isOpen = isThemeAlertOpen,
         themeOptions = settingsViewModel.themeOptions,
         selectedOption = currentTheme,
@@ -120,7 +115,7 @@ fun SettingsScreen(
                 ContestAlarmItem(
                     id = 0,
                     contestId = "test-notification-alarm",
-                    timeInMillis = getCurrentTimeInMillis() + minutesToMillis(it),
+                    timeInMillis = TimeUtils.currentTimeInMillis() + TimeUtils.minutesToMillis(it),
                     title = Sites.Codeforces.title,
                     message = buildString {
                         append("{Contest.name}")
@@ -151,18 +146,19 @@ fun SettingsScreen(
                     onClick = { settingsViewModel.setShowTags(!showTags) },
                     switchState = showTags
                 )
+            }
+        }
 
-
-                    RowWithLeadingIcon(
-                        title = stringResource(id = R.string.schedule_notif_before),
-                        leadingIconId = R.drawable.ic_schedule_24px,
-                        subTitle = ScheduleNotifBeforeOptions.values()
-                            .find { it.value == scheduleNotifBefore }?.option,
-                        onClick = { isScheduleNotifBeforeAlertOpen = true },
-                        showError = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
-                            !alarmManager.canScheduleExactAlarms() else false
-                    )
-
+        item {
+            SettingsSection(title = stringResource(R.string.notifications)) {
+                RowWithLeadingIcon(
+                    title = stringResource(id = R.string.schedule_notif_before),
+                    leadingIconId = R.drawable.ic_schedule_24px,
+                    subTitle = ScheduleNotifBeforeOptions.getOption(scheduleNotifBefore),
+                    onClick = { isScheduleNotifBeforeAlertOpen = true },
+                    showError = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+                        !alarmManager.canScheduleExactAlarms() else false
+                )
 
                 RowWithLeadingIcon(
                     title = stringResource(id = R.string.clear_all_set_notif),
@@ -175,12 +171,32 @@ fun SettingsScreen(
                     leadingIconId = R.drawable.ic_notifications_24px,
                     onClick = { isTestNotifAlertOpen = true }
                 )
+
+                RowWithLeadingIcon(
+                    title = "More Notification Settings",
+                    leadingIconId = R.drawable.ic_more_horiz_24px,
+                    onClick = {
+                        Intent().apply {
+                            when {
+                                Build.VERSION.SDK_INT >= Build.VERSION_CODES.O -> {
+                                    action = Settings.ACTION_APP_NOTIFICATION_SETTINGS
+                                    putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+                                }
+                                else -> {
+                                    action = "android.settings.APP_NOTIFICATION_SETTINGS"
+                                    putExtra("app_package", context.packageName)
+                                    putExtra("app_uid", context.applicationInfo.uid)
+                                }
+                            }
+                        }.also(context::startActivity)
+                    }
+                )
             }
         }
 
         item {
             SettingsSection(title = stringResource(id = R.string.theme)) {
-                if (settingsViewModel.isDeviceAbove12) RowWithLeadingIcon(
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) RowWithLeadingIcon(
                     title = stringResource(id = R.string.theme),
                     leadingIconId = R.drawable.ic_palette_24px,
                     subTitle = currentTheme,
@@ -206,15 +222,14 @@ fun SettingsScreen(
                 ) {
                     CompetraceIconButton(
                         iconId = R.drawable.ic_shield_24px,
-                        onClick = { loadUrl(context = context, url = privacyPolicyLink) },
+                        onClick = { context.loadUrl(url = privacyPolicyLink) },
                         text = stringResource(id = R.string.privacy_policy),
                         contentDescription = stringResource(id = R.string.privacy_policy),
                     )
                     CompetraceIconButton(
                         iconId = R.drawable.ic_report_24px,
                         onClick = {
-                            sendEmail(
-                                context = context,
+                            context.sendEmail(
                                 toSendEmail = arrayOf(feedbackEmailAddress),
                                 emailSubject = feedbackEmailSubject,
                                 emailBody = feedbackEmailBody
@@ -226,7 +241,7 @@ fun SettingsScreen(
                     CompetraceIconButton(
                         iconId = R.drawable.ic_star_half_24px,
                         onClick = {
-                            loadUrl(context = context, url = appLink)
+                            context.loadUrl(url = appLink)
                         },
                         text = stringResource(id = R.string.rate_and_review),
                         contentDescription = stringResource(id = R.string.rate_and_review)
@@ -235,8 +250,8 @@ fun SettingsScreen(
                         iconId = R.drawable.ic_share_24px,
                         onClick = {
                             context.shareTextToOtherApp(
-                                textToShare = shareAppText,
-                                heading = context.getString(R.string.share_competrace_via)
+                                textToShare = UiText.StringResource(R.string.share_app_text),
+                                heading = UiText.StringResource(R.string.share_competrace_via)
                             )
                         },
                         text = stringResource(id = R.string.share),

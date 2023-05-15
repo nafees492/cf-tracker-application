@@ -1,11 +1,8 @@
 package com.gourav.competrace.contests.model
 
 import android.content.Context
-import com.gourav.competrace.app_core.util.ContestRatedCategories
-import com.gourav.competrace.app_core.util.minutesToMillis
-import com.gourav.competrace.app_core.util.unixToTime
-import com.gourav.competrace.contests.util.addEventToCalendar
-import com.gourav.competrace.settings.ScheduleNotifBeforeOptions
+import com.gourav.competrace.app_core.util.*
+import com.gourav.competrace.settings.util.ScheduleNotifBeforeOptions
 import java.util.*
 
 data class CompetraceContest(
@@ -15,8 +12,6 @@ data class CompetraceContest(
     val websiteUrl: String,
     val startTimeInMillis: Long,
     val durationInMillis: Long,
-    val within7Days: Boolean = false,
-    val registrationOpen: Boolean = false,
     val registrationUrl: String? = null,
     val site: String,
 ) {
@@ -38,7 +33,7 @@ data class CompetraceContest(
     private fun getNotificationMessage(timeBeforeStart: Int) = buildString {
         append(name)
         append(" is going to start at ")
-        append(unixToTime(startTimeInMillis))
+        append(TimeUtils.unixToTime(startTimeInMillis))
         append(". Hurry Up!!\n")
         append(ScheduleNotifBeforeOptions.getOption(timeBeforeStart))
         append(" to Go.\n")
@@ -47,15 +42,14 @@ data class CompetraceContest(
     fun getAlarmItem(timeBeforeStart: Int) = ContestAlarmItem(
         id = uniqueId(),
         contestId = id.toString(),
-        timeInMillis = startTimeInMillis - minutesToMillis(timeBeforeStart),
+        timeInMillis = startTimeInMillis - TimeUtils.minutesToMillis(timeBeforeStart),
         title = site,
         message = getNotificationMessage(timeBeforeStart),
         registrationUrl = registrationUrl ?: ""
     )
 
     fun addToCalender(context: Context) {
-        addEventToCalendar(
-            context = context,
+        context.addEventToCalendar(
             title = name,
             startTime = startTimeInMillis,
             endTime = endTimeInMillis,
@@ -63,5 +57,17 @@ data class CompetraceContest(
             description = "Add Contest to Calender"
         )
     }
+
+    private fun daysLeft(): Long = (startTimeInMillis - TimeUtils.currentTimeInMillis()) / (24 * 3600 * 1000)
+
+    private fun within7Days(): Boolean = daysLeft() in Long.MIN_VALUE..6L
+
+    fun registrationOpen(): Boolean = if(site == Sites.Codeforces.title) daysLeft() in 0L..1L else false
+
+    fun isOngoing() = phase == Phase.CODING
+
+    fun isWithin7Days() = phase == Phase.BEFORE && within7Days()
+
+    fun isAfter7Days() = phase == Phase.BEFORE && !within7Days()
 }
 

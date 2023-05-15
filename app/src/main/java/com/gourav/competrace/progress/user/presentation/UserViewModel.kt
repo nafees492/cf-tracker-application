@@ -7,9 +7,10 @@ import com.gourav.competrace.app_core.data.CodeforcesDatabase
 import com.gourav.competrace.app_core.data.UserPreferences
 import com.gourav.competrace.app_core.data.repository.remote.CodeforcesRepository
 import com.gourav.competrace.app_core.util.ApiState
+import com.gourav.competrace.app_core.util.ErrorEntity
 import com.gourav.competrace.app_core.util.Sites
+import com.gourav.competrace.app_core.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -23,7 +24,8 @@ class UserViewModel @Inject constructor(
     val userSites = Sites.values().filter { it.isUserSite }
 
     val userHandle = userPreferences.handleNameFlow
-    private val codeforcesDatabase: CodeforcesDatabase = CodeforcesDatabase.instance as CodeforcesDatabase
+    private val codeforcesDatabase: CodeforcesDatabase =
+        CodeforcesDatabase.instance as CodeforcesDatabase
 
     private val _responseForUserInfo = MutableStateFlow<ApiState>(ApiState.Success)
     val responseForUserInfo = _responseForUserInfo.asStateFlow()
@@ -33,7 +35,7 @@ class UserViewModel @Inject constructor(
     fun refreshUserInfo() {
         viewModelScope.launch {
             userPreferences.handleNameFlow.collect {
-                if(it.isNotBlank()) getUserInfo(it)
+                if (it.isNotBlank()) getUserInfo(it)
             }
         }
     }
@@ -47,31 +49,38 @@ class UserViewModel @Inject constructor(
                 .onStart {
                     _responseForUserInfo.update { ApiState.Loading }
                     _isUserRefreshing.update { true }
-                }.catch {
-                    _responseForUserInfo.update { ApiState.Failure }
+                }.catch { e ->
+                    val errorMessage = ErrorEntity.getError(e).messageId
+                    _responseForUserInfo.update {
+                        ApiState.Failure(
+                            UiText.StringResource(
+                                errorMessage
+                            )
+                        )
+                    }
                     _isUserRefreshing.update { false }
-                    Log.e(TAG, "getUserInfo: $it")
-                }.collect {
-                    if(it.status == "OK"){
-                        codeforcesDatabase.setUser(user = it.result!![0])
+                    Log.e(TAG, "getUserInfo: $e")
+                }.collect {apiResult ->
+                    if (apiResult.status == "OK") {
+                        codeforcesDatabase.setUser(user = apiResult.result!![0])
                         _responseForUserInfo.update { ApiState.Success }
                         Log.d(TAG, "Got - User Info - $handle")
                     } else {
-                        _responseForUserInfo.update { ApiState.Failure }
-                        Log.e(TAG, "getUserInfo: " + it.comment.toString())
+                        _responseForUserInfo.update { ApiState.Failure(UiText.DynamicString(apiResult.comment.toString())) }
+                        Log.e(TAG, "getUserInfo: " + apiResult.comment.toString())
                     }
                     _isUserRefreshing.update { false }
                 }
         }
     }
 
-    fun logoutUser(){
+    fun logoutUser() {
         viewModelScope.launch {
             userPreferences.setHandleName("")
         }
     }
 
-    companion object{
+    companion object {
         private const val TAG = "User ViewModel"
     }
 
