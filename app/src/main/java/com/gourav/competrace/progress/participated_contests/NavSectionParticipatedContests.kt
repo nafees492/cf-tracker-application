@@ -11,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import com.gourav.competrace.app_core.TrackScreen
 import com.gourav.competrace.app_core.util.ApiState
 import com.gourav.competrace.app_core.util.Screens
 import com.gourav.competrace.app_core.util.TopAppBarManager
@@ -24,6 +25,7 @@ fun NavGraphBuilder.participatedContests(
     participatedContestViewModel: ParticipatedContestViewModel,
 ) {
     composable(route = Screens.ParticipatedContestsScreen.route) {
+        TrackScreen(screen = Screens.ParticipatedContestsScreen)
 
         val isRefreshing by participatedContestViewModel.isUserRatingChangesRefreshing.collectAsState()
         val responseForUserRatingChanges by participatedContestViewModel.responseForUserRatingChanges.collectAsState()

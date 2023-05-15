@@ -6,20 +6,24 @@ import android.content.Context
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.contentColorFor
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.install.InstallStateUpdatedListener
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
+import com.gourav.competrace.R
 import com.gourav.competrace.app_core.ui.MainActivity
 import com.gourav.competrace.app_core.util.SnackbarManager
 import com.gourav.competrace.app_core.util.UiText
+import com.gourav.competrace.app_core.util.findActivity
+import com.gourav.competrace.app_core.util.loadUrl
+import java.time.Duration
 
 class CompetraceInAppUpdate(context: Context) {
 
     private val appContext = context.applicationContext
-    private val activity = appContext as Activity
     private val appUpdateManager: AppUpdateManager = AppUpdateManagerFactory.create(appContext)
     private val updateType = AppUpdateType.FLEXIBLE
 
@@ -40,23 +44,26 @@ class CompetraceInAppUpdate(context: Context) {
     }
 
     init {
-        if(updateType == AppUpdateType.FLEXIBLE){
+        /*if(updateType == AppUpdateType.FLEXIBLE){
             appUpdateManager.registerListener(installStateUpdatedListener)
-        }
+        }*/
     }
 
-    private fun checkForAppUpdates(){
+    fun checkForAppUpdates(){
         appUpdateManager.appUpdateInfo.addOnSuccessListener { info ->
 
             val isUpdateAvailable = info.updateAvailability() ==  UpdateAvailability.UPDATE_AVAILABLE
             val isUpdateAllow = info.isUpdateTypeAllowed(updateType)
 
             if(isUpdateAvailable && isUpdateAllow){
-                appUpdateManager.startUpdateFlowForResult(
-                    info,
-                    updateType,
-                    activity,
-                    APP_UPDATE_REQ_CODE
+                SnackbarManager.showMessageWithAction(
+                    message = UiText.StringResource(R.string.app_update_available),
+                    actionLabel = UiText.StringResource(R.string.download),
+                    action = {
+                        val appUrl = appContext.getString(R.string.app_link_on_playstore)
+                        appContext.loadUrl(appUrl)
+                    },
+                    duration = SnackbarDuration.Long
                 )
             }
         }
@@ -77,21 +84,21 @@ class CompetraceInAppUpdate(context: Context) {
             appUpdateManager.appUpdateInfo.addOnSuccessListener { info ->
                 val isDevTriggered = info.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS
                 if(isDevTriggered){
-                    appUpdateManager.startUpdateFlowForResult(
+                    /*appUpdateManager.startUpdateFlowForResult(
                         info,
                         updateType,
-                        activity,
+                        context.findActivity(),
                         APP_UPDATE_REQ_CODE
-                    )
+                    )*/
                 }
             }
         }
     }
 
     fun onDestroy(){
-        if(updateType == AppUpdateType.FLEXIBLE){
+        /*if(updateType == AppUpdateType.FLEXIBLE){
             appUpdateManager.unregisterListener(installStateUpdatedListener)
-        }
+        }*/
     }
 
     companion object{

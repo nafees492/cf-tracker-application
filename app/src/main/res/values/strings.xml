@@ -142,6 +142,8 @@
     <string name="remove_user_from_recent">Remove User from recent</string>
     <string name="reset">Reset</string>
     <string name="notifications">Notifications</string>
+    <string name="app_update_available">App Update is available</string>
+    <string name="download">Download</string>
 
 
 </resources>

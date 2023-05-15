@@ -1,6 +1,8 @@
 package com.gourav.competrace.app_core.util
 
+import android.app.Activity
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
 import android.net.Uri
 import android.provider.CalendarContract
@@ -61,7 +63,9 @@ fun Context.loadUrl(url: String?) {
         )
     } catch (e: Exception){
         startActivity(
-            Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            }
         )
     }
 
@@ -106,4 +110,13 @@ fun Context.addEventToCalendar(
         //.putExtra(Intent.EXTRA_EMAIL, "fooInviteeOne@gmail.com,fooInviteeTwo@gmail.com")
         //.putExtra(CalendarContract.Events.RRULE, getRRule()) // Recurrence rule
     }.also(this::startActivity)
+}
+
+fun Context.findActivity(): Activity {
+    var context = this
+    while (context is ContextWrapper) {
+        if (context is Activity) return context
+        context = context.baseContext
+    }
+    throw IllegalStateException("no activity")
 }

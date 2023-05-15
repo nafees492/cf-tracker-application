@@ -19,6 +19,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.gourav.competrace.R
+import com.gourav.competrace.app_core.TrackScreen
 import com.gourav.competrace.app_core.ui.CompetraceAppState
 import com.gourav.competrace.app_core.ui.FailureScreen
 import com.gourav.competrace.app_core.ui.components.CompetracePlatformRow
@@ -41,6 +42,7 @@ fun NavGraphBuilder.problemSet(
     paddingValues: PaddingValues
 ) {
     composable(route = Screens.ProblemSetScreen.route) {
+        TrackScreen(screen = Screens.ProblemSetScreen)
         val context = LocalContext.current
         val scope = rememberCoroutineScope()
 

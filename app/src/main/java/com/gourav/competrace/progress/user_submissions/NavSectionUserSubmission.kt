@@ -24,6 +24,7 @@ import com.gourav.competrace.app_core.ui.FailureScreen
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.gourav.competrace.R
+import com.gourav.competrace.app_core.TrackScreen
 import com.gourav.competrace.app_core.ui.components.CompetracePullRefreshIndicator
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
@@ -31,6 +32,7 @@ fun NavGraphBuilder.userSubmission(
     userSubmissionsViewModel: UserSubmissionsViewModel,
 ) {
     composable(route = Screens.UserSubmissionsScreen.route) {
+        TrackScreen(screen = Screens.UserSubmissionsScreen)
         val scope = rememberCoroutineScope()
 
         val contestListById by userSubmissionsViewModel.contestListById.collectAsState()

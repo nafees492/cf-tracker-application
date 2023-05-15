@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import com.gourav.competrace.app_core.TrackScreen
 import com.gourav.competrace.app_core.ui.CompetraceAppState
 import com.gourav.competrace.app_core.ui.components.CompetracePlatformRow
 import com.gourav.competrace.app_core.util.ApiState
@@ -33,6 +34,7 @@ fun NavGraphBuilder.user(
     paddingValues: PaddingValues
 ) {
     composable(route = Screens.ProgressScreen.route) {
+        TrackScreen(screen = Screens.ProgressScreen)
         val loginViewModel: LoginViewModel = hiltViewModel()
 
         val isPlatformTabRowVisible by appState.isPlatformsTabRowVisible.collectAsState()

@@ -7,43 +7,50 @@ import com.gourav.competrace.R
 enum class Screens(
     @StringRes val titleId: Int,
     @DrawableRes val iconId: Int?,
+    val screenName: String,
     val route: String,
-    val isHomeScreen: Boolean
+    val isHomeScreen: Boolean,
 ) {
     ContestsScreen(
-        R.string.contests,
-        R.drawable.ic_round_leaderboard_24,
-        "home/contests",
-        true
+        titleId = R.string.contests,
+        iconId = R.drawable.ic_round_leaderboard_24,
+        screenName = "Contests",
+        route = "home/contests",
+        isHomeScreen = true
     ),
     ProblemSetScreen(
-        R.string.problem_set,
-        R.drawable.ic_round_assignment_24,
-        "home/problemset",
-        true
+        titleId = R.string.problem_set,
+        iconId = R.drawable.ic_round_assignment_24,
+        screenName = "Problem Set",
+        route = "home/problemset",
+        isHomeScreen = true
     ),
     ProgressScreen(
-        R.string.progress,
-        R.drawable.ic_round_insights_24,
-        "home/progress",
-        true
+        titleId = R.string.progress,
+        iconId = R.drawable.ic_round_insights_24,
+        screenName = "Progress",
+        route = "home/progress",
+        isHomeScreen = true
     ),
     ParticipatedContestsScreen(
-        R.string.participated_contests,
-        null,
-        "home/progress/participated-contests",
-        false
+        titleId = R.string.participated_contests,
+        iconId = null,
+        screenName = "Participated Contests",
+        route = "home/progress/participated-contests",
+        isHomeScreen = false
     ),
     UserSubmissionsScreen(
-        R.string.your_submissions,
-        null,
-        "home/progress/user-submission",
-        false
+        titleId = R.string.your_submissions,
+        iconId = null,
+        screenName = "User Submission",
+        route = "home/progress/user-submission",
+        isHomeScreen = false
     ),
     SettingsScreen(
-        R.string.settings,
-        R.drawable.ic_baseline_settings_24px,
-        "home/settings",
-        false
+        titleId = R.string.settings,
+        iconId = R.drawable.ic_baseline_settings_24px,
+        screenName = "Settings",
+        route = "home/settings",
+        isHomeScreen = false
     );
 }
