@@ -100,7 +100,13 @@ class ContestViewModel @Inject constructor(
                             } ?: false
                         }.map {
                             it.mapToCompetraceContest()
-                        }.sortedBy {
+                        }.filter {
+                            if (it.phase == Phase.BEFORE)
+                                it.startTimeInMillis >= TimeUtils.currentTimeInMillis()
+                            else
+                                it.endTimeInMillis >= TimeUtils.currentTimeInMillis()
+                        }
+                        .sortedBy {
                             it.startTimeInMillis
                         }
 
