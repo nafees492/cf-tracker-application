@@ -1,4 +1,4 @@
-package com.gourav.competrace.app_core.ui
+package com.gourav.competrace
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.PaddingValues
@@ -11,7 +11,6 @@ import androidx.navigation.compose.composable
 import com.gourav.competrace.app_core.util.Screens
 import com.gourav.competrace.app_core.util.TopAppBarManager
 import com.gourav.competrace.contests.contests
-import com.gourav.competrace.contests.presentation.ContestScreenActions
 import com.gourav.competrace.contests.presentation.ContestViewModel
 import com.gourav.competrace.problemset.presentation.ProblemSetViewModel
 import com.gourav.competrace.problemset.problemSet

@@ -13,7 +13,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.gourav.competrace.R
-import com.gourav.competrace.app_core.ui.MainActivity
+import com.gourav.competrace.MainActivity
 
 data class NotificationItem(
     val channelId: String,

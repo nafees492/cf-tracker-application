@@ -1,8 +1,10 @@
-package com.gourav.competrace.app_core.ui
+package com.gourav.competrace
 
 
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import com.gourav.competrace.app_core.ui.components.CompetraceBottomNavigationBar
 import com.gourav.competrace.app_core.ui.components.CompetraceTopAppBar
 
@@ -19,7 +21,7 @@ fun Application() {
             bottomBar = {
                 CompetraceBottomNavigationBar(appState = appState)
             },
-            snackbarHost = { SnackbarHost(hostState = appState.snackbarHostState) }
+            snackbarHost = { SnackbarHost(hostState = appState.snackbarHostState) },
         ) {
             CompetraceNavHost(
                 appState = appState,

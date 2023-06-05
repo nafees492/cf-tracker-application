@@ -1,4 +1,4 @@
-package com.gourav.competrace.app_core.ui
+package com.gourav.competrace
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

@@ -7,25 +7,23 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.TransformOrigin
-import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gourav.competrace.R
-import com.gourav.competrace.app_core.ui.CompetraceAppState
-import com.gourav.competrace.app_core.ui.SharedViewModel
+import com.gourav.competrace.CompetraceAppState
 import com.gourav.competrace.app_core.util.TopAppBarManager
 
 @OptIn(ExperimentalAnimationApi::class)
 @ExperimentalMaterial3Api
 @Composable
 fun CompetraceTopAppBar(
-    appState: CompetraceAppState
+    appState: CompetraceAppState,
 ) {
     val topAppBarValues by TopAppBarManager.topAppBarValues.collectAsStateWithLifecycle()
     val isPlatformTabRowVisible by appState.isPlatformsTabRowVisible.collectAsStateWithLifecycle()
