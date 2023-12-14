@@ -104,7 +104,7 @@ fun NavGraphBuilder.contests(
 
         val pullRefreshState = rememberPullRefreshState(
             refreshing = screenState.apiState == ApiState.Loading,
-            onRefresh = contestViewModel::getContestListFromKontests
+            onRefresh = contestViewModel::getContestListFromCodeforces
         )
 
         Column(Modifier.padding(bottom = paddingValues.calculateBottomPadding())) {
@@ -126,7 +126,7 @@ fun NavGraphBuilder.contests(
                     }
                     is ApiState.Failure -> {
                         FailureScreen(
-                            onClickRetry = contestViewModel::getContestListFromKontests,
+                            onClickRetry = contestViewModel::getContestListFromCodeforces,
                             errorMessage = apiState.message
                         )
                     }

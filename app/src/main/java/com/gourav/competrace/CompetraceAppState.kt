@@ -93,7 +93,7 @@ class CompetraceAppState(
         false
     )
 
-    private val _isPlatformsTabRowVisible = MutableStateFlow(true)
+    private val _isPlatformsTabRowVisible = MutableStateFlow(false)
     val isPlatformsTabRowVisible = _isPlatformsTabRowVisible.asStateFlow()
 
     fun toggleIsPlatformsTabRowVisibleTo(value: Boolean) {

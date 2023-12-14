@@ -19,7 +19,7 @@ enum class Sites(
         contestsUrl = "https://codeforces.com/contests",
         problemSetUrl = "https://codeforces.com/problemset"
     ),
-    CodeChef(
+   /* CodeChef(
         title = "CodeChef",
         iconId = R.drawable.logo_codechef_white_96,
         true, false, false,
@@ -36,7 +36,7 @@ enum class Sites(
         iconId = R.drawable.logo_leetcode_white_96,
         true, false, false,
         contestsUrl = "https://leetcode.com/contest"
-    ),
+    ),*/
     Competrace(
         title = "Competrace",
         iconId = R.drawable.competrace_notification_icon,

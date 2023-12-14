@@ -9,6 +9,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.gourav.competrace.app_core.TrackScreen
@@ -19,6 +20,7 @@ import com.gourav.competrace.progress.participated_contests.presentation.Partici
 import com.gourav.competrace.progress.participated_contests.presentation.ParticipatedContestsScreen
 import com.gourav.competrace.app_core.ui.FailureScreen
 import com.gourav.competrace.app_core.ui.components.CompetracePullRefreshIndicator
+import com.gourav.competrace.progress.user_submissions.presentation.UserSubmissionsViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
 fun NavGraphBuilder.participatedContests(
