@@ -13,7 +13,6 @@ import com.gourav.competrace.app_core.util.UiText
 import com.gourav.competrace.contests.model.CompetraceContest
 import com.gourav.competrace.problemset.model.CompetraceProblem
 import com.gourav.competrace.problemset.model.ProblemSetScreenState
-import com.gourav.competrace.problemset.util.processCodeforcesContestFromAPIResult
 import com.gourav.competrace.problemset.util.processCodeforcesProblemSetFromAPIResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -35,16 +34,10 @@ class ProblemSetViewModel @Inject constructor(
     private val _codeforcesContest = codeforcesDatabase.codeforcesContestListByIdFlow
     private val _allProblems = codeforcesDatabase.allProblemsFlow
 
-    private var fetchContestJob: Job? = null
     private var fetchProblemsetJob: Job? = null
 
     fun refreshProblemSetAndContests() {
-        getContestListFromCodeforces()
         getProblemSetFromCodeforces()
-    }
-
-    fun addContestToContestListById(codeforcesContest: CompetraceContest) {
-        codeforcesDatabase.addContestToContestListById(contest = codeforcesContest)
     }
 
     fun clearProblemsFromCodeforcesDatabase() {
@@ -55,44 +48,6 @@ class ProblemSetViewModel @Inject constructor(
         codeforcesDatabase.addAllProblems(problems = problem)
     }
 
-    private fun getContestListFromCodeforces() {
-        fetchContestJob?.cancel()
-        fetchContestJob = viewModelScope.launch(Dispatchers.IO) {
-            // Load Normal Contests.
-            codeforcesRepository.getContestList(gym = false)
-                .catch {
-                    Log.e(TAG, "getContestListFromCodeforces: ${it.cause}")
-                }.collect {
-                    if (it.status == "OK") {
-
-                        processCodeforcesContestFromAPIResult(apiResult = it)
-
-                        Log.d(TAG, "Codeforces - Got - Contest List")
-                    } else {
-                        Log.e(TAG, "getContestListFromCodeforces: " + it.comment.toString())
-                    }
-                }
-            delay(100)
-            // Load Gym Contests.
-            codeforcesRepository.getContestList(gym = true)
-                .catch {
-                    Log.e(TAG, "getContestListFromCodeforces: ${it.cause}")
-                }
-                .collect { apiResult ->
-                    if (apiResult.status == "OK") {
-                        apiResult.result?.map {
-                            it.mapToCompetraceContest()
-                        }?.forEach { contest ->
-                            codeforcesDatabase.addContestToContestListById(contest = contest)
-                        }
-
-                        Log.d(TAG, "Codeforces - Got - Gym Contest List")
-                    } else {
-                        Log.e(TAG, "getContestListFromCodeforces: " + apiResult.comment.toString())
-                    }
-                }
-        }
-    }
 
     private val _showTags = userPreferences.showTagsFlow
     private val _allTags = MutableStateFlow(emptyList<String>())

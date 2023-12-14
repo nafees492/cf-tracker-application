@@ -13,6 +13,7 @@ import com.gourav.competrace.contests.model.CompetraceContest
 import com.gourav.competrace.progress.participated_contests.model.UserRatingChanges
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -50,7 +51,7 @@ class ParticipatedContestViewModel @Inject constructor(
 
     private val _isUserRatingChangesRefreshing = MutableStateFlow(false)
     val isUserRatingChangesRefreshing = _isUserRatingChangesRefreshing.asStateFlow()
-
+    
     fun refreshUserRatingChanges() {
         viewModelScope.launch {
             userPreferences.handleNameFlow.collect {
@@ -106,6 +107,6 @@ class ParticipatedContestViewModel @Inject constructor(
     }
 
     companion object {
-        private const val TAG = "Finished Contest ViewModel"
+        private const val TAG = "Participated Contest ViewModel"
     }
 }

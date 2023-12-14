@@ -10,9 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.navigation.NavHostController
-import com.gourav.competrace.app_core.ui.CompetraceAppState
-import com.gourav.competrace.app_core.util.Screens
+import com.gourav.competrace.CompetraceAppState
 
 @Composable
 fun CompetraceBottomNavigationBar(appState: CompetraceAppState) {

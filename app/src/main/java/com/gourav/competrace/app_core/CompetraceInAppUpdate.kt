@@ -1,12 +1,10 @@
 package com.gourav.competrace.app_core
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.contentColorFor
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.install.InstallStateUpdatedListener
@@ -14,12 +12,9 @@ import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
 import com.gourav.competrace.R
-import com.gourav.competrace.app_core.ui.MainActivity
 import com.gourav.competrace.app_core.util.SnackbarManager
 import com.gourav.competrace.app_core.util.UiText
-import com.gourav.competrace.app_core.util.findActivity
 import com.gourav.competrace.app_core.util.loadUrl
-import java.time.Duration
 
 class CompetraceInAppUpdate(context: Context) {
 

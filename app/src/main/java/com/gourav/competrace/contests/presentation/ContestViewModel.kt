@@ -4,23 +4,26 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gourav.competrace.R
+import com.gourav.competrace.app_core.data.CodeforcesDatabase
 import com.gourav.competrace.app_core.data.UserPreferences
-import com.gourav.competrace.app_core.data.repository.remote.KontestsRepository
+import com.gourav.competrace.app_core.data.repository.remote.CodeforcesRepository
 import com.gourav.competrace.app_core.util.*
 import com.gourav.competrace.contests.data.ContestAlarmScheduler
 import com.gourav.competrace.contests.data.repository.ContestAlarmRepository
 import com.gourav.competrace.contests.model.CompetraceContest
 import com.gourav.competrace.contests.model.ContestAlarmItem
 import com.gourav.competrace.contests.model.ContestScreenState
+import com.gourav.competrace.problemset.presentation.ProblemSetViewModel
 import com.gourav.competrace.settings.util.ScheduleNotifBeforeOptions
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ContestViewModel @Inject constructor(
-    private val kontestsRepository: KontestsRepository,
+    private val codeforcesRepository: CodeforcesRepository,
     private val userPreferences: UserPreferences,
     private val contestAlarmRepository: ContestAlarmRepository,
     private val contestAlarmScheduler: ContestAlarmScheduler,
@@ -29,6 +32,12 @@ class ContestViewModel @Inject constructor(
     val contestSites = Sites.values().filter { it.isContestSite }
 
     private val _selectedIndex = userPreferences.selectedContestSiteIndexFlow
+
+    private val codeforcesDatabase = CodeforcesDatabase.instance as CodeforcesDatabase
+
+    fun addContestToContestListById(codeforcesContest: CompetraceContest) {
+        codeforcesDatabase.addContestToContestListById(contest = codeforcesContest)
+    }
 
     fun setSelectedIndexTo(value: Int) {
         viewModelScope.launch {
@@ -57,7 +66,8 @@ class ContestViewModel @Inject constructor(
     private val _screenState = MutableStateFlow(ContestScreenState())
     val screenState = _screenState
         .combine(_selectedIndex) { state, index ->
-            state.copy(selectedIndex = index)
+            if(index >= contestSites.size) state.copy(selectedIndex = 0)
+            else state.copy(selectedIndex = index)
         }
         .combine(_allContests) { state, allContests ->
             val currentSite = contestSites[state.selectedIndex].title
@@ -77,9 +87,9 @@ class ContestViewModel @Inject constructor(
             ContestScreenState()
         )
 
-    fun getContestListFromKontests() {
+    fun getContestListFromCodeforces() {
         viewModelScope.launch {
-            kontestsRepository.getAllContests()
+            codeforcesRepository.getContestList(gym = false)
                 .onStart {
                     _screenState.update { it.copy(apiState = ApiState.Loading) }
                 }
@@ -91,36 +101,78 @@ class ContestViewModel @Inject constructor(
                     Log.e(TAG, "getContestListFromKontests: ${e.cause}")
                 }
                 .collect { apiResult ->
-                    clearAllContests()
+                    if (apiResult.status == "OK") {
 
-                    val contests = apiResult
-                        .filter { contest ->
-                            contest.site?.let { site ->
-                                contestSites.any { it.title == site }
-                            } ?: false
-                        }.map {
+                        // To add contest to database
+                        apiResult.result?.map {
                             it.mapToCompetraceContest()
-                        }.sortedBy {
-                            it.startTimeInMillis
+                        }?.forEach { contest ->
+                            contest.ratedCategories.clear()
+                            ContestRatedCategories.values().forEach {
+                                if (contest.name.contains(it.value)) contest.ratedCategories.add(it)
+                            }
+                            addContestToContestListById(codeforcesContest = contest)
                         }
 
-                    contests.forEach { contest ->
-                        contest.ratedCategories.clear()
-                        ContestRatedCategories.values().forEach {
-                            if (contest.name.contains(it.value)) contest.ratedCategories.add(it)
-                        }
-                        addContestToAllContests(contest = contest)
+                        // To display Upcoming Contests
+                        clearAllContests()
+                        val contests = apiResult.result
+                            ?.map {
+                                it.mapToCompetraceContest()
+                            }
+                            ?.filter {
+                                if (it.phase == Phase.BEFORE)
+                                    it.startTimeInMillis >= TimeUtils.currentTimeInMillis()
+                                else
+                                    it.endTimeInMillis >= TimeUtils.currentTimeInMillis()
+                            }
+                            ?.sortedBy {
+                                it.startTimeInMillis
+                            }
 
-                        if (contest.startTimeInMillis - TimeUtils.currentTimeInMillis() >
-                            TimeUtils.minutesToMillis(scheduleNotifBefore.value)
-                        )
-                            contestAlarmRepository.updateAlarm(
-                                contest.getAlarmItem(scheduleNotifBefore.value)
+                        contests?.forEach { contest ->
+                            contest.ratedCategories.clear()
+                            ContestRatedCategories.values().forEach {
+                                if (contest.name.contains(it.value)) contest.ratedCategories.add(it)
+                            }
+                            addContestToAllContests(contest = contest)
+
+                            if (contest.startTimeInMillis - TimeUtils.currentTimeInMillis() >
+                                TimeUtils.minutesToMillis(scheduleNotifBefore.value)
                             )
-                    }
+                                contestAlarmRepository.updateAlarm(
+                                    contest.getAlarmItem(scheduleNotifBefore.value)
+                                )
+                        }
 
-                    _screenState.update { it.copy(apiState = ApiState.Success) }
-                    Log.d(TAG, "Kontests - Got - Contest List")
+                        _screenState.update { it.copy(apiState = ApiState.Success) }
+                        Log.d(TAG, "Codeforces - Got - Contest List")
+                    } else {
+                        Log.e(TAG, "getContestListFromCodeforces: " + apiResult.comment.toString())
+                        _screenState.update {
+                            it.copy(apiState = ApiState.Failure(UiText.DynamicString("Something Went Wrong!")))
+                        }
+                    }
+                }
+
+            delay(1000)
+            // Load Gym Contests.
+            codeforcesRepository.getContestList(gym = true)
+                .catch {
+                    Log.e(TAG, "getContestListFromCodeforcesGym: ${it.cause}")
+                }
+                .collect { apiResult ->
+                    if (apiResult.status == "OK") {
+                        apiResult.result?.map {
+                            it.mapToCompetraceContest()
+                        }?.forEach { contest ->
+                            codeforcesDatabase.addContestToContestListById(contest = contest)
+                        }
+
+                        Log.d(TAG, "Codeforces - Got - Gym Contest List")
+                    } else {
+                        Log.e(TAG, "getContestListFromCodeforcesGym: " + apiResult.comment.toString())
+                    }
                 }
         }
     }
@@ -188,7 +240,7 @@ class ContestViewModel @Inject constructor(
     }
 
     init {
-        getContestListFromKontests()
+        getContestListFromCodeforces()
 
         viewModelScope.launch {
             val alarmsToDelete = mutableListOf<ContestAlarmItem>()

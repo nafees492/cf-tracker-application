@@ -68,20 +68,17 @@ fun CompetraceIconButton(
         verticalArrangement = Arrangement.Center,
         modifier = modifier
     ) {
-        CompetraceTooltipBox(text = contentDescription) {
-            IconButton(
-                onClick = onClick,
-                enabled = enabled,
-                colors = IconButtonDefaults.iconButtonColors(
-                    contentColor = iconColor
-                ),
-                modifier = Modifier.tooltipAnchor()
-            ) {
-                Icon(
-                    painter = painterResource(id = iconId),
-                    contentDescription = contentDescription
-                )
-            }
+        IconButton(
+            onClick = onClick,
+            enabled = enabled,
+            colors = IconButtonDefaults.iconButtonColors(
+                contentColor = iconColor
+            ),
+        ) {
+            Icon(
+                painter = painterResource(id = iconId),
+                contentDescription = contentDescription
+            )
         }
         text?.let {
             Text(

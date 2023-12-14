@@ -15,6 +15,7 @@ import com.gourav.competrace.progress.user_submissions.util.processUserSubmissio
 import com.gourav.competrace.app_core.util.UserSubmissionFilter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject

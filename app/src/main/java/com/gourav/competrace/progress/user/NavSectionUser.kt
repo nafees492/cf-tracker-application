@@ -14,7 +14,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.gourav.competrace.app_core.TrackScreen
-import com.gourav.competrace.app_core.ui.CompetraceAppState
+import com.gourav.competrace.CompetraceAppState
 import com.gourav.competrace.app_core.ui.components.CompetracePlatformRow
 import com.gourav.competrace.app_core.util.ApiState
 import com.gourav.competrace.app_core.util.Screens

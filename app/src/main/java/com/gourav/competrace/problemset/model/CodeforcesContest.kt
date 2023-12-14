@@ -24,6 +24,7 @@ data class CodeforcesContest(
 ) {
     private val gymOrContest = if(id > 100000) "gym" else "contest"
     private fun getLink() = "https://codeforces.com/$gymOrContest/$id"
+    private fun getRegistrationLink() = "https://codeforces.com/contestRegistration/$id"
 
     private fun startTimeInMillis() = startTimeSeconds?.toLong()?.times(1000L) ?: 0
     private fun durationInMillis() = durationSeconds?.toLong()?.times(1000L) ?: 0
@@ -35,6 +36,7 @@ data class CodeforcesContest(
         websiteUrl = this.getLink(),
         startTimeInMillis = this.startTimeInMillis(),
         durationInMillis = this.durationInMillis(),
-        site = Sites.Codeforces.name
+        site = Sites.Codeforces.title,
+        registrationUrl = this.getRegistrationLink()
     )
 }

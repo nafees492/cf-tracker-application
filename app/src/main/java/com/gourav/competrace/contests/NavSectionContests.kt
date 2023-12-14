@@ -22,11 +22,12 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.gourav.competrace.R
 import com.gourav.competrace.app_core.TrackScreen
-import com.gourav.competrace.app_core.ui.CompetraceAppState
+import com.gourav.competrace.CompetraceAppState
 import com.gourav.competrace.app_core.ui.FailureScreen
 import com.gourav.competrace.app_core.ui.components.CompetracePlatformRow
 import com.gourav.competrace.app_core.ui.components.CompetracePullRefreshIndicator
 import com.gourav.competrace.app_core.util.*
+import com.gourav.competrace.contests.model.CompetraceContest
 import com.gourav.competrace.contests.presentation.ContestScreenActions
 import com.gourav.competrace.contests.presentation.ContestViewModel
 import com.gourav.competrace.contests.presentation.UpcomingContestScreen
@@ -60,6 +61,31 @@ fun NavGraphBuilder.contests(
             onResult = { isGranted -> hasNotificationPermission = isGranted }
         )
 
+         val onClickNotificationIcon: (CompetraceContest) -> Unit = {
+             if (hasNotificationPermission)
+                 contestViewModel.toggleContestNotification(it)
+             else {
+                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                     permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                 }
+                 SnackbarManager.showMessageWithAction(
+                     message = UiText.StringResource(R.string.grant_permission_to_continue),
+                     actionLabel = UiText.StringResource(R.string.go_to_settings),
+                     action = {
+                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                             Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                                 putExtra(
+                                     Settings.EXTRA_APP_PACKAGE,
+                                     context.packageName
+                                 )
+                             }.also(context::startActivity)
+                         }
+                     }
+                 )
+             }
+        }
+
         LaunchedEffect(Unit) {
             TopAppBarManager.updateTopAppBar(
                 screen = Screens.ContestsScreen,
@@ -78,7 +104,7 @@ fun NavGraphBuilder.contests(
 
         val pullRefreshState = rememberPullRefreshState(
             refreshing = screenState.apiState == ApiState.Loading,
-            onRefresh = contestViewModel::getContestListFromKontests
+            onRefresh = contestViewModel::getContestListFromCodeforces
         )
 
         Column(Modifier.padding(bottom = paddingValues.calculateBottomPadding())) {
@@ -100,40 +126,18 @@ fun NavGraphBuilder.contests(
                     }
                     is ApiState.Failure -> {
                         FailureScreen(
-                            onClickRetry = contestViewModel::getContestListFromKontests,
+                            onClickRetry = contestViewModel::getContestListFromCodeforces,
                             errorMessage = apiState.message
                         )
                     }
                     is ApiState.Success -> {
                         UpcomingContestScreen(
                             state = screenState,
-                            onClickNotificationIcon = {
-                                if (hasNotificationPermission)
-                                    contestViewModel.toggleContestNotification(it)
-                                else {
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                                    }
-                                    SnackbarManager.showMessageWithAction(
-                                        message = UiText.StringResource(R.string.grant_permission_to_continue),
-                                        actionLabel = UiText.StringResource(R.string.go_to_settings),
-                                        action = {
-                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                                Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
-                                                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                                                    putExtra(
-                                                        Settings.EXTRA_APP_PACKAGE,
-                                                        context.packageName
-                                                    )
-                                                }.also(context::startActivity)
-                                            }
-                                        }
-                                    )
-                                }
-                            },
+                            onClickNotificationIcon = onClickNotificationIcon,
                         )
                     }
                 }
+
                 CompetracePullRefreshIndicator(
                     refreshing = screenState.apiState == ApiState.Loading,
                     state = pullRefreshState
