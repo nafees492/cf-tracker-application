@@ -7,12 +7,12 @@ plugins {
 }
 
 android {
-    compileSdk 33
+    compileSdk 35
 
     defaultConfig {
         applicationId "com.gourav.competrace"
         minSdk 23
-        targetSdk 33
+        targetSdk 35
         versionCode 8
         versionName "0.1.7"
 
@@ -158,8 +158,8 @@ dependencies {
     implementation("androidx.core:core-splashscreen:1.0.1")
 
     // In-App Update
-    implementation 'com.google.android.play:app-update:2.0.1'
-    implementation 'com.google.android.play:app-update-ktx:2.0.1'
+    implementation 'com.google.android.play:app-update:2.1.0'
+    implementation 'com.google.android.play:app-update-ktx:2.1.0'
 
     // In-App Review
     implementation 'com.google.android.play:review:2.0.1'
