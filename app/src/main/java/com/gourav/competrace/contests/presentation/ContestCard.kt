@@ -30,7 +30,7 @@ import com.gourav.competrace.app_core.ui.theme.RegistrationRed
 import com.gourav.competrace.app_core.util.*
 import java.sql.Time
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ContestCard(
     contest: CompetraceContest,

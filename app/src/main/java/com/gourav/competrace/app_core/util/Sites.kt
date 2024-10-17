@@ -14,7 +14,7 @@ enum class Sites(
 ) {
     Codeforces(
         title = "CodeForces",
-        iconId = R.drawable.logo_codeforces_white_96,
+        iconId = R.drawable.logo_codeforces_colored,
         true, true, true,
         contestsUrl = "https://codeforces.com/contests",
         problemSetUrl = "https://codeforces.com/problemset"

@@ -35,3 +35,29 @@ fun ExpandArrow(expanded: Boolean, modifier: Modifier = Modifier) {
         )
     }
 }
+
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+fun PlatformExpandArrow(expanded: Boolean, platformIcon: Int, modifier: Modifier = Modifier) {
+    AnimatedContent(
+        targetState = expanded,
+        transitionSpec = {
+            if (targetState) {
+                slideInVertically { height -> height } + fadeIn() with
+                        slideOutVertically { height -> -height } + fadeOut()
+            } else {
+                slideInVertically { height -> -height } + fadeIn() with
+                        slideOutVertically { height -> height } + fadeOut()
+            }.using(
+                SizeTransform(clip = false)
+            )
+        }
+    ) {
+        val iconId = if (it) R.drawable.ic_expand_less_24px else platformIcon
+        Icon(
+            painter = painterResource(id = iconId),
+            contentDescription = "Expandable Arrow",
+            modifier = modifier.size(24.dp)
+        )
+    }
+}

@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,6 +16,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gourav.competrace.R
 import com.gourav.competrace.CompetraceAppState
+import com.gourav.competrace.app_core.util.Sites
 import com.gourav.competrace.app_core.util.TopAppBarManager
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -30,10 +30,10 @@ fun CompetraceTopAppBar(
     val isConnected by appState.isConnectedToNetwork.collectAsStateWithLifecycle()
 
     val navigationIcon: @Composable (() -> Unit) = {
-        AnimatedContent(targetState = appState.shouldShowBottomBar) {
+        AnimatedContent(targetState = appState.shouldShowBottomBar, label = "") {
             if (it) {
                 IconButton(onClick = { appState.toggleIsPlatformsTabRowVisibleTo(!isPlatformTabRowVisible) }) {
-                    ExpandArrow(expanded = isPlatformTabRowVisible)
+                    PlatformExpandArrow(expanded = isPlatformTabRowVisible, platformIcon = Sites.Codeforces.iconId)
                 }
             } else {
                 CompetraceIconButton(
