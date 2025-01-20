@@ -5,7 +5,7 @@ Google Play - [Competrace](https://play.google.com/store/apps/details?id=com.gou
 Track Your Competitive Programming Progress with this App, which uses [KONTESTS API](https://kontests.net/api) and [Codeforces API](https://codeforces.com/apiHelp) to bring out useful information which is important to you.
 
 ## Features
-Get Information about Upcoming Contests and add them to your calendar. 
+Get Information about Upcoming Contests and add them to your calendar....
 
 Get the Problemset of Codeforces and filter problems according to the Rating Range and Tags easily.
 
